@@ -4,13 +4,8 @@ addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
-      - deadsnakes
-      - kalakris-cmake
     packages:
       - g++-4.8
-      - python3.5
-      - python3.5-dev
-      - python3.5-venv
       - libglu1-mesa-dev
       - libxxf86vm-dev 
       - cmake
@@ -19,10 +14,10 @@ matrix:
     - os: linux
       compiler: gcc-4.8
       script:
-        - CXXFLAGS=-DNANOVG_GL_NO_UNIFORMBUFFER=1 cmake -DNANOGUI_PYTHON_VERSION=3.5 -DPYTHON_INCLUDE_DIRS:PATH=/usr/include/python3.5m -DPYTHON_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libpython3.5m.so -DCMAKE_CXX_COMPILER=g++-4.8
+        - CXXFLAGS=-DNANOVG_GL_NO_UNIFORMBUFFER=1 cmake -DCMAKE_CXX_COMPILER=g++-4.8
         - make -j 2
     - os: osx
       compiler: clang
       script:
-        - cmake -DNANOGUI_PYTHON_VERSION=2.7
+        - cmake
         - make -j 2
