@@ -51,140 +51,146 @@ public:
     TestWindow( SDL_Window* pwindow, int rwidth, int rheight )
       : nanogui::Screen( pwindow, Eigen::Vector2i(rwidth, rheight), "SDL_gui Test")
       {
+        mProgress = nullptr;
         using namespace nanogui;
 
-        auto& nwindow = add<Window>("Button demo");
-        nwindow.setPosition(Vector2i(15, 15));
-        nwindow.setLayout(new GroupLayout());
+        {
+          auto& nwindow = add<Window>("Button demo");
+          nwindow.setPosition(Vector2i(15, 15));
+          nwindow.setLayout(new GroupLayout());
 
-        nwindow.add<Label>("Push buttons", "sans-bold");
-        nwindow.add<Button>("Plain button").withCallback([] { cout << "pushed!" << endl; } );
+          nwindow.add<Label>("Push buttons", "sans-bold");
+          nwindow.add<Button>("Plain button").withCallback([] { cout << "pushed!" << endl; } );
 
-        nwindow.add<Button>("Styled", ENTYPO_ICON_ROCKET).withCallback([] { cout << "pushed!" << endl; })
-                                                         .withBackgroundColor( Color(0, 0, 255, 25) );
+          nwindow.add<Button>("Styled", ENTYPO_ICON_ROCKET).withCallback([] { cout << "pushed!" << endl; })
+                                                           .withBackgroundColor( Color(0, 0, 255, 25) );
 
-        nwindow.add<Label>("Toggle buttons", "sans-bold");
-        nwindow.add<Button>("Toggle me").withFlags(Button::ToggleButton)
-                                        .withChangeCallback([](bool state) { cout << "Toggle button state: " << state << endl; });
+          nwindow.add<Label>("Toggle buttons", "sans-bold");
+          nwindow.add<Button>("Toggle me").withFlags(Button::ToggleButton)
+                                          .withChangeCallback([](bool state) { cout << "Toggle button state: " << state << endl; });
 
-        Window* window = &nwindow;
+          nwindow.add<Label>("Radio buttons", "sans-bold");
+          nwindow.add<Button>("Radio button 1").withFlags(Button::RadioButton);
 
-        new Label(window, "Radio buttons", "sans-bold");
-        auto button = new Button(window, "Radio button 1");
-        button->setFlags(Button::RadioButton);
-        button = new Button(window, "Radio button 2");
-        button->setFlags(Button::RadioButton);
+          nwindow.add<Button>("Radio button 2").withFlags(Button::RadioButton);
+          nwindow.add<Label>("A tool palette", "sans-bold");
 
-        new Label(window, "A tool palette", "sans-bold");
-        Widget *tools = new Widget(window);
-        tools->setLayout(new BoxLayout(Orientation::Horizontal,
-                                       Alignment::Middle, 0, 6));
+          auto& tools = nwindow.add<Widget>().withLayout<BoxLayout>(Orientation::Horizontal,
+                                                                    Alignment::Middle, 0, 6);
 
-        button = new ToolButton(tools, ENTYPO_ICON_CLOUD);
-        button = new ToolButton(tools, ENTYPO_ICON_FF);
-        button = new ToolButton(tools, ENTYPO_ICON_COMPASS);
-        button = new ToolButton(tools, ENTYPO_ICON_INSTALL);
+          tools.add<ToolButton>(ENTYPO_ICON_CLOUD);
+          tools.add<ToolButton>(ENTYPO_ICON_FF);
+          tools.add<ToolButton>(ENTYPO_ICON_COMPASS);
+          tools.add<ToolButton>(ENTYPO_ICON_INSTALL);
 
-        new Label(window, "Popup buttons", "sans-bold");
-        PopupButton *popupBtn = new PopupButton(window, "Popup", ENTYPO_ICON_EXPORT);
-        Popup *popup = popupBtn->popup();
-        popup->setLayout(new GroupLayout());
-        new Label(popup, "Arbitrary widgets can be placed here");
-        new CheckBox(popup, "A check box");
-        popupBtn = new PopupButton(popup, "Recursive popup", ENTYPO_ICON_FLASH);
-        popup = popupBtn->popup();
-        popup->setLayout(new GroupLayout());
-        new CheckBox(popup, "Another check box");
+          nwindow.add<Label>("Popup buttons", "sans-bold");
+          PopupButton& pButton = nwindow.add<PopupButton>("Popup", ENTYPO_ICON_EXPORT);
+          pButton.popup()->withLayout<GroupLayout>();
+          pButton.popup()->add<Label>("Arbitrary widgets can be placed here");
+          pButton.popup()->add<CheckBox>("A check box");
 
-        window = new Window(this, "Basic widgets");
-        window->setPosition(Vector2i(200, 15));
-        window->setLayout(new GroupLayout());
-
-        new Label(window, "Message dialog", "sans-bold");
-        tools = new Widget(window);
-        tools->setLayout(new BoxLayout(Orientation::Horizontal,
-                                       Alignment::Middle, 0, 6));
-        button = new Button(tools, "Info");
-        button->setCallback([&] {
-            auto dlg = new MessageDialog(this, MessageDialog::Type::Information, "Title", "This is an information message");
-            dlg->setCallback([](int result) { cout << "Dialog result: " << result << endl; });
-        });
-        button = new Button(tools, "Warn");
-        button->setCallback([&] {
-            auto dlg = new MessageDialog(this, MessageDialog::Type::Warning, "Title", "This is a warning message");
-            dlg->setCallback([](int result) { cout << "Dialog result: " << result << endl; });
-        });
-        button = new Button(tools, "Ask");
-        button->setCallback([&] {
-            auto dlg = new MessageDialog(this, MessageDialog::Type::Warning, "Title", "This is a question message", "Yes", "No", true);
-            dlg->setCallback([](int result) { cout << "Dialog result: " << result << endl; });
-        });
+          PopupButton& rPopupBtn = pButton.popup()->add<PopupButton>("Recursive popup", ENTYPO_ICON_FLASH);
+          rPopupBtn.popup()->withLayout<GroupLayout>();
+          rPopupBtn.popup()->add<CheckBox>("Another check box");
+        }
 
         std::vector<std::pair<int, std::string>>
             icons = loadImageDirectory(mNVGContext, "icons");
 
-        new Label(window, "Image panel & scroll panel", "sans-bold");
-        PopupButton *imagePanelBtn = new PopupButton(window, "Image Panel");
-        imagePanelBtn->setIcon(ENTYPO_ICON_FOLDER);
-        popup = imagePanelBtn->popup();
-        VScrollPanel *vscroll = new VScrollPanel(popup);
-        ImagePanel *imgPanel = new ImagePanel(vscroll);
-        imgPanel->setImages(icons);
-        popup->setFixedSize(Vector2i(245, 150));
+        {
+          auto& window = add<Window>("Basic widgets")
+                              .withPosition(Vector2i(200, 15))
+                              .withLayout<GroupLayout>();
+          window.add<Label>("Message dialog", "sans-bold");
+          auto& tools = window.add<Widget>()
+                                .withLayout<BoxLayout>(Orientation::Horizontal,
+                                                       Alignment::Middle, 0, 6);
+          tools.add<Button>("Info")
+                .withCallback([&] {
+              auto dlg = new MessageDialog(this, MessageDialog::Type::Information, "Title", "This is an information message");
+              dlg->setCallback([](int result) { cout << "Dialog result: " << result << endl; });
+            } );
+          tools.add<Button>("Warn")
+                .withCallback([&] {
+              auto dlg = new MessageDialog(this, MessageDialog::Type::Warning, "Title", "This is a warning message");
+              dlg->setCallback([](int result) { cout << "Dialog result: " << result << endl; });
+            });
+          tools.add<Button>("Ask")
+                .withCallback([&] {
+              auto dlg = new MessageDialog(this, MessageDialog::Type::Warning, "Title", "This is a question message", "Yes", "No", true);
+              dlg->setCallback([](int result) { cout << "Dialog result: " << result << endl; });
+            });
 
-        auto img_window = new Window(this, "Selected image");
-        img_window->setPosition(Vector2i(675, 15));
-        img_window->setLayout(new GroupLayout());
+          window.add<Label>("Image panel & scroll panel", "sans-bold");
+          PopupButton& imagePanelBtn = window.add<PopupButton>("Image Panel");
 
-        auto img = new ImageView(img_window);
-        img->setPolicy(ImageView::SizePolicy::Expand);
-        img->setFixedSize(Vector2i(300, 300));
-        img->setImage(icons[0].first);
-        imgPanel->setCallback([&, img, imgPanel, imagePanelBtn](int i) {
-            img->setImage(imgPanel->images()[i].first); cout << "Selected item " << i << endl;
-        });
-        auto img_cb = new CheckBox(img_window, "Expand",
-            [img](bool state) { if (state) img->setPolicy(ImageView::SizePolicy::Expand);
-                                else       img->setPolicy(ImageView::SizePolicy::Fixed); });
-        img_cb->setChecked(true);
+          imagePanelBtn.setIcon(ENTYPO_ICON_FOLDER);
+          auto* popup = imagePanelBtn.popup();
+          VScrollPanel& vscroll = popup->add<VScrollPanel>();
+          ImagePanel& imgPanel = vscroll.add<ImagePanel>();
+          imgPanel.setImages(icons);
+          popup->setFixedSize(Vector2i(245, 150));
 
-        new Label(window, "File dialog", "sans-bold");
-        tools = new Widget(window);
-        tools->setLayout(new BoxLayout(Orientation::Horizontal,
-                                       Alignment::Middle, 0, 6));
-        button = new Button(tools, "Open");
-        button->setCallback([&] {
-            cout << "File dialog result: " << file_dialog(
+          auto& img_window = add<Window>("Selected image");
+          img_window.withPosition(Vector2i(675, 15))
+                    .withLayout<GroupLayout>();
+
+          auto& img = img_window.add<ImageView>();
+          img.setPolicy(ImageView::SizePolicy::Expand);
+          img.setFixedSize(Vector2i(300, 300));
+          img.setImage(icons[0].first);
+          imgPanel.setCallback([&, img, imgPanel, imagePanelBtn](int i) mutable {
+              img.setImage(imgPanel.images()[i].first); cout << "Selected item " << i << endl;
+          });
+
+          auto& img_cb = img_window.add<CheckBox>( "Expand",
+              [&, img](bool state) mutable { if (state) img.setPolicy(ImageView::SizePolicy::Expand);
+                                   else                 img.setPolicy(ImageView::SizePolicy::Fixed); });
+          img_cb.setChecked(true);
+          window.add<Label>("File dialog", "sans-bold");
+          auto& tools2 = window.add<Widget>().withLayout<BoxLayout>( Orientation::Horizontal,
+                                                                     Alignment::Middle, 0, 6 );
+          tools2.add<Button>("Open")
+                .withCallback([&] {
+                    cout << "File dialog result: " << file_dialog(
                     { {"png", "Portable Network Graphics"}, {"txt", "Text file"} }, false) << endl;
-        });
-        button = new Button(tools, "Save");
-        button->setCallback([&] {
-            cout << "File dialog result: " << file_dialog(
-                    { {"png", "Portable Network Graphics"}, {"txt", "Text file"} }, true) << endl;
-        });
+              });
 
-        new Label(window, "Combo box", "sans-bold");
-        new ComboBox(window, { "Combo box item 1", "Combo box item 2", "Combo box item 3"});
-        new Label(window, "Check box", "sans-bold");
-        CheckBox *cb = new CheckBox(window, "Flag 1",
-            [](bool state) { cout << "Check box 1 state: " << state << endl; }
-        );
-        cb->setChecked(true);
-        cb = new CheckBox(window, "Flag 2",
-            [](bool state) { cout << "Check box 2 state: " << state << endl; }
-        );
-        new Label(window, "Progress bar", "sans-bold");
-        mProgress = new ProgressBar(window);
+          tools2.add<Button>("Save").withCallback([&] {
+              cout << "File dialog result: " << file_dialog(
+                      { {"png", "Portable Network Graphics"}, {"txt", "Text file"} }, true) << endl;
+          });
 
-        new Label(window, "Slider and text box", "sans-bold");
+          window.add<Label>("Combo box", "sans-bold");
+          window.add<ComboBox>(std::vector<std::string>{ "Combo box item 1", "Combo box item 2", "Combo box item 3"});
+          window.add<Label>("Check box", "sans-bold");
 
-        Widget *panel = new Widget(window);
-        panel->setLayout(new BoxLayout(Orientation::Horizontal,
-                                       Alignment::Middle, 0, 20));
+          auto& cb = window.add<CheckBox>("Flag 1",
+              [](bool state) { cout << "Check box 1 state: " << state << endl; }
+          );
+          cb.setChecked(true);
+          window.add<CheckBox>("Flag 2",
+              [](bool state) { cout << "Check box 2 state: " << state << endl; }
+          );
+          window.add<Label>("Progress bar", "sans-bold");
+          mProgress = &window.add<ProgressBar>();
 
-        Slider *slider = new Slider(panel);
-        slider->setValue(0.5f);
-        slider->setFixedWidth(80);
+          window.add<Label>("Slider and text box", "sans-bold");
+
+          auto& panel = window.add<Widget>().withLayout<BoxLayout>(Orientation::Horizontal,
+                                         Alignment::Middle, 0, 20);
+
+          auto& slider = panel.add<Slider>();
+          slider.setValue(0.5f);
+          slider.setFixedWidth(80);
+
+        }
+
+ /*
+
+
+
+
 
         TextBox *textBox = new TextBox(panel);
         textBox->setFixedSize(Vector2i(60, 25));
@@ -264,11 +270,11 @@ public:
         cobo->setFixedSize(Vector2i(100,20));
 
         new Label(window, "Color button :", "sans-bold");
-        popupBtn = new PopupButton(window, "", 0);
+        auto* popupBtn = new PopupButton(window, "", 0);
         popupBtn->setBackgroundColor(Color(255, 120, 0, 255));
         popupBtn->setFontSize(16);
         popupBtn->setFixedSize(Vector2i(100, 20));
-        popup = popupBtn->popup();
+        auto* popup = popupBtn->popup();
         popup->setLayout(new GroupLayout());
 
         ColorWheel *colorwheel = new ColorWheel(popup);
@@ -288,7 +294,7 @@ public:
                 popupBtn->setBackgroundColor(colorBtn->backgroundColor());
                 popupBtn->setPushed(false);
             }
-        });
+        });*/
 
         performLayout(mNVGContext);
     }
@@ -311,7 +317,12 @@ public:
 
     virtual void draw(NVGcontext *ctx) {
         // Animate the scrollbar
-        mProgress->setValue( 0.5f );
+        if( mProgress )
+        {
+          mProgress->setValue( mProgress->value() + 0.001f );
+          if( mProgress->value() >= 1.f )
+            mProgress->setValue( 0.f );
+        }
 
         // Draw the user interface
         Screen::draw(ctx);

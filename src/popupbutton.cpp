@@ -18,12 +18,12 @@ NAMESPACE_BEGIN(nanogui)
 
 PopupButton::PopupButton(Widget *parent, const std::string &caption,
                          int buttonIcon, int chevronIcon)
-    : Button(parent, caption, buttonIcon), mChevronIcon(chevronIcon) {
-
+    : Button(parent, caption, buttonIcon), mChevronIcon(chevronIcon)
+{
     setFlags(Flags::ToggleButton | Flags::PopupButton);
 
     Window *parentWindow = window();
-    mPopup = new Popup(parentWindow->parent(), window());
+    mPopup = &parentWindow->parent()->add<Popup>(window());
     mPopup->setSize(Vector2i(320, 250));
 }
 

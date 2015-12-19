@@ -223,6 +223,16 @@ public:
     /// Draw the widget (and all child widgets)
     virtual void draw(NVGcontext *ctx);
 
+    Widget& withPosition( const Vector2i& pos ) { setPosition( pos); return *this; }
+
+    template<typename LayoutClass,typename... Args>
+    Widget& withLayout( const Args&... args)
+    {
+      auto* layout = new LayoutClass( args... );
+      setLayout( layout );
+      return *this;
+    }
+
 protected:
     /// Free all resources used by the widget and any children
     virtual ~Widget();

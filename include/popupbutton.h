@@ -27,7 +27,7 @@ public:
     int chevronIcon() const { return mChevronIcon; }
 
     Popup *popup() { return mPopup; }
-    const Popup *popup() const { return mPopup; }
+    const Popup* popup() const { return mPopup; }
 
     virtual void draw(NVGcontext* ctx);
     virtual Vector2i preferredSize(NVGcontext *ctx) const;

@@ -71,6 +71,7 @@ public:
     Button& withFlags(int flags) { setFlags( flags); return *this; }
     Button& withChangeCallback(const std::function<void(bool)>& callback) { setChangeCallback( callback ); return *this; }
     Button& withBackgroundColor(const Color& color) { setBackgroundColor( color ); return *this; }
+    Button& withIcon(int icon) { setIcon( icon ); return *this; }
 
     /// Set the button group (for radio buttons)
     void setButtonGroup(const std::vector<Button *> &buttonGroup) { mButtonGroup = buttonGroup; }
