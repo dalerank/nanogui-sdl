@@ -86,10 +86,10 @@ elseif (APPLE)
   list(APPEND NANOGUISDL_EXTRA_LIBS ${cocoa_library} ${opengl_library} ${corevideo_library} ${iokit_library})
   list(APPEND LIBNANOGUISDL_EXTRA_SOURCE src/darwin.mm)
 elseif(CMAKE_SYSTEM MATCHES "Linux")
-  list(APPEND NANOGUISDL_EXTRA_LIBS GL Xxf86vm Xrandr Xinerama Xcursor Xi X11 pthread dl rt)
+  list(APPEND NANOGUISDL_EXTRA_LIBS GL Xxf86vm Xrandr Xinerama Xcursor Xi X11 pthread dl rt SDL2)
 endif()
 
-include_directories(ext/eigen ext/nanovg/src include ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(ext ext/eigen ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 # Run simple C converter to put font files into the data segment
 add_executable(bin2c resources/bin2c.c)
@@ -120,38 +120,37 @@ endif()
 # Compile main NanoGUI library
 add_library(nanogui ${NANOGUISDL_LIBRARY_TYPE}
   # Merge NanoVG into the NanoGUI library
-  ext/nanovg/src/nanovg.c
+  ext/nanovg/nanovg.c
   # Merge GLEW into the NanoGUI library (only if needed)
   ${LIBNANOGUISDL_EXTRA_SOURCE}
   # Fonts etc.
   nanogui_resources.cpp
-  include/nanogui/glutil.h src/glutil.cpp
-  include/nanogui/common.h src/common.cpp
-  include/nanogui/widget.h src/widget.cpp
-  include/nanogui/theme.h src/theme.cpp
-  include/nanogui/layout.h src/layout.cpp
-  include/nanogui/screen.h src/screen.cpp
-  include/nanogui/label.h src/label.cpp
-  include/nanogui/window.h src/window.cpp
-  include/nanogui/popup.h src/popup.cpp
-  include/nanogui/checkbox.h src/checkbox.cpp
-  include/nanogui/button.h src/button.cpp
-  include/nanogui/popupbutton.h src/popupbutton.cpp
-  include/nanogui/combobox.h src/combobox.cpp
-  include/nanogui/progressbar.h src/progressbar.cpp
-  include/nanogui/slider.h src/slider.cpp
-  include/nanogui/messagedialog.h src/messagedialog.cpp
-  include/nanogui/textbox.h src/textbox.cpp
-  include/nanogui/imagepanel.h src/imagepanel.cpp
-  include/nanogui/imageview.h src/imageview.cpp
-  include/nanogui/vscrollpanel.h src/vscrollpanel.cpp
-  include/nanogui/colorwheel.h src/colorwheel.cpp
-  include/nanogui/colorpicker.h src/colorpicker.cpp
-  include/nanogui/graph.h src/graph.cpp
-  include/nanogui/formhelper.h
-  include/nanogui/toolbutton.h
-  include/nanogui/opengl.h
-  include/nanogui/nanogui.h
+  include/common.h src/common.cpp
+  include/widget.h src/widget.cpp
+  include/theme.h src/theme.cpp
+  include/layout.h src/layout.cpp
+  include/screen.h src/screen.cpp
+  include/label.h src/label.cpp
+  include/window.h src/window.cpp
+  include/popup.h src/popup.cpp
+  include/checkbox.h src/checkbox.cpp
+  include/button.h src/button.cpp
+  include/popupbutton.h src/popupbutton.cpp
+  include/combobox.h src/combobox.cpp
+  include/progressbar.h src/progressbar.cpp
+  include/slider.h src/slider.cpp
+  include/messagedialog.h src/messagedialog.cpp
+  include/textbox.h src/textbox.cpp
+  include/imagepanel.h src/imagepanel.cpp
+  include/imageview.h src/imageview.cpp
+  include/vscrollpanel.h src/vscrollpanel.cpp
+  include/colorwheel.h src/colorwheel.cpp
+  include/colorpicker.h src/colorpicker.cpp
+  include/graph.h src/graph.cpp
+  include/formhelper.h
+  include/toolbutton.h
+  include/opengl.h
+  include/nanogui.h
 )
 
 # Compile/link flags for NanoGUI

@@ -10,10 +10,11 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#pragma once
+#ifndef __NGSDL_OPENGL_INCLUDE_H__
+#define __NGSDL_OPENGL_INCLUDE_H__
 
-#include <gui2/common.h>
-#include <SDL_opengl.h>
+#include <SDL/SDL_opengl.h>
+#include <include/common.h>
 #include <nanovg/nanovg.h>
 
 NAMESPACE_BEGIN(nanogui)
@@ -30,3 +31,5 @@ inline bool nvgIsFontIcon(int value) { return value >= 1024; }
 
 
 NAMESPACE_END(nanogui)
+
+#endif

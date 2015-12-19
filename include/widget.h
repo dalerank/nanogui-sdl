@@ -9,10 +9,10 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#ifndef __RRR_WIDGET_H__
-#define __RRR_WIDGET_H__
+#ifndef __NGSDL_WIDGET_H__
+#define __NGSDL_WIDGET_H__
 
-#include <gui2/object.h>
+#include <include/object.h>
 #include <vector>
 
 NAMESPACE_BEGIN(nanogui)
@@ -243,4 +243,4 @@ protected:
 
 NAMESPACE_END(nanogui)
 
-#endif
+#endif //__NGSDL_WIDGET_H__

@@ -11,10 +11,11 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#pragma once
+#ifndef __NGSDL_THEME_INCLUDE_H__
+#define __NGSDL_THEME_INCLUDE_H__
 
-#include <gui2/common.h>
-#include <gui2/object.h>
+#include <include/common.h>
+#include <include/object.h>
 
 NAMESPACE_BEGIN(nanogui)
 
@@ -73,3 +74,5 @@ protected:
 };
 
 NAMESPACE_END(nanogui)
+
+#endif

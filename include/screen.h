@@ -14,7 +14,7 @@
 #ifndef __RRR_SCREEN_H__
 #define __RRR_SCREEN_H__
 
-#include <gui2/widget.h>
+#include <include/widget.h>
 
 union SDL_Event;
 struct SDL_Window;

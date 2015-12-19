@@ -9,9 +9,9 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <gui2/label.h>
-#include <gui2/theme.h>
-#include <gui2/opengl.h>
+#include <include/label.h>
+#include <include/theme.h>
+#include <include/opengl.h>
 
 NAMESPACE_BEGIN(nanogui)
 

@@ -9,8 +9,8 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <gui2/combobox.h>
-#include <gui2/layout.h>
+#include <include/combobox.h>
+#include <include/layout.h>
 #include <cassert>
 
 NAMESPACE_BEGIN(nanogui)

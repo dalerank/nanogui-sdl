@@ -11,9 +11,9 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <gui2/colorpicker.h>
-#include <gui2/layout.h>
-#include <gui2/colorwheel.h>
+#include <include/colorpicker.h>
+#include <include/layout.h>
+#include <include/colorwheel.h>
 
 NAMESPACE_BEGIN(nanogui)
 

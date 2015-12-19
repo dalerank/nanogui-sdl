@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <gui2/window.h>
+#include <include/window.h>
 
 NAMESPACE_BEGIN(nanogui)
 

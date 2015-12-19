@@ -9,10 +9,10 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#ifndef __RRR_BUTTON_H__
-#define __RRR_BUTTON_H__
+#ifndef __NGSDL_BUTTON_H__
+#define __NGSDL_BUTTON_H__
 
-#include <gui2/widget.h>
+#include <include/widget.h>
 
 NAMESPACE_BEGIN(nanogui)
 
@@ -94,4 +94,4 @@ protected:
 
 NAMESPACE_END(nanogui)
 
-#endif //__RRR_BUTTON_H__
+#endif //__NGSDL_BUTTON_H__

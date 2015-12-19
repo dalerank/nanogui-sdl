@@ -9,12 +9,12 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <gui2/screen.h>
+#include <include/screen.h>
 #if defined(_WIN32)
 #include <windows.h>
 #endif
-#include <gui2/opengl.h>
-#include "SDL.h"
+#include <include/opengl.h>
+#include <SDL/SDL.h>
 #include <map>
 #include <thread>
 #include <chrono>

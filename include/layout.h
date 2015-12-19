@@ -13,8 +13,8 @@
 
 #pragma once
 
-#include <gui2/compat.h>
-#include <gui2/object.h>
+#include <include/compat.h>
+#include <include/object.h>
 #include <unordered_map>
 
 NAMESPACE_BEGIN(nanogui)

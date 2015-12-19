@@ -9,10 +9,10 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#ifndef __RRR_OBJECT_H__
-#define __RRR_OBJECT_H__
+#ifndef __NGSDL_OBJECT_H__
+#define __NGSDL_OBJECT_H__
 
-#include <gui2/common.h>
+#include <include/common.h>
 #include <atomic>
 
 NAMESPACE_BEGIN(nanogui)
@@ -168,4 +168,4 @@ private:
 
 NAMESPACE_END(nanogui)
 
-#endif //__RRR_OBJECT_H__
+#endif //__NGSDL_OBJECT_H__

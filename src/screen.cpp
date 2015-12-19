@@ -11,78 +11,106 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <gui2/screen.h>
-#include <gui2/theme.h>
-#include <gui2/opengl.h>
-#include <gui2/window.h>
-#include <gui2/popup.h>
+#include <include/screen.h>
+#include <include/theme.h>
+#include <include/opengl.h>
+#include <include/window.h>
+#include <include/popup.h>
 #include <iostream>
 #include <map>
 
 #ifndef GL_GLEXT_PROTOTYPES
-PFNGLACTIVETEXTUREPROC glActiveTexture;
-PFNGLCREATESHADERPROC glCreateShader;
-PFNGLSHADERSOURCEPROC glShaderSource ;
-PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv ;
-PFNGLCOMPILESHADERPROC glCompileShader ;
-PFNGLGETSHADERIVPROC glGetShaderiv ;
-PFNGLUSEPROGRAMPROC glUseProgram ;
-PFNGLUNIFORM1IPROC glUniform1i ;
-PFNGLUNIFORM1FPROC glUniform1f ;
-PFNGLUNIFORM2IPROC glUniform2i ;
-PFNGLUNIFORM2FPROC glUniform2f ;
-PFNGLUNIFORM3FPROC glUniform3f ;
-PFNGLUNIFORM4FPROC glUniform4f ;
-PFNGLUNIFORM4FVPROC glUniform4fv ;
-PFNGLCREATEPROGRAMPROC glCreateProgram ;
-PFNGLATTACHSHADERPROC glAttachShader ;
-PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog ;
-PFNGLLINKPROGRAMPROC glLinkProgram ;
-PFNGLGETPROGRAMIVPROC glGetProgramiv ;
-PFNGLGENVERTEXARRAYSPROC glGenVertexArrays ;
-PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog ;
-PFNGLBINDVERTEXARRAYPROC glBindVertexArray ;
-PFNGLBINDBUFFERPROC glBindBuffer ;
-PFNGLGETATTRIBLOCATIONPROC  glGetAttribLocation ;
-PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation ;
-PFNGLGENBUFFERSPROC  glGenBuffers ;
-PFNGLBINDATTRIBLOCATIONPROC glBindAttribLocation;
-PFNGLGETUNIFORMBLOCKINDEXPROC glGetUniformBlockIndex;
-PFNGLUNIFORMBLOCKBINDINGPROC glUniformBlockBinding;
-PFNGLBUFFERDATAPROC  glBufferData ;
-PFNGLDISABLEVERTEXATTRIBARRAYPROC  glDisableVertexAttribArray ;
-PFNGLENABLEVERTEXATTRIBARRAYPROC  glEnableVertexAttribArray ;
-PFNGLGETBUFFERSUBDATAPROC  glGetBufferSubData ;
-PFNGLVERTEXATTRIBPOINTERPROC  glVertexAttribPointer ;
-PFNGLDELETEBUFFERSPROC  glDeleteBuffers ;
-PFNGLBINDFRAMEBUFFERPROC  glBindFramebuffer ;
-PFNGLBINDRENDERBUFFERPROC  glBindRenderbuffer ;
-PFNGLRENDERBUFFERSTORAGEPROC  glRenderbufferStorage ;
-PFNGLDELETEVERTEXARRAYSPROC  glDeleteVertexArrays ;
-PFNGLDELETEPROGRAMPROC  glDeleteProgram ;
-PFNGLDELETESHADERPROC  glDeleteShader ;
-PFNGLGENRENDERBUFFERSPROC  glGenRenderbuffers ;
-PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC  glRenderbufferStorageMultisample ;
-PFNGLGENFRAMEBUFFERSPROC  glGenFramebuffers ;
-PFNGLFRAMEBUFFERRENDERBUFFERPROC  glFramebufferRenderbuffer ;
-PFNGLCHECKFRAMEBUFFERSTATUSPROC  glCheckFramebufferStatus ;
-PFNGLDELETERENDERBUFFERSPROC  glDeleteRenderbuffers ;
-PFNGLBLITFRAMEBUFFERPROC glBlitFramebuffer ;
+#ifdef WIN32
+  PFNGLACTIVETEXTUREPROC glActiveTexture;
+#else
+  typedef void (GLAPIENTRY *PFNGLGENVERTEXARRAYSPROC) (GLsizei n, GLuint* arrays);
+  typedef void (GLAPIENTRY *PFNGLGENVERTEXARRAYSPROC) (GLsizei n, GLuint* arrays);
+  typedef void (GLAPIENTRY * PFNGLBINDVERTEXARRAYPROC) (GLuint array);
+  typedef GLuint (GLAPIENTRY * PFNGLGETUNIFORMBLOCKINDEXPROC) (GLuint program, const GLchar* uniformBlockName);
+  typedef void (GLAPIENTRY * PFNGLUNIFORMBLOCKBINDINGPROC) (GLuint program, GLuint uniformBlockIndex, GLuint uniformBlockBinding);
+  typedef void (GLAPIENTRY * PFNGLBINDFRAMEBUFFERPROC) (GLenum target, GLuint framebuffer);
+  typedef void (GLAPIENTRY * PFNGLBINDRENDERBUFFERPROC) (GLenum target, GLuint renderbuffer);
+  typedef void (GLAPIENTRY * PFNGLRENDERBUFFERSTORAGEPROC) (GLenum target, GLenum internalformat, GLsizei width, GLsizei height);
+  typedef void (GLAPIENTRY * PFNGLDELETEVERTEXARRAYSPROC) (GLsizei n, const GLuint* arrays);
+  typedef void (GLAPIENTRY * PFNGLGENRENDERBUFFERSPROC) (GLsizei n, GLuint* renderbuffers);
+  typedef void (GLAPIENTRY * PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC) (GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height);
+  typedef void (GLAPIENTRY * PFNGLGENFRAMEBUFFERSPROC) (GLsizei n, GLuint* framebuffers);
+  typedef void (GLAPIENTRY * PFNGLFRAMEBUFFERRENDERBUFFERPROC) (GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
+  typedef GLenum (GLAPIENTRY * PFNGLCHECKFRAMEBUFFERSTATUSPROC) (GLenum target);
+  typedef void (GLAPIENTRY * PFNGLDELETERENDERBUFFERSPROC) (GLsizei n, const GLuint* renderbuffers);
+  typedef void (GLAPIENTRY * PFNGLBLITFRAMEBUFFERPROC) (GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
+  typedef void (GLAPIENTRY * PFNGLGENERATEMIPMAPPROC) (GLenum target);
+  typedef void (GLAPIENTRY * PFNGLBINDBUFFERRANGEPROC) (GLenum target, GLuint index, GLuint buffer, GLintptr offset, GLsizeiptr size);
+#endif
+  #ifndef GL_UNIFORM_BUFFER
+  #define GL_UNIFORM_BUFFER 0x8A11
+  #endif
 
-PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
-PFNGLBINDBUFFERRANGEPROC glBindBufferRange;
-PFNGLSTENCILOPSEPARATEPROC glStencilOpSeparate;
-PFNGLUNIFORM2FVPROC glUniform2fv;
+  #ifndef GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT
+  #define GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT 0x8A34
+  #endif
+
+  PFNGLCREATESHADERPROC glCreateShader;
+  PFNGLSHADERSOURCEPROC glShaderSource ;
+  PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv ;
+  PFNGLCOMPILESHADERPROC glCompileShader ;
+  PFNGLGETSHADERIVPROC glGetShaderiv ;
+  PFNGLUSEPROGRAMPROC glUseProgram ;
+  PFNGLUNIFORM1IPROC glUniform1i ;
+  PFNGLUNIFORM1FPROC glUniform1f ;
+  PFNGLUNIFORM2IPROC glUniform2i ;
+  PFNGLUNIFORM2FPROC glUniform2f ;
+  PFNGLUNIFORM3FPROC glUniform3f ;
+  PFNGLUNIFORM4FPROC glUniform4f ;
+  PFNGLUNIFORM4FVPROC glUniform4fv ;
+  PFNGLCREATEPROGRAMPROC glCreateProgram ;
+  PFNGLATTACHSHADERPROC glAttachShader ;
+  PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog ;
+  PFNGLLINKPROGRAMPROC glLinkProgram ;
+  PFNGLGETPROGRAMIVPROC glGetProgramiv ;
+  PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog ;
+  PFNGLGENVERTEXARRAYSPROC glGenVertexArrays ;
+  PFNGLBINDVERTEXARRAYPROC glBindVertexArray ;
+  PFNGLBINDBUFFERPROC glBindBuffer ;
+  PFNGLGETATTRIBLOCATIONPROC  glGetAttribLocation ;
+  PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation ;
+  PFNGLGENBUFFERSPROC  glGenBuffers ;
+  PFNGLBINDATTRIBLOCATIONPROC glBindAttribLocation;
+  PFNGLGETUNIFORMBLOCKINDEXPROC glGetUniformBlockIndex;
+  PFNGLUNIFORMBLOCKBINDINGPROC glUniformBlockBinding;
+  PFNGLBUFFERDATAPROC  glBufferData ;
+  PFNGLDISABLEVERTEXATTRIBARRAYPROC  glDisableVertexAttribArray ;
+  PFNGLENABLEVERTEXATTRIBARRAYPROC  glEnableVertexAttribArray ;
+  PFNGLGETBUFFERSUBDATAPROC  glGetBufferSubData ;
+  PFNGLVERTEXATTRIBPOINTERPROC  glVertexAttribPointer ;
+  PFNGLDELETEBUFFERSPROC  glDeleteBuffers ;
+  PFNGLBINDFRAMEBUFFERPROC  glBindFramebuffer ;
+  PFNGLBINDRENDERBUFFERPROC  glBindRenderbuffer ;
+  PFNGLRENDERBUFFERSTORAGEPROC  glRenderbufferStorage ;
+  PFNGLDELETEVERTEXARRAYSPROC  glDeleteVertexArrays ;
+  PFNGLDELETEPROGRAMPROC  glDeleteProgram ;
+  PFNGLDELETESHADERPROC  glDeleteShader ;
+  PFNGLGENRENDERBUFFERSPROC  glGenRenderbuffers ;
+  PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC  glRenderbufferStorageMultisample ;
+  PFNGLGENFRAMEBUFFERSPROC  glGenFramebuffers ;
+  PFNGLFRAMEBUFFERRENDERBUFFERPROC  glFramebufferRenderbuffer ;
+  PFNGLCHECKFRAMEBUFFERSTATUSPROC  glCheckFramebufferStatus ;
+  PFNGLDELETERENDERBUFFERSPROC  glDeleteRenderbuffers ;
+  PFNGLBLITFRAMEBUFFERPROC glBlitFramebuffer ;
+
+  PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
+  PFNGLBINDBUFFERRANGEPROC glBindBufferRange;
+  PFNGLSTENCILOPSEPARATEPROC glStencilOpSeparate;
+  PFNGLUNIFORM2FVPROC glUniform2fv;
 #endif
 
 /* Allow enforcing the GL2 implementation of NanoVG */
-#define NANOVG_GL3_IMPLEMENTATION
-#include <nanovg_gl.h>
-#include "SDL.h"
+#define NANOVG_GL2_IMPLEMENTATION
+#include <SDL2/SDL.h>
+#include <nanovg/nanovg_gl.h>
 
 NAMESPACE_BEGIN(nanogui)
 static bool __glInit = false;
-SDL_GLContext _glcontext;
 
 std::map<SDL_Window *, Screen *> __nanogui_screens;
 
@@ -92,8 +120,10 @@ static void __initGl()
    {
     __glInit = true;
  #ifndef GL_GLEXT_PROTOTYPES
-    #define ASSIGNGLFUNCTION(type,name) name = (type)wglGetProcAddress( #name );
+    #define ASSIGNGLFUNCTION(type,name) name = (type)SDL_GL_GetProcAddress( #name );
+#ifdef WIN32
     ASSIGNGLFUNCTION(PFNGLACTIVETEXTUREPROC,glActiveTexture)
+#endif
     ASSIGNGLFUNCTION(PFNGLCREATESHADERPROC,glCreateShader)
     ASSIGNGLFUNCTION(PFNGLSHADERSOURCEPROC,glShaderSource)
     ASSIGNGLFUNCTION(PFNGLUNIFORMMATRIX4FVPROC,glUniformMatrix4fv)
@@ -214,9 +244,9 @@ void Screen::initialize(SDL_Window* window)
     SDL_GetWindowSize( window, &mFBSize[0], &mFBSize[1]);
 
 #ifdef NDEBUG
-    mNVGContext = nvgCreateGL3(NVG_STENCIL_STROKES | NVG_ANTIALIAS);
+    mNVGContext = nvgCreateGL2(NVG_STENCIL_STROKES | NVG_ANTIALIAS);
 #else
-    mNVGContext = nvgCreateGL3(NVG_STENCIL_STROKES | NVG_ANTIALIAS | NVG_DEBUG);
+    mNVGContext = nvgCreateGL2(NVG_STENCIL_STROKES | NVG_ANTIALIAS | NVG_DEBUG);
 #endif
     if (mNVGContext == nullptr)
         throw std::runtime_error("Could not initialize NanoVG!");
@@ -236,7 +266,7 @@ Screen::~Screen()
 {
     __nanogui_screens.erase(_window);
     if (mNVGContext)
-        nvgDeleteGL3(mNVGContext);
+        nvgDeleteGL2(mNVGContext);
 }
 
 void Screen::setVisible(bool visible)

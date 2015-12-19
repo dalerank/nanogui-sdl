@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <gui2/popupbutton.h>
+#include <include/popupbutton.h>
 
 NAMESPACE_BEGIN(nanogui)
 

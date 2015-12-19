@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include <gui2/widget.h>
+#include <include/widget.h>
 
 NAMESPACE_BEGIN(nanogui)
 

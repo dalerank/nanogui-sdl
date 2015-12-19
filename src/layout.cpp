@@ -11,11 +11,11 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <gui2/layout.h>
-#include <gui2/widget.h>
-#include <gui2/window.h>
-#include <gui2/theme.h>
-#include <gui2/label.h>
+#include <include/layout.h>
+#include <include/widget.h>
+#include <include/window.h>
+#include <include/theme.h>
+#include <include/label.h>
 #include <numeric>
 
 NAMESPACE_BEGIN(nanogui)
