@@ -22,7 +22,7 @@ public:
     ComboBox(Widget *parent);
 
     /// Create a new combo box with the given items
-    ComboBox(Widget *parent, const std::vector<std::string> &items);
+    ComboBox(Widget *parent, const std::vector<std::string>& items={});
 
     /**
      * \brief Create a new combo box with the given items, providing both short and
@@ -41,6 +41,8 @@ public:
     void setItems(const std::vector<std::string> &items) { setItems(items, items); }
     const std::vector<std::string> &items() const { return mItems; }
     const std::vector<std::string> &itemsShort() const { return mItemsShort; }
+
+    ComboBox& withItems(const std::vector<std::string>& items) {setItems(items); return *this;}
 protected:
     std::vector<std::string> mItems, mItemsShort;
     std::function<void(int)> mCallback;

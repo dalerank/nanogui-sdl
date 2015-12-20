@@ -32,6 +32,8 @@ public:
     virtual bool mouseButtonEvent(const Vector2i &p, int button, bool down, int modifiers);
     virtual Vector2i preferredSize(NVGcontext *ctx) const;
     virtual void draw(NVGcontext* ctx);
+
+    ImagePanel& withImages(const Images& data ) { setImages(data); return *this; }
 protected:
     Vector2i gridSize() const;
     int indexForPosition(const Vector2i &p) const;

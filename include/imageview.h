@@ -32,6 +32,9 @@ public:
     void       setPolicy(SizePolicy policy) { mPolicy = policy; }
     SizePolicy policy() const { return mPolicy; }
 
+    ImageView& withPolicy(SizePolicy policy) { setPolicy(policy); return *this; }
+    ImageView& withImage(int img) { setImage(img); return *this; }
+
     virtual Vector2i preferredSize(NVGcontext *ctx) const;
     virtual void draw(NVGcontext* ctx);
 

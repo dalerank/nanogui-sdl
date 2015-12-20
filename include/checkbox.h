@@ -27,6 +27,8 @@ public:
     const bool &checked() const { return mChecked; }
     void setChecked(const bool &checked) { mChecked = checked; }
 
+    CheckBox& withChecked(bool value) { setChecked(value); return *this; }
+
     const bool &pushed() const { return mPushed; }
     void setPushed(const bool &pushed) { mPushed = pushed; }
 

@@ -33,6 +33,9 @@ public:
 
     std::function<void(int)> callback() const { return mCallback; }
     void setCallback(const std::function<void(int)> &callback) { mCallback = callback; }
+
+    MessageDialog& withCallback(const std::function<void(int)> &callback)
+    { setCallback( callback ); return *this; }
 protected:
     std::function<void(int)> mCallback;
     Label *mMessageLabel;

@@ -224,6 +224,8 @@ public:
     virtual void draw(NVGcontext *ctx);
 
     Widget& withPosition( const Vector2i& pos ) { setPosition( pos); return *this; }
+    Widget& withFontSize(int size) { setFontSize(size); return *this; }
+    Widget& withFixedSize(const Vector2i& size) { setFixedSize(size); return *this; }
 
     template<typename LayoutClass,typename... Args>
     Widget& withLayout( const Args&... args)

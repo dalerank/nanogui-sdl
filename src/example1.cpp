@@ -101,24 +101,27 @@ public:
           auto& window = add<Window>("Basic widgets")
                               .withPosition(Vector2i(200, 15))
                               .withLayout<GroupLayout>();
+
           window.add<Label>("Message dialog", "sans-bold");
           auto& tools = window.add<Widget>()
-                                .withLayout<BoxLayout>(Orientation::Horizontal,
+                              .withLayout<BoxLayout>(Orientation::Horizontal,
                                                        Alignment::Middle, 0, 6);
           tools.add<Button>("Info")
                 .withCallback([&] {
-              auto dlg = new MessageDialog(this, MessageDialog::Type::Information, "Title", "This is an information message");
-              dlg->setCallback([](int result) { cout << "Dialog result: " << result << endl; });
+              add<MessageDialog>(MessageDialog::Type::Information, "Title", "This is an information message")
+                    .withCallback([](int result) { cout << "Dialog result: " << result << endl; });
             } );
           tools.add<Button>("Warn")
-                .withCallback([&] {
-              auto dlg = new MessageDialog(this, MessageDialog::Type::Warning, "Title", "This is a warning message");
-              dlg->setCallback([](int result) { cout << "Dialog result: " << result << endl; });
-            });
+                .withCallback([&]
+              {
+                add<MessageDialog>(MessageDialog::Type::Warning, "Title", "This is a warning message")
+                      .withCallback([](int result) { cout << "Dialog result: " << result << endl; });
+              }
+          );
           tools.add<Button>("Ask")
                 .withCallback([&] {
-              auto dlg = new MessageDialog(this, MessageDialog::Type::Warning, "Title", "This is a question message", "Yes", "No", true);
-              dlg->setCallback([](int result) { cout << "Dialog result: " << result << endl; });
+              add<MessageDialog>(MessageDialog::Type::Warning, "Title", "This is a question message", "Yes", "No", true)
+                    .withCallback([](int result) { cout << "Dialog result: " << result << endl; });
             });
 
           window.add<Label>("Image panel & scroll panel", "sans-bold");
@@ -127,25 +130,26 @@ public:
           imagePanelBtn.setIcon(ENTYPO_ICON_FOLDER);
           auto* popup = imagePanelBtn.popup();
           VScrollPanel& vscroll = popup->add<VScrollPanel>();
-          ImagePanel& imgPanel = vscroll.add<ImagePanel>();
-          imgPanel.setImages(icons);
+          ImagePanel& imgPanel = vscroll.add<ImagePanel>()
+                                        .withImages(icons);
+
           popup->setFixedSize(Vector2i(245, 150));
 
           auto& img_window = add<Window>("Selected image");
           img_window.withPosition(Vector2i(675, 15))
                     .withLayout<GroupLayout>();
 
-          auto& img = img_window.add<ImageView>();
-          img.setPolicy(ImageView::SizePolicy::Expand);
+          auto& img = img_window.add<ImageView>()
+                                .withPolicy(ImageView::SizePolicy::Expand)
+                                .withImage(icons[0].first);
           img.setFixedSize(Vector2i(300, 300));
-          img.setImage(icons[0].first);
-          imgPanel.setCallback([&, img, imgPanel, imagePanelBtn](int i) mutable {
+          imgPanel.setCallback([&img, &imgPanel, &imagePanelBtn](int i) {
               img.setImage(imgPanel.images()[i].first); cout << "Selected item " << i << endl;
           });
 
           auto& img_cb = img_window.add<CheckBox>( "Expand",
-              [&, img](bool state) mutable { if (state) img.setPolicy(ImageView::SizePolicy::Expand);
-                                   else                 img.setPolicy(ImageView::SizePolicy::Fixed); });
+              [&img](bool state) { if (state) img.setPolicy(ImageView::SizePolicy::Expand);
+                                   else       img.setPolicy(ImageView::SizePolicy::Fixed); });
           img_cb.setChecked(true);
           window.add<Label>("File dialog", "sans-bold");
           auto& tools2 = window.add<Widget>().withLayout<BoxLayout>( Orientation::Horizontal,
@@ -177,125 +181,116 @@ public:
 
           window.add<Label>("Slider and text box", "sans-bold");
 
-          auto& panel = window.add<Widget>().withLayout<BoxLayout>(Orientation::Horizontal,
-                                         Alignment::Middle, 0, 20);
+          auto& panel = window.add<Widget>()
+                              .withLayout<BoxLayout>(Orientation::Horizontal,
+                                                     Alignment::Middle, 0, 20);
 
           auto& slider = panel.add<Slider>();
           slider.setValue(0.5f);
           slider.setFixedWidth(80);
 
-        }
-
- /*
-
-
-
-
-
-        TextBox *textBox = new TextBox(panel);
-        textBox->setFixedSize(Vector2i(60, 25));
-        textBox->setValue("50");
-        textBox->setUnits("%");
-        slider->setCallback([textBox](float value) {
-            textBox->setValue(std::to_string((int) (value * 100)));
-        });
-        slider->setFinalCallback([&](float value) {
-            cout << "Final slider value: " << (int) (value * 100) << endl;
-        });
-        textBox->setFixedSize(Vector2i(60,25));
-        textBox->setFontSize(20);
-        textBox->setAlignment(TextBox::Alignment::Right);
-
-        window = new Window(this,"Misc. widgets");
-        window->setPosition(Vector2i(425,15));
-        window->setLayout(new GroupLayout());
-        new Label(window,"Color wheel","sans-bold");
-        new ColorWheel(window);
-        new Label(window, "Function graph", "sans-bold");
-        Graph *graph = new Graph(window, "Some function");
-        graph->setHeader("E = 2.35e-3");
-        graph->setFooter("Iteration 89");
-        VectorXf &func = graph->values();
-        func.resize(100);
-        for (int i = 0; i < 100; ++i)
-            func[i] = 0.5f * (0.5f * std::sin(i / 10.f) +
-                              0.5f * std::cos(i / 23.f) + 1);
-
-        window = new Window(this, "Grid of small widgets");
-        window->setPosition(Vector2i(425, 288));
-        GridLayout *layout =
-            new GridLayout(Orientation::Horizontal, 2,
-                           Alignment::Middle, 15, 5);
-        layout->setColAlignment(
-            { Alignment::Maximum, Alignment::Fill });
-        layout->setSpacing(0, 10);
-        window->setLayout(layout);
-
-        {
-            new Label(window, "Floating point :", "sans-bold");
-            textBox = new TextBox(window);
-            textBox->setEditable(true);
-            textBox->setFixedSize(Vector2i(100, 20));
-            textBox->setValue("50");
-            textBox->setUnits("GiB");
-            textBox->setDefaultValue("0.0");
-            textBox->setFontSize(16);
-            textBox->setFormat("[-]?[0-9]*\\.?[0-9]+");
+          auto& textBox = panel.add<TextBox>();
+          textBox.setFixedSize(Vector2i(60, 25));
+          textBox.setValue("50");
+          textBox.setUnits("%");
+          slider.setCallback([&textBox](float value) {
+              textBox.setValue(std::to_string((int) (value * 100)));
+          });
+          slider.setFinalCallback([](float value) {
+              cout << "Final slider value: " << (int) (value * 100) << endl;
+          });
+          textBox.setFixedSize(Vector2i(60,25));
+          textBox.setFontSize(20);
+          textBox.setAlignment(TextBox::Alignment::Right);
         }
 
         {
-            new Label(window, "Positive integer :", "sans-bold");
-            textBox = new TextBox(window);
-            textBox->setEditable(true);
-            textBox->setFixedSize(Vector2i(100, 20));
-            textBox->setValue("50");
-            textBox->setUnits("Mhz");
-            textBox->setDefaultValue("0.0");
-            textBox->setFontSize(16);
-            textBox->setFormat("[1-9][0-9]*");
+          auto& window = add<Window>("Misc. widgets");
+          window.setPosition(Vector2i(425,15));
+          window.setLayout(new GroupLayout());
+          window.add<Label>("Color wheel","sans-bold");
+          window.add<ColorWheel>();
+          window.add<Label>("Function graph", "sans-bold");
+          Graph& graph = window.add<Graph>("Some function");
+          graph.setHeader("E = 2.35e-3");
+          graph.setFooter("Iteration 89");
+          VectorXf &func = graph.values();
+          func.resize(100);
+
+          for (int i = 0; i < 100; ++i)
+              func[i] = 0.5f * (0.5f * std::sin(i / 10.f) +
+                                0.5f * std::cos(i / 23.f) + 1);
+
+
         }
 
         {
-            new Label(window, "Checkbox :", "sans-bold");
+          auto& window = add<Window>("Grid of small widgets");
+          window.withPosition({425, 288});
+          auto* layout = new GridLayout(Orientation::Horizontal, 2,
+                                         Alignment::Middle, 15, 5);
+          layout->setColAlignment({ Alignment::Maximum, Alignment::Fill });
+          layout->setSpacing(0, 10);
+          window.setLayout(layout);
 
-            cb = new CheckBox(window, "Check me");
-            cb->setFontSize(16);
-            cb->setChecked(true);
+          window.add<Label>("Floating point :", "sans-bold");
+          auto& textBox = window.add<TextBox>();
+          textBox.setEditable(true);
+          textBox.setFixedSize(Vector2i(100, 20));
+          textBox.setValue("50");
+          textBox.setUnits("GiB");
+          textBox.setDefaultValue("0.0");
+          textBox.setFontSize(16);
+          textBox.setFormat("[-]?[0-9]*\\.?[0-9]+");
+
+          window.add<Label>("Positive integer :", "sans-bold");
+          auto& textBox2 = window.add<TextBox>();
+          textBox2.setEditable(true);
+          textBox2.setFixedSize(Vector2i(100, 20));
+          textBox2.setValue("50");
+          textBox2.setUnits("Mhz");
+          textBox2.setDefaultValue("0.0");
+          textBox2.setFontSize(16);
+          textBox2.setFormat("[1-9][0-9]*");
+
+          window.add<Label>( "Checkbox :", "sans-bold");
+
+          window.add<CheckBox>("Check me")
+                .withChecked(true)
+                .withFontSize(16);
+
+          window.add<Label>("Combo box :", "sans-bold");
+          window.add<ComboBox>()
+                .withItems(std::vector<std::string>{ "Item 1", "Item 2", "Item 3" })
+                .withFontSize(16)
+                .withFixedSize(Vector2i(100,20));
+
+          window.add<Label>("Color button :", "sans-bold");
+          auto& popupBtn = window.add<PopupButton>("", 0);
+          popupBtn.setBackgroundColor(Color(255, 120, 0, 255));
+          popupBtn.setFontSize(16);
+          popupBtn.setFixedSize(Vector2i(100, 20));
+          auto& popup = popupBtn.popup()->withLayout<GroupLayout>();
+
+          ColorWheel& colorwheel = popup.add<ColorWheel>();
+          colorwheel.setColor(popupBtn.backgroundColor());
+
+          Button& colorBtn = popup.add<Button>("Pick");
+          colorBtn.setFixedSize(Vector2i(100, 25));
+          Color c = colorwheel.color();
+          colorBtn.setBackgroundColor(c);
+
+          colorwheel.setCallback([&colorBtn](const Color &value) {
+              colorBtn.setBackgroundColor(value);
+          });
+
+          colorBtn.setChangeCallback([&colorBtn, &popupBtn](bool pushed) {
+              if (pushed) {
+                  popupBtn.setBackgroundColor(colorBtn.backgroundColor());
+                  popupBtn.setPushed(false);
+              }
+          });
         }
-
-        new Label(window, "Combo box :", "sans-bold");
-        ComboBox *cobo =
-            new ComboBox(window, { "Item 1", "Item 2", "Item 3" });
-        cobo->setFontSize(16);
-        cobo->setFixedSize(Vector2i(100,20));
-
-        new Label(window, "Color button :", "sans-bold");
-        auto* popupBtn = new PopupButton(window, "", 0);
-        popupBtn->setBackgroundColor(Color(255, 120, 0, 255));
-        popupBtn->setFontSize(16);
-        popupBtn->setFixedSize(Vector2i(100, 20));
-        auto* popup = popupBtn->popup();
-        popup->setLayout(new GroupLayout());
-
-        ColorWheel *colorwheel = new ColorWheel(popup);
-        colorwheel->setColor(popupBtn->backgroundColor());
-
-        Button *colorBtn = new Button(popup, "Pick");
-        colorBtn->setFixedSize(Vector2i(100, 25));
-        Color c = colorwheel->color();
-        colorBtn->setBackgroundColor(c);
-
-        colorwheel->setCallback([colorBtn](const Color &value) {
-            colorBtn->setBackgroundColor(value);
-        });
-
-        colorBtn->setChangeCallback([colorBtn, popupBtn](bool pushed) {
-            if (pushed) {
-                popupBtn->setBackgroundColor(colorBtn->backgroundColor());
-                popupBtn->setPushed(false);
-            }
-        });*/
-
         performLayout(mNVGContext);
     }
 
