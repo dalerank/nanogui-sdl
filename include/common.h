@@ -166,6 +166,17 @@ public:
 };
 
 
+inline Color::operator const NVGcolor &() const {
+    return reinterpret_cast<const NVGcolor &>(*this->data());
+}
+
+/// Determine whether an icon ID is a texture loaded via nvgImageIcon
+inline bool nvgIsImageIcon(int value) { return value < 1024; }
+
+/// Determine whether an icon ID is a font-based icon (e.g. from the entypo.ttf font)
+inline bool nvgIsFontIcon(int value) { return value >= 1024; }
+
+
 /* Forward declarations */
 template <typename T> class ref;
 class AdvancedGridLayout;
