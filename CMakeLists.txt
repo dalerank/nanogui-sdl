@@ -2,6 +2,10 @@ cmake_minimum_required (VERSION 2.8.3)
 
 project("NanoGUI-SDL")
 
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    set(CMAKE_CXX_FLAGS "-std=c++11")
+endif()
+
 if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ext/eigen/Eigen")
   message(FATAL_ERROR "The NanoGUI-SDL dependency repositories (Eigen, etc.) are missing! "
     "You probably did not clone the project with --recursive. It is possible to recover "

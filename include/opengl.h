@@ -19,6 +19,7 @@
 
 NAMESPACE_BEGIN(nanogui)
 
+/*
 inline Color::operator const NVGcolor &() const {
     return reinterpret_cast<const NVGcolor &>(*this->data());
 }
@@ -28,7 +29,7 @@ inline bool nvgIsImageIcon(int value) { return value < 1024; }
 
 /// Determine whether an icon ID is a font-based icon (e.g. from the entypo.ttf font)
 inline bool nvgIsFontIcon(int value) { return value >= 1024; }
-
+*/
 
 NAMESPACE_END(nanogui)
 
