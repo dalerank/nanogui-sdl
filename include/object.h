@@ -12,7 +12,7 @@
 #ifndef __NGSDL_OBJECT_H__
 #define __NGSDL_OBJECT_H__
 
-#include <include/common.h>
+#include <include/vector2.h>
 #include <atomic>
 
 NAMESPACE_BEGIN(nanogui)

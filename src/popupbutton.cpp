@@ -41,7 +41,7 @@ void PopupButton::draw(NVGcontext* ctx) {
     if (mChevronIcon) {
         auto icon = utf8(mChevronIcon);
         NVGcolor textColor =
-            mTextColor.w() == 0 ? mTheme->mTextColor : mTextColor;
+            mTextColor.a() == 0 ? mTheme->mTextColor : mTextColor;
 
         nvgFontSize(ctx, (mFontSize < 0 ? mTheme->mButtonFontSize : mFontSize) * 1.5f);
         nvgFontFace(ctx, "icons");

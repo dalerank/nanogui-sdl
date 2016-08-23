@@ -123,13 +123,13 @@ void Button::draw(NVGcontext *ctx) {
     nvgRoundedRect(ctx, mPos.x() + 1, mPos.y() + 1.0f, mSize.x() - 2,
                    mSize.y() - 2, mTheme->mButtonCornerRadius - 1);
 
-    if (mBackgroundColor.w() != 0) {
-        nvgFillColor(ctx, Color(mBackgroundColor.head<3>(), 1.f));
+    if (mBackgroundColor.a() != 0) {
+        nvgFillColor(ctx, mBackgroundColor.withAlpha(1.f));
         nvgFill(ctx);
         if (mPushed) {
             gradTop.a = gradBot.a = 0.8f;
         } else {
-            double v = 1 - mBackgroundColor.w();
+            double v = 1 - mBackgroundColor.a();
             gradTop.a = gradBot.a = mEnabled ? v : v * .5f + .5f;
         }
     }
@@ -160,7 +160,8 @@ void Button::draw(NVGcontext *ctx) {
     Vector2f center = mPos.cast<float>() + mSize.cast<float>() * 0.5f;
     Vector2f textPos(center.x() - tw * 0.5f, center.y() - 1);
     NVGcolor textColor =
-        mTextColor.w() == 0 ? mTheme->mTextColor : mTextColor;
+        mTextColor.a() == 0 ? mTheme->mTextColor : mTextColor;
+
     if (!mEnabled)
         textColor = mTheme->mDisabledTextColor;
 

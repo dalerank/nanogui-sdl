@@ -79,12 +79,12 @@ public:
     /// Return the width of the widget
     int width() const { return mSize.x(); }
     /// Set the width of the widget
-    void setWidth(int width) { mSize.x() = width; }
+    void setWidth(int width) { mSize.setX(width); }
 
     /// Return the height of the widget
     int height() const { return mSize.y(); }
     /// Set the height of the widget
-    void setHeight(int height) { mSize.y() = height; }
+    void setHeight(int height) { mSize.setY(height); }
 
     /**
      * \brief Set the fixed size of this widget
@@ -105,9 +105,9 @@ public:
     // Return the fixed height (see \ref setFixedSize())
     int fixedHeight() const { return mFixedSize.y(); }
     /// Set the fixed width (see \ref setFixedSize())
-    void setFixedWidth(int width) { mFixedSize.x() = width; }
+    void setFixedWidth(int width) { mFixedSize.setX(width); }
     /// Set the fixed height (see \ref setFixedSize())
-    void setFixedHeight(int height) { mFixedSize.y() = height; }
+    void setFixedHeight(int height) { mFixedSize.setY(height); }
 
     /// Return whether or not the widget is currently visible (assuming all parents are visible)
     bool visible() const { return mVisible; }
@@ -183,7 +183,7 @@ public:
 
     /// Check if the widget contains a certain position
     bool contains(const Vector2i &p) const {
-        auto d = (p-mPos).array();
+        auto d = p-mPos;
         return (d >= 0).all() && (d < mSize.array()).all();
     }
 

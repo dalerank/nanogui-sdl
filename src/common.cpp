@@ -14,7 +14,7 @@
 #include <windows.h>
 #endif
 #include <include/opengl.h>
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 #include <map>
 #include <thread>
 #include <chrono>

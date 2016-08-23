@@ -266,7 +266,7 @@ Color ColorWheel::color() const {
 }
 
 void ColorWheel::setColor(const Color &rgb) {
-    float r = rgb[0], g = rgb[1], b = rgb[2];
+    float r = rgb.r(), g = rgb.g(), b = rgb.b();
 
     float max = std::max({ r, g, b });
     float min = std::min({ r, g, b });
@@ -289,17 +289,17 @@ void ColorWheel::setColor(const Color &rgb) {
 
         mHue = h;
 
-        Eigen::Matrix<float, 4, 3> M;
+       /* Eigen::Matrix<float, 4, 3> M;
         M.topLeftCorner<3, 1>() = hue2rgb(h).head<3>();
         M(3, 0) = 1.;
         M.col(1) = Vector4f{ 0., 0., 0., 1. };
         M.col(2) = Vector4f{ 1., 1., 1., 1. };
 
-        Vector4f rgb4{ rgb[0], rgb[1], rgb[2], 1. };
+        Vector4f rgb4 = rgb.withAlpha(1);
         Vector3f bary = M.colPivHouseholderQr().solve(rgb4);
 
         mBlack = bary[1];
-        mWhite = bary[2];
+        mWhite = bary[2];*/
     }
 }
 

@@ -6,12 +6,6 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     set(CMAKE_CXX_FLAGS "-std=c++11")
 endif()
 
-if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ext/eigen/Eigen")
-  message(FATAL_ERROR "The NanoGUI-SDL dependency repositories (Eigen, etc.) are missing! "
-    "You probably did not clone the project with --recursive. It is possible to recover "
-    "by calling \"git submodule update --init --recursive\"")
-endif()
-
 option(NANOGUISDL_BUILD_EXAMPLE "Build NanoGUI example application?" ON)
 option(NANOGUISDL_BUILD_SHARED  "Build NanoGUI as a shared library?" ON)
 
@@ -155,6 +149,7 @@ add_library(nanogui ${NANOGUISDL_LIBRARY_TYPE}
   include/toolbutton.h
   include/opengl.h
   include/nanogui.h
+  include/vector2.h
 )
 
 # Compile/link flags for NanoGUI
