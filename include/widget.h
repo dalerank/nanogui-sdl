@@ -184,7 +184,7 @@ public:
     /// Check if the widget contains a certain position
     bool contains(const Vector2i &p) const {
         auto d = p-mPos;
-        return (d >= 0).all() && (d < mSize.array()).all();
+        return d.x() >= 0 && d.y() >= 0 && d.x() < mSize.x() && d.y() < mSize.y();
     }
 
     /// Determine the widget located at the given position value (recursive)

@@ -22,6 +22,9 @@ public:
   //! Copy constructor
   Vector2(const Vector2<T>& other) : _x(other._x), _y(other._y) {}
 
+  static Vector2 Constant(T v) { return Vector2(v,v); }
+  static Vector2 Zero() { return Vector2(0,0); }
+
   // operators
   Vector2<T> operator-() const { return Vector2<T>(-_x, -_y); }
 

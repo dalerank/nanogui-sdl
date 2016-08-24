@@ -152,9 +152,9 @@ public:
     int resolution() const { return mResolution; }
     void setResolution(int resolution) { mResolution = resolution; }
 
-    int spacing(int axis) const { return mSpacing[axis]; }
-    void setSpacing(int axis, int spacing) { mSpacing[axis] = spacing; }
-    void setSpacing(int spacing) { mSpacing[0] = mSpacing[1] = spacing; }
+    int spacingX() const { return mSpacing.x(); }
+    void setSpacingX(int spacing) { mSpacing.setX(spacing); }
+    void setSpacing(int spacing) { mSpacing.set(spacing, spacing); }
 
     int margin() const { return mMargin; }
     void setMargin(int margin) { mMargin = margin; }

@@ -270,7 +270,7 @@ std::string file_dialog(const std::vector<std::pair<std::string, std::string>> &
         ;
     pclose(output);
     std::string result(buffer);
-    result.erase(std::remove(result.begin(), result.end(), '\n'), result.end());
+    //result.erase(std::remove(result.begin(), result.end(), '\n'), result.end());
     return result;
 #endif
 }
