@@ -139,7 +139,7 @@ add_library(nanogui ${NANOGUISDL_LIBRARY_TYPE}
   include/screen.h src/screen.cpp
   include/label.h src/label.cpp
   include/window.h src/window.cpp
-  include/popup.h src/popup.cpp
+  src/picogui.cpp
   include/checkbox.h src/checkbox.cpp
   include/button.h src/button.cpp
   include/popupbutton.h src/popupbutton.cpp

@@ -31,6 +31,7 @@
 #include <include/colorwheel.h>
 #include <include/graph.h>
 #include <include/formhelper.h>
+#include <include/picogui.h>
 #if defined(_WIN32)
 #include <windows.h>
 #endif

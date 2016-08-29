@@ -10,6 +10,7 @@
 */
 
 #include <include/popupbutton.h>
+#include <include/picogui.h>
 #include <include/entypo.h>
 #include <include/theme.h>
 #include <include/opengl.h>

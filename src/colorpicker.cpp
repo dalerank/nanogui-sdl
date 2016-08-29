@@ -13,6 +13,7 @@
 
 #include <include/colorpicker.h>
 #include <include/layout.h>
+#include <include/picogui.h>
 #include <include/colorwheel.h>
 
 NAMESPACE_BEGIN(nanogui)

@@ -10,6 +10,7 @@
 */
 
 #include <include/combobox.h>
+#include <include/picogui.h>
 #include <include/layout.h>
 #include <cassert>
 
