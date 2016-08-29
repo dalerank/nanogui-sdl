@@ -12,7 +12,7 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <include/window.h>
+#include <include/picogui.h>
 #include <include/screen.h>
 #include <include/textbox.h>
 #include <include/opengl.h>

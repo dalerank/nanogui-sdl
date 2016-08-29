@@ -15,7 +15,7 @@
 #pragma once
 
 #include <include/compat.h>
-#include <include/widget.h>
+#include <include/picogui.h>
 #include <sstream>
 
 NAMESPACE_BEGIN(nanogui)

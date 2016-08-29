@@ -14,9 +14,8 @@
 
 #include <include/screen.h>
 #include <include/label.h>
-#include <include/checkbox.h>
+#include <include/picogui.h>
 #include <include/textbox.h>
-#include <include/combobox.h>
 #include <include/colorpicker.h>
 #include <include/layout.h>
 #include <cassert>

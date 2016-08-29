@@ -12,17 +12,10 @@
 */
 
 #include <include/screen.h>
-#include <include/window.h>
 #include <include/layout.h>
 #include <include/label.h>
-#include <include/checkbox.h>
-#include <include/button.h>
 #include <include/toolbutton.h>
-#include <include/popupbutton.h>
-#include <include/combobox.h>
 #include <include/progressbar.h>
-#include <include/entypo.h>
-#include <include/messagedialog.h>
 #include <include/textbox.h>
 #include <include/imagepanel.h>
 #include <include/imageview.h>

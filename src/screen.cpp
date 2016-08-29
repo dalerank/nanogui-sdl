@@ -11,11 +11,9 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <include/widget.h>
 #include <include/opengl.h>
 #include <include/screen.h>
 #include <include/theme.h>
-#include <include/window.h>
 #include <include/picogui.h>
 #include <iostream>
 #include <map>

@@ -14,7 +14,7 @@
 #ifndef __RRR_SCREEN_H__
 #define __RRR_SCREEN_H__
 
-#include <include/widget.h>
+#include <include/picogui.h>
 
 union SDL_Event;
 struct SDL_Window;

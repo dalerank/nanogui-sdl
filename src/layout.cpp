@@ -12,8 +12,6 @@
 */
 
 #include <include/layout.h>
-#include <include/widget.h>
-#include <include/window.h>
 #include <include/theme.h>
 #include <include/label.h>
 #include <numeric>

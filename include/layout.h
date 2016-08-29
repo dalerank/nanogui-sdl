@@ -14,7 +14,7 @@
 #pragma once
 
 #include <include/compat.h>
-#include <include/object.h>
+#include <include/picogui.h>
 #include <unordered_map>
 
 NAMESPACE_BEGIN(nanogui)
