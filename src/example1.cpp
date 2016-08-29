@@ -17,7 +17,6 @@
 #include <include/toolbutton.h>
 #include <include/progressbar.h>
 #include <include/textbox.h>
-#include <include/imagepanel.h>
 #include <include/vscrollpanel.h>
 #include <include/graph.h>
 #include <include/formhelper.h>

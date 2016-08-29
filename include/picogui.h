@@ -1085,6 +1085,36 @@ protected:
     SizePolicy mPolicy;
 };
 
+class NANOGUI_EXPORT ImagePanel : public Widget {
+public:
+    typedef std::vector<std::pair<int, std::string>> Images;
+public:
+    ImagePanel(Widget *parent);
+
+    void setImages(const Images &data) { mImages = data; }
+    const Images& images() const { return mImages; }
+
+    std::function<void(int)> callback() const { return mCallback; }
+    void setCallback(const std::function<void(int)> &callback) { mCallback = callback; }
+
+    virtual bool mouseMotionEvent(const Vector2i &p, const Vector2i &rel, int button, int modifiers);
+    virtual bool mouseButtonEvent(const Vector2i &p, int button, bool down, int modifiers);
+    virtual Vector2i preferredSize(NVGcontext *ctx) const;
+    virtual void draw(NVGcontext* ctx);
+
+    ImagePanel& withImages(const Images& data ) { setImages(data); return *this; }
+protected:
+    Vector2i gridSize() const;
+    int indexForPosition(const Vector2i &p) const;
+protected:
+    Images mImages;
+    std::function<void(int)> mCallback;
+    int mThumbSize;
+    int mSpacing;
+    int mMargin;
+    int mMouseIndex;
+};
+
 NAMESPACE_END(nanogui)
 
 #endif
