@@ -20,7 +20,6 @@
 #include <include/imagepanel.h>
 #include <include/imageview.h>
 #include <include/vscrollpanel.h>
-#include <include/colorwheel.h>
 #include <include/graph.h>
 #include <include/formhelper.h>
 #include <include/picogui.h>
