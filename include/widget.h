@@ -14,6 +14,7 @@
 
 #include <include/object.h>
 #include <vector>
+#include <functional>
 
 NAMESPACE_BEGIN(nanogui)
 

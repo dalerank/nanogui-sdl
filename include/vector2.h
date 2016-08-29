@@ -266,6 +266,16 @@ public:
     }
   }
 
+  T& seq(int index)
+  {
+    return index == 0 ? _x : _y;
+  }
+
+  const T& seq(int index) const
+  {
+    return index == 0 ? _x : _y;
+  }
+
   //! Creates an interpolated vector between this vector and another vector.
   /** \param other The other vector to interpolate with.
   \param d Interpolation value between 0.0f (all the other vector) and 1.0f (all this vector).
@@ -295,6 +305,21 @@ public:
                         (T)(_y * mul0 + v2.Y * mul1 + v3.Y * mul2));
   }
 
+  Vector2<T> cwiseMax(T rx, T ry) const
+  {
+      return Vector2<T>(std::max(x(), rx), std::max(y(), ry));
+  }
+
+  Vector2<T> cwiseMax(const Vector2<T>& o) const
+  {
+      return Vector2<T>(std::max(x(), o.x()), std::max(y(), o.y()));
+  }
+
+  Vector2<T> cwiseMin(const Vector2<T>& o) const
+  {
+      return Vector2<T>(std::min(x(), o.x()), std::min(y(), o.y()));
+  }
+
   //! Sets this vector to the linearly interpolated vector between a and b.
   /** \param a first vector to interpolate with, maximum at 1.0f
   \param b second vector to interpolate with, maximum at 0.0f
@@ -316,6 +341,9 @@ public:
 
   inline void setX( T xv ) { _x = xv; }
   inline void setY( T yv ) { _y = yv; }
+
+  template <class B>
+  inline Vector2<B> cast() const { return Vector2<B>(static_cast<B>(x()), static_cast<B>(y())); }
 
 protected:
   //! X coordinate of vector.

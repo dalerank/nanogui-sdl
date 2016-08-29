@@ -15,6 +15,8 @@
 
 NAMESPACE_BEGIN(nanogui)
 
+typedef std::vector<float> VectorXf;
+
 class NANOGUI_EXPORT Graph : public Widget {
 public:
     Graph(Widget *parent, const std::string &caption = "Untitled");

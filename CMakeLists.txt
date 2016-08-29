@@ -8,6 +8,7 @@ endif()
 
 option(NANOGUISDL_BUILD_EXAMPLE "Build NanoGUI example application?" ON)
 option(NANOGUISDL_BUILD_SHARED  "Build NanoGUI as a shared library?" ON)
+option(NANOGUISDL_BUILD_EXAMPLESDL  "Build NanoGUI examples with SDL2?" ON)
 
 # Required libraries for linking against nanogui (all targets)
 set(NANOGUISDL_EXTRA_LIBS "")
@@ -73,8 +74,16 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
   add_definitions( -DEIGEN_DONT_ALIGN )
 endif()
 
+if(NANOGUISDL_BUILD_EXAMPLESDL)
+  set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+
+  find_package(SDL2 REQUIRED)
+
+  list(APPEND NANOGUISDL_EXTRA_LIBS ${SDL2_LIBRARY})
+ endif()
+
 # Required core libraries on various platforms
-if (WIN32)
+if (WIN32) 
   list(APPEND NANOGUISDL_EXTRA_LIBS opengl32)
 elseif (APPLE)
   find_library(cocoa_library Cocoa)
@@ -84,10 +93,10 @@ elseif (APPLE)
   list(APPEND NANOGUISDL_EXTRA_LIBS ${cocoa_library} ${opengl_library} ${corevideo_library} ${iokit_library})
   list(APPEND LIBNANOGUISDL_EXTRA_SOURCE src/darwin.mm)
 elseif(CMAKE_SYSTEM MATCHES "Linux")
-  list(APPEND NANOGUISDL_EXTRA_LIBS GL Xxf86vm Xrandr Xinerama Xcursor Xi X11 pthread dl rt SDL2)
+  list(APPEND NANOGUISDL_EXTRA_LIBS GL Xxf86vm Xrandr Xinerama Xcursor Xi X11 pthread dl rt)
 endif()
 
-include_directories(ext ext/eigen ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(ext ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 # Run simple C converter to put font files into the data segment
 add_executable(bin2c resources/bin2c.c)
@@ -152,6 +161,7 @@ add_library(nanogui ${NANOGUISDL_LIBRARY_TYPE}
   include/vector2.h
 )
 
+message(${NANOGUISDL_EXTRA_LIBS})
 # Compile/link flags for NanoGUI
 set_property(TARGET nanogui APPEND PROPERTY COMPILE_DEFINITIONS "NANOGUI_BUILD ")
 
@@ -203,6 +213,7 @@ endif()
 if(NANOGUISDL_BUILD_EXAMPLE)
   add_executable(example1 src/example1.cpp)
   add_executable(example2 src/example2.cpp)
+
   target_link_libraries(example1 nanogui ${NANOGUI_EXTRA_LIBS})
   target_link_libraries(example2 nanogui ${NANOGUI_EXTRA_LIBS})
 

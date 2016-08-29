@@ -49,7 +49,7 @@ class TestWindow : public nanogui::Screen
 {
 public:
     TestWindow( SDL_Window* pwindow, int rwidth, int rheight )
-      : nanogui::Screen( pwindow, Eigen::Vector2i(rwidth, rheight), "SDL_gui Test")
+      : nanogui::Screen( pwindow, Vector2i(rwidth, rheight), "SDL_gui Test")
       {
         mProgress = nullptr;
         using namespace nanogui;
@@ -230,7 +230,7 @@ public:
           auto* layout = new GridLayout(Orientation::Horizontal, 2,
                                          Alignment::Middle, 15, 5);
           layout->setColAlignment({ Alignment::Maximum, Alignment::Fill });
-          layout->setSpacing(0, 10);
+          layout->setSpacing(Vector2i(0, 10));
           window.setLayout(layout);
 
           window.add<Label>("Floating point :", "sans-bold");

@@ -14,8 +14,6 @@
 #include <include/colorwheel.h>
 #include <include/theme.h>
 #include <nanovg/nanovg.h>
-#include <Eigen/QR>
-#include <Eigen/Geometry>
 
 NAMESPACE_BEGIN(nanogui)
 
@@ -25,7 +23,7 @@ ColorWheel::ColorWheel(Widget *parent, const Color& rgb)
 }
 
 Vector2i ColorWheel::preferredSize(NVGcontext *) const {
-    return { 100, 100. };
+    return Vector2i(100, 100.);
 }
 
 void ColorWheel::draw(NVGcontext *ctx) {
@@ -197,7 +195,8 @@ ColorWheel::Region ColorWheel::adjustPosition(const Vector2i &p, Region consider
     float bx = std::cos(-120.0f/180.0f*NVG_PI) * r;
     float by = std::sin(-120.0f/180.0f*NVG_PI) * r;
 
-    typedef Eigen::Matrix<float,2,2>        Matrix2f;
+    /* TODO UNIMPLEMENTED
+     * typedef Eigen::Matrix<float,2,2>        Matrix2f;
 
     Eigen::Matrix<float, 2, 3> triangle;
     triangle << ax,bx,r,
@@ -229,7 +228,7 @@ ColorWheel::Region ColorWheel::adjustPosition(const Vector2i &p, Region consider
         if (mCallback)
             mCallback(color());
         return InnerTriangle;
-    }
+    } */
 
     return None;
 }
@@ -268,8 +267,8 @@ Color ColorWheel::color() const {
 void ColorWheel::setColor(const Color &rgb) {
     float r = rgb.r(), g = rgb.g(), b = rgb.b();
 
-    float max = std::max({ r, g, b });
-    float min = std::min({ r, g, b });
+    float max = std::max(std::max(r, g), b);
+    float min = std::min(std::min(r, g), b);
     float l = (max + min) / 2;
 
     if (max == min) {

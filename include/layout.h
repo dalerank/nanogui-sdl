@@ -155,6 +155,7 @@ public:
     int spacingX() const { return mSpacing.x(); }
     void setSpacingX(int spacing) { mSpacing.setX(spacing); }
     void setSpacing(int spacing) { mSpacing.set(spacing, spacing); }
+    void setSpacing(const Vector2i& sp) { mSpacing = sp; }
 
     int margin() const { return mMargin; }
     void setMargin(int margin) { mMargin = margin; }

@@ -240,8 +240,8 @@ void Screen::onEvent(SDL_Event& event)
 void Screen::initialize(SDL_Window* window)
 {
     _window = window;    
-    SDL_GetWindowSize( window, &mSize[0], &mSize[1]);
-    SDL_GetWindowSize( window, &mFBSize[0], &mFBSize[1]);
+    SDL_GetWindowSize( window, &mSize.rx(), &mSize.ry());
+    SDL_GetWindowSize( window, &mFBSize.rx(), &mFBSize.ry());
 
 #ifdef NDEBUG
     mNVGContext = nvgCreateGL2(NVG_STENCIL_STROKES | NVG_ANTIALIAS);
@@ -258,7 +258,7 @@ void Screen::initialize(SDL_Window* window)
     mDragActive = false;
     mLastInteraction = SDL_GetTicks();
     mProcessEvents = true;
-    mBackground = Vector3f(0.3f, 0.3f, 0.32f);
+    mBackground = Color(0.3f, 0.3f, 0.32f, 1.f);
     __nanogui_screens[_window] = this;
 }
 
@@ -310,12 +310,12 @@ void Screen::drawWidgets()
 
     //SDL_GL_MakeCurrent( _window, _glcontext );
     //glfwGetFramebufferSize(mGLFWWindow, &mFBSize[0], &mFBSize[1]);
-    SDL_GetWindowSize( _window, &mSize[0], &mSize[1]);
-    glViewport(0, 0, mFBSize[0], mFBSize[1]);
+    SDL_GetWindowSize( _window, &mSize.rx(), &mSize.ry());
+    glViewport(0, 0, mFBSize.x(), mFBSize.y());
 
     /* Calculate pixel ratio for hi-dpi devices. */
-    mPixelRatio = (float) mFBSize[0] / (float) mSize[0];
-    nvgBeginFrame(mNVGContext, mSize[0], mSize[1], mPixelRatio);
+    mPixelRatio = (float) mFBSize.x() / (float) mSize.x();
+    nvgBeginFrame(mNVGContext, mSize.x(), mSize.y(), mPixelRatio);
 
     draw(mNVGContext);
 
@@ -524,7 +524,7 @@ bool Screen::resizeCallbackEvent(int, int)
 {
     Vector2i fbSize, size;
     //glfwGetFramebufferSize(mGLFWWindow, &fbSize[0], &fbSize[1]);
-    SDL_GetWindowSize(_window, &size[0], &size[1]);
+    SDL_GetWindowSize(_window, &size.rx(), &size.ry());
 
     if (mFBSize == Vector2i(0, 0) || size == Vector2i(0, 0))
         return false;
@@ -564,8 +564,16 @@ void Screen::updateFocus(Widget *widget) {
 }
 
 void Screen::disposeWindow(Window *window) {
-    if (std::find(mFocusPath.begin(), mFocusPath.end(), window) != mFocusPath.end())
+    auto it=mFocusPath.begin();
+    for(; it != mFocusPath.end(); ++it)
+    {
+        if (*it == window)
+                break;
+    }
+
+    if (it != mFocusPath.end())
         mFocusPath.clear();
+
     if (mDragWidget == window)
         mDragWidget = nullptr;
     removeChild(window);
@@ -580,7 +588,11 @@ void Screen::centerWindow(Window *window) {
 }
 
 void Screen::moveWindowToFront(Window *window) {
-    mChildren.erase(std::remove(mChildren.begin(), mChildren.end(), window), mChildren.end());
+    for (auto it=mChildren.begin(); it != mChildren.end();)
+    {
+        if(*it == window) it = mChildren.erase(it);
+        else ++it;
+    }
     mChildren.push_back(window);
     /* Brute force topological sort (no problem for a few windows..) */
     bool changed = false;

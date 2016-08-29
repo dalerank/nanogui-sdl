@@ -101,7 +101,7 @@ int main(int /* argc */, char ** /* argv */)
 
     bool enabled = true;
     FormHelper *gui = new FormHelper(screen);
-    ref<Window> rwindow = gui->addWindow(Eigen::Vector2i(10, 10), "Form helper example");
+    ref<Window> rwindow = gui->addWindow(Vector2i(10, 10), "Form helper example");
     gui->addGroup("Basic types");
     gui->addVariable("bool", bvar);
     gui->addVariable("string", strval);

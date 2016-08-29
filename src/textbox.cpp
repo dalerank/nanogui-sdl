@@ -57,14 +57,14 @@ Vector2i TextBox::preferredSize(NVGcontext *ctx) const {
     if (mUnitsImage > 0) {
         int w, h;
         nvgImageSize(ctx, mUnitsImage, &w, &h);
-        float uh = size(1) * 0.4f;
+        float uh = size.y() * 0.4f;
         uw = w * uh / h;
     } else if (!mUnits.empty()) {
         uw = nvgTextBounds(ctx, 0, 0, mUnits.c_str(), nullptr, nullptr);
     }
 
     float ts = nvgTextBounds(ctx, 0, 0, mValue.c_str(), nullptr, nullptr);
-    size(0) = size(1) + ts + uw;
+    size.rx() = size.y() + ts + uw;
     return size;
 }
 
@@ -133,15 +133,15 @@ void TextBox::draw(NVGcontext* ctx) {
     switch (mAlignment) {
         case Alignment::Left:
             nvgTextAlign(ctx, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
-            drawPos.x() += xSpacing;
+            drawPos.rx() += xSpacing;
             break;
         case Alignment::Right:
             nvgTextAlign(ctx, NVG_ALIGN_RIGHT | NVG_ALIGN_MIDDLE);
-            drawPos.x() += mSize.x() - unitWidth - xSpacing;
+            drawPos.rx() += mSize.x() - unitWidth - xSpacing;
             break;
         case Alignment::Center:
             nvgTextAlign(ctx, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-            drawPos.x() += mSize.x() * 0.5f;
+            drawPos.rx() += mSize.x() * 0.5f;
             break;
     }
 
@@ -157,7 +157,7 @@ void TextBox::draw(NVGcontext* ctx) {
     nvgScissor(ctx, clipX, clipY, clipWidth, clipHeight);
 
     Vector2i oldDrawPos(drawPos);
-    drawPos.x() += mTextOffset;
+    drawPos.rx() += mTextOffset;
 
     if (mCommitted) {
         nvgText(ctx, drawPos.x(), drawPos.y(), mValue.c_str(), nullptr);
@@ -186,7 +186,7 @@ void TextBox::draw(NVGcontext* ctx) {
         if (prevCX < clipX)
             mTextOffset += clipX - prevCX + 1;
 
-        drawPos.x() = oldDrawPos.x() + mTextOffset;
+        drawPos.rx() = oldDrawPos.x() + mTextOffset;
 
         // draw text with offset
         nvgText(ctx, drawPos.x(), drawPos.y(), mValueTemp.c_str(), nullptr);

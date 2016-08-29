@@ -185,18 +185,18 @@ void Button::draw(NVGcontext *ctx) {
         nvgFillColor(ctx, textColor);
         nvgTextAlign(ctx, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
         Vector2f iconPos = center;
-        iconPos.y() -= 1;
+        iconPos.ry() -= 1;
 
         if (mIconPosition == IconPosition::LeftCentered) {
-            iconPos.x() -= (tw + iw) * 0.5f;
-            textPos.x() += iw * 0.5f;
+            iconPos.rx() -= (tw + iw) * 0.5f;
+            textPos.rx() += iw * 0.5f;
         } else if (mIconPosition == IconPosition::RightCentered) {
-            textPos.x() -= iw * 0.5f;
-            iconPos.x() += tw * 0.5f;
+            textPos.rx() -= iw * 0.5f;
+            iconPos.rx() += tw * 0.5f;
         } else if (mIconPosition == IconPosition::Left) {
-            iconPos.x() = mPos.x() + 8;
+            iconPos.rx() = mPos.x() + 8;
         } else if (mIconPosition == IconPosition::Right) {
-            iconPos.x() = mPos.x() + mSize.x() - iw - 8;
+            iconPos.rx() = mPos.x() + mSize.x() - iw - 8;
         }
 
         if (nvgIsFontIcon(mIcon)) {
