@@ -143,7 +143,6 @@ add_library(nanogui ${NANOGUISDL_LIBRARY_TYPE}
   include/imagepanel.h src/imagepanel.cpp
   include/imageview.h src/imageview.cpp
   include/vscrollpanel.h src/vscrollpanel.cpp
-  include/colorpicker.h src/colorpicker.cpp
   include/graph.h src/graph.cpp
   include/formhelper.h
   include/toolbutton.h
