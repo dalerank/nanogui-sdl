@@ -139,13 +139,12 @@ add_library(nanogui ${NANOGUISDL_LIBRARY_TYPE}
   include/screen.h src/screen.cpp
   include/label.h src/label.cpp
   include/window.h src/window.cpp
-  src/picogui.cpp
+  include/picogui.h src/picogui.cpp
   include/checkbox.h src/checkbox.cpp
   include/button.h src/button.cpp
   include/popupbutton.h src/popupbutton.cpp
   include/combobox.h src/combobox.cpp
   include/progressbar.h src/progressbar.cpp
-  include/slider.h src/slider.cpp
   include/messagedialog.h src/messagedialog.cpp
   include/textbox.h src/textbox.cpp
   include/imagepanel.h src/imagepanel.cpp
@@ -157,7 +156,6 @@ add_library(nanogui ${NANOGUISDL_LIBRARY_TYPE}
   include/formhelper.h
   include/toolbutton.h
   include/opengl.h
-  include/nanogui.h
   include/vector2.h
 )
 

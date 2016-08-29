@@ -24,7 +24,6 @@
 #include <include/entypo.h>
 #include <include/messagedialog.h>
 #include <include/textbox.h>
-#include <include/slider.h>
 #include <include/imagepanel.h>
 #include <include/imageview.h>
 #include <include/vscrollpanel.h>
