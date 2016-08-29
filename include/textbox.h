@@ -14,7 +14,6 @@
 
 #pragma once
 
-#include <include/compat.h>
 #include <include/picogui.h>
 #include <sstream>
 

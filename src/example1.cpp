@@ -12,7 +12,6 @@
 */
 
 #include <include/screen.h>
-#include <include/layout.h>
 #include <include/label.h>
 #include <include/toolbutton.h>
 #include <include/progressbar.h>

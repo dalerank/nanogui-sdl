@@ -16,7 +16,6 @@
 #include <include/label.h>
 #include <include/picogui.h>
 #include <include/textbox.h>
-#include <include/layout.h>
 #include <cassert>
 
 NAMESPACE_BEGIN(nanogui)

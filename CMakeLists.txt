@@ -134,7 +134,6 @@ add_library(nanogui ${NANOGUISDL_LIBRARY_TYPE}
   nanogui_resources.cpp
   include/common.h src/common.cpp
   include/theme.h src/theme.cpp
-  include/layout.h src/layout.cpp
   include/screen.h src/screen.cpp
   include/label.h src/label.cpp
   include/picogui.h src/picogui.cpp
