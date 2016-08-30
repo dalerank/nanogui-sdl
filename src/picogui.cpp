@@ -11,13 +11,84 @@
 */
 
 #include <include/picogui.h>
-#include <include/opengl.h>
-#include <include/nanogui_resources.h>
 #include <SDL2/SDL.h>
 #include <assert.h>
 #include <regex>
 #include <iostream>
 #include <numeric>
+#include <thread>
+
+#include <SDL2/SDL_opengl.h>
+
+#ifdef _WIN32
+    #include <windows.h>
+    #include <commdlg.h>
+#else
+    #include <locale.h>
+    #include <signal.h>
+    #include <sys/dir.h>
+#endif
+
+
+/*
+struct glhelper
+{
+PFNGLACTIVETEXTUREPROC glActiveTexture;
+PFNGLCREATESHADERPROC glCreateShader;
+PFNGLSHADERSOURCEPROC glShaderSource ;
+PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv ;
+PFNGLCOMPILESHADERPROC glCompileShader ;
+PFNGLGETSHADERIVPROC glGetShaderiv ;
+PFNGLUSEPROGRAMPROC glUseProgram ;
+PFNGLUNIFORM1IPROC glUniform1i ;
+PFNGLUNIFORM1FPROC glUniform1f ;
+PFNGLUNIFORM2IPROC glUniform2i ;
+PFNGLUNIFORM2FPROC glUniform2f ;
+PFNGLUNIFORM3FPROC glUniform3f ;
+PFNGLUNIFORM4FPROC glUniform4f ;
+PFNGLUNIFORM4FVPROC glUniform4fv ;
+PFNGLCREATEPROGRAMPROC glCreateProgram ;
+PFNGLATTACHSHADERPROC glAttachShader ;
+PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog ;
+PFNGLLINKPROGRAMPROC glLinkProgram ;
+PFNGLGETPROGRAMIVPROC glGetProgramiv ;
+PFNGLGENVERTEXARRAYSPROC glGenVertexArrays ;
+PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog ;
+PFNGLBINDVERTEXARRAYPROC glBindVertexArray ;
+PFNGLBINDBUFFERPROC glBindBuffer ;
+PFNGLGETATTRIBLOCATIONPROC  glGetAttribLocation ;
+PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation ;
+PFNGLGENBUFFERSPROC  glGenBuffers ;
+PFNGLBINDATTRIBLOCATIONPROC glBindAttribLocation;
+PFNGLGETUNIFORMBLOCKINDEXPROC glGetUniformBlockIndex;
+PFNGLUNIFORMBLOCKBINDINGPROC glUniformBlockBinding;
+PFNGLBUFFERDATAPROC  glBufferData ;
+PFNGLDISABLEVERTEXATTRIBARRAYPROC  glDisableVertexAttribArray ;
+PFNGLENABLEVERTEXATTRIBARRAYPROC  glEnableVertexAttribArray ;
+PFNGLGETBUFFERSUBDATAPROC  glGetBufferSubData ;
+PFNGLVERTEXATTRIBPOINTERPROC  glVertexAttribPointer ;
+PFNGLDELETEBUFFERSPROC  glDeleteBuffers ;
+PFNGLBINDFRAMEBUFFERPROC  glBindFramebuffer ;
+PFNGLBINDRENDERBUFFERPROC  glBindRenderbuffer ;
+PFNGLRENDERBUFFERSTORAGEPROC  glRenderbufferStorage ;
+PFNGLDELETEVERTEXARRAYSPROC  glDeleteVertexArrays ;
+PFNGLDELETEPROGRAMPROC  glDeleteProgram ;
+PFNGLDELETESHADERPROC  glDeleteShader ;
+PFNGLGENRENDERBUFFERSPROC  glGenRenderbuffers ;
+PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC  glRenderbufferStorageMultisample ;
+PFNGLGENFRAMEBUFFERSPROC  glGenFramebuffers ;
+PFNGLFRAMEBUFFERRENDERBUFFERPROC  glFramebufferRenderbuffer ;
+PFNGLCHECKFRAMEBUFFERSTATUSPROC  glCheckFramebufferStatus ;
+PFNGLDELETERENDERBUFFERSPROC  glDeleteRenderbuffers ;
+PFNGLBLITFRAMEBUFFERPROC glBlitFramebuffer ;
+
+PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
+PFNGLBINDBUFFERRANGEPROC glBindBufferRange;
+PFNGLSTENCILOPSEPARATEPROC glStencilOpSeparate;
+PFNGLUNIFORM2FVPROC glUniform2fv;
+};
+
+glhelper& glh();*/
 
 #ifndef GL_GLEXT_PROTOTYPES
 #ifdef WIN32
@@ -110,6 +181,15 @@
 #include <nanovg/nanovg_gl.h>
 
 NAMESPACE_BEGIN(nanogui)
+
+extern uint8_t entypo_ttf[];
+extern uint32_t entypo_ttf_size;
+
+extern uint8_t roboto_bold_ttf[];
+extern uint32_t roboto_bold_ttf_size;
+
+extern uint8_t roboto_regular_ttf[];
+extern uint32_t roboto_regular_ttf_size;
     
 Popup::Popup(Widget *parent, Window *parentWindow)
     : Window(parent, ""), mParentWindow(parentWindow),
@@ -3281,5 +3361,261 @@ void Screen::performLayout()
 {
   Widget::performLayout(mNVGContext);
 }
+
+/****************************************  Stuff ****************************************/
+
+#if !defined(_WIN32)
+    #include <locale.h>
+    #include <signal.h>
+    #include <sys/dir.h>
+#endif
+
+static bool __mainloop_active = false;
+extern std::map<SDL_Window *, Screen *> __nanogui_screens;
+
+void init()
+{
+    #if !defined(_WIN32)
+        /* Avoid locale-related number parsing issues */
+        setlocale(LC_NUMERIC, "C");
+    #endif
+
+    int rc = SDL_Init(SDL_INIT_VIDEO);
+    if (rc != 0)
+      throw std::runtime_error("Unable to initialize SDL!");
+
+    //glfwSetTime(0);
+}
+
+void mainloop()
+{
+    __mainloop_active = true;
+
+    /* If there are no mouse/keyboard events, try to refresh the
+       view roughly every 50 ms; this is to support animations
+       such as progress bars while keeping the system load
+       reasonably low */
+    std::thread refresh_thread = std::thread(
+        [&]() {
+            std::chrono::milliseconds time(50);
+            while (__mainloop_active) {
+                std::this_thread::sleep_for(time);
+
+                SDL_Event user_event;
+
+                user_event.type = SDL_USEREVENT;
+                user_event.user.code = 2;
+                user_event.user.data1 = NULL;
+                user_event.user.data2 = NULL;
+                SDL_PushEvent(&user_event);
+            }
+        }
+    );
+
+    try {
+        while (__mainloop_active)
+        {
+            int numScreens = 0;
+            SDL_Event e;
+            for (auto kv : __nanogui_screens)
+            {
+                Screen *screen = kv.second;
+                if (!screen->visible())
+                {
+                    continue;
+                }
+               /* else if (glfwWindowShouldClose(screen->glfwWindow()))
+                {
+                    screen->setVisible(false);
+                    continue;
+                }
+               */
+                screen->drawAll();
+                numScreens++;
+            }
+
+            if (numScreens == 0) {
+                /* Give up if there was nothing to draw */
+                __mainloop_active = false;
+                break;
+            }
+
+            /* Wait for mouse/keyboard or empty refresh events */
+            //Handle events on queue
+            while( SDL_PollEvent( &e ) != 0 )
+            {
+                //User requests quit
+                if( e.type == SDL_QUIT )
+                {
+                    __mainloop_active = false;
+                }
+            }
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Caught exception in main loop: " << e.what() << std::endl;
+        abort();
+    }
+
+    refresh_thread.join();
+}
+
+void leave()
+{
+    __mainloop_active = false;
+}
+
+void shutdown() {
+    SDL_Quit();
+}
+
+std::array<char, 8> utf8(int c) {
+    std::array<char, 8> seq;
+    int n = 0;
+    if (c < 0x80) n = 1;
+    else if (c < 0x800) n = 2;
+    else if (c < 0x10000) n = 3;
+    else if (c < 0x200000) n = 4;
+    else if (c < 0x4000000) n = 5;
+    else if (c <= 0x7fffffff) n = 6;
+    seq[n] = '\0';
+    switch (n) {
+        case 6: seq[5] = 0x80 | (c & 0x3f); c = c >> 6; c |= 0x4000000;
+        case 5: seq[4] = 0x80 | (c & 0x3f); c = c >> 6; c |= 0x200000;
+        case 4: seq[3] = 0x80 | (c & 0x3f); c = c >> 6; c |= 0x10000;
+        case 3: seq[2] = 0x80 | (c & 0x3f); c = c >> 6; c |= 0x800;
+        case 2: seq[1] = 0x80 | (c & 0x3f); c = c >> 6; c |= 0xc0;
+        case 1: seq[0] = c;
+    }
+    return seq;
+}
+
+int __nanogui_get_image(NVGcontext *ctx, const std::string &name, uint8_t *data, uint32_t size) {
+    static std::map<std::string, int> iconCache;
+    auto it = iconCache.find(name);
+    if (it != iconCache.end())
+        return it->second;
+    int iconID = nvgCreateImageMem(ctx, 0, data, size);
+    if (iconID == 0)
+        throw std::runtime_error("Unable to load resource data.");
+    iconCache[name] = iconID;
+    return iconID;
+}
+
+std::vector<std::pair<int, std::string>>
+loadImageDirectory(NVGcontext *ctx, const std::string &path) {
+    std::vector<std::pair<int, std::string> > result;
+#if !defined(_WIN32)
+    DIR *dp = opendir(path.c_str());
+    if (!dp)
+        throw std::runtime_error("Could not open image directory!");
+    struct dirent *ep;
+    while ((ep = readdir(dp))) {
+        const char *fname = ep->d_name;
+#else
+    WIN32_FIND_DATA ffd;
+    std::string searchPath = path + "/*.*";
+    HANDLE handle = FindFirstFileA(searchPath.c_str(), &ffd);
+    if (handle == INVALID_HANDLE_VALUE)
+        throw std::runtime_error("Could not open image directory!");
+    do {
+        const char *fname = ffd.cFileName;
+#endif
+        if (strstr(fname, "png") == nullptr)
+            continue;
+        std::string fullName = path + "/" + std::string(fname);
+        int img = nvgCreateImage(ctx, fullName.c_str(), 0);
+        if (img == 0)
+            throw std::runtime_error("Could not open image data!");
+        result.push_back(
+            std::make_pair(img, fullName.substr(0, fullName.length() - 4)));
+#if !defined(_WIN32)
+    }
+    closedir(dp);
+#else
+    } while (FindNextFileA(handle, &ffd) != 0);
+    FindClose(handle);
+#endif
+    return result;
+}
+
+#if !defined(__APPLE__)
+std::string file_dialog(const std::vector<std::pair<std::string, std::string>> &filetypes, bool save) {
+#define FILE_DIALOG_MAX_BUFFER 1024
+#ifdef _WIN32
+    OPENFILENAME ofn;
+    ZeroMemory(&ofn, sizeof(OPENFILENAME));
+    ofn.lStructSize = sizeof(OPENFILENAME);
+    char tmp[FILE_DIALOG_MAX_BUFFER];
+    ofn.lpstrFile = tmp;
+    ZeroMemory(tmp, FILE_DIALOG_MAX_BUFFER);
+    ofn.nMaxFile = FILE_DIALOG_MAX_BUFFER;
+    ofn.nFilterIndex = 1;
+
+    std::string filter;
+
+    if (!save && filetypes.size() > 1) {
+        filter.append("Supported file types (");
+        for (size_t i = 0; i < filetypes.size(); ++i) {
+            filter.append("*.");
+            filter.append(filetypes[i].first);
+            if (i + 1 < filetypes.size())
+                filter.append(";");
+        }
+        filter.append(")");
+        filter.push_back('\0');
+        for (size_t i = 0; i < filetypes.size(); ++i) {
+            filter.append("*.");
+            filter.append(filetypes[i].first);
+            if (i + 1 < filetypes.size())
+                filter.append(";");
+        }
+        filter.push_back('\0');
+    }
+    for (auto pair: filetypes) {
+        filter.append(pair.second);
+        filter.append(" (*.");
+        filter.append(pair.first);
+        filter.append(")");
+        filter.push_back('\0');
+        filter.append("*.");
+        filter.append(pair.first);
+        filter.push_back('\0');
+    }
+    filter.push_back('\0');
+    ofn.lpstrFilter = filter.data();
+
+    if (save) {
+        ofn.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
+        if (GetSaveFileNameA(&ofn) == FALSE)
+            return "";
+    } else {
+        ofn.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+        if (GetOpenFileNameA(&ofn) == FALSE)
+            return "";
+    }
+    return std::string(ofn.lpstrFile);
+#else
+    char buffer[FILE_DIALOG_MAX_BUFFER];
+    std::string cmd = "/usr/bin/zenity --file-selection ";
+    if (save)
+        cmd += "--save ";
+    cmd += "--file-filter=\"";
+    for (auto pair: filetypes)
+        cmd += "\"*." + pair.first +  "\" ";
+    cmd += "\"";
+    FILE *output = popen(cmd.c_str(), "r");
+    if (output == nullptr)
+        throw std::runtime_error("popen() failed -- could not launch zenity!");
+    while (fgets(buffer, FILE_DIALOG_MAX_BUFFER, output) != NULL)
+        ;
+    pclose(output);
+    std::string result(buffer);
+    //result.erase(std::remove(result.begin(), result.end(), '\n'), result.end());
+    return result;
+#endif
+}
+#endif
 
 NAMESPACE_END(nanogui)

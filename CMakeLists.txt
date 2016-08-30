@@ -98,22 +98,6 @@ endif()
 
 include_directories(ext ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
-# Run simple C converter to put font files into the data segment
-add_executable(bin2c resources/bin2c.c)
-set(bin2c_cmdline nanogui_resources.cpp nanogui_resources.h)
-file(GLOB resources "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.ttf")
-foreach(file ${resources})
-  list(APPEND bin2c_cmdline ${file})
-endforeach()
-
-# Run bin2c on resource files
-add_custom_command(
-  OUTPUT nanogui_resources.cpp nanogui_resources.h
-  COMMAND bin2c ARGS ${bin2c_cmdline}
-  DEPENDS bin2c ${resources}
-  COMMENT "Running bin2c"
-  PRE_BUILD VERBATIM)
-
 # Needed to generated files
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
@@ -131,11 +115,8 @@ add_library(nanogui ${NANOGUISDL_LIBRARY_TYPE}
   # Merge GLEW into the NanoGUI library (only if needed)
   ${LIBNANOGUISDL_EXTRA_SOURCE}
   # Fonts etc.
-  nanogui_resources.cpp
-  include/common.h src/common.cpp
   include/picogui.h src/picogui.cpp
-  include/opengl.h
-  include/vector2.h
+  src/picogui_resources.cpp
 )
 
 message(${NANOGUISDL_EXTRA_LIBS})

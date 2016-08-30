@@ -15,6 +15,8 @@
 #if defined(_WIN32)
 #include <windows.h>
 #endif
+
+#include <cmath>
 #include <iostream>
 #include <SDL2/SDL.h>
 

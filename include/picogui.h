@@ -12,17 +12,73 @@
 #ifndef PICOGUI_HEADER_INCLUDE
 #define PICOGUI_HEADER_INCLUDE
 
-#include <include/common.h>
-#include <include/vector2.h>
 #include <unordered_map>
 #include <sstream>
 #include <functional>
 #include <atomic>
+#include <vector>
+#include <math.h>
 #include <assert.h>
 #include <istream>
 
 union SDL_Event;
 struct SDL_Window;
+
+#if !defined(NAMESPACE_BEGIN)
+#define NAMESPACE_BEGIN(name) namespace name {
+#endif
+
+#if !defined(NAMESPACE_END)
+#define NAMESPACE_END(name) }
+#endif
+
+#if defined(NANOGUI_SHARED)
+#  if defined(_WIN32)
+#    if defined(NANOGUI_BUILD)
+#      define NANOGUI_EXPORT __declspec(dllexport)
+#    else
+#      define NANOGUI_EXPORT __declspec(dllimport)
+#    endif
+#  elif defined(NANOGUI_BUILD)
+#    define NANOGUI_EXPORT __attribute__ ((visibility("default")))
+#  else
+#    define NANOGUI_EXPORT
+#  endif
+#else
+#    define NANOGUI_EXPORT
+#endif
+
+/* Force usage of discrete GPU on laptops (macro must be invoked in main application) */
+#if defined(_WIN32)
+#define NANOGUI_FORCE_DISCRETE_GPU() \
+    extern "C" { \
+        __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1; \
+        __declspec(dllexport) int NvOptimusEnablement = 1; \
+    }
+#else
+#define NANOGUI_FORCE_DISCRETE_GPU()
+#endif
+
+#if defined(_WIN32)
+    #if defined(NANOGUI_BUILD)
+    /* Quench a few warnings on when compiling NanoGUI on Windows */
+    #pragma warning(disable : 4127) // warning C4127: conditional expression is constant
+    #pragma warning(disable : 4244) // warning C4244: conversion from X to Y, possible loss of data
+    #endif
+//#pragma warning(disable : 4251) // warning C4251: class X needs to have dll-interface to be used by clients of class Y
+//#pragma warning(disable : 4714) // warning C4714: funtion X marked as __forceinline not inlined
+#endif
+
+struct NVGcontext;
+struct NVGcolor;
+struct NVGglyphPosition;
+
+// Define command key for windows/mac/linux
+#ifdef __APPLE__
+#define SYSTEM_COMMAND_MOD GLFW_MOD_SUPER
+#else
+#define SYSTEM_COMMAND_MOD GLFW_MOD_CONTROL
+#endif
 
 NAMESPACE_BEGIN(nanogui)
 
@@ -333,6 +389,545 @@ enum class Orientation {
 #define ENTYPO_ICON_VK                   0xF354
 #define ENTYPO_ICON_SMASHING             0xF357
 
+/* Cursor shapes */
+enum class Cursor {
+    Arrow = 0,
+    IBeam,
+    Crosshair,
+    Hand,
+    HResize,
+    VResize,
+    CursorCount
+};
+
+/// Stores an RGBA color value
+class Color {
+public:
+    Color() : Color(0, 0, 0, 0) {}
+
+    //Color(const Eigen::Vector4f &color) : Eigen::Vector4f(color) { }
+
+    //Color(const Eigen::Vector3f &color, float alpha)
+      //  : Color(color(0), color(1), color(2), alpha) { }
+
+    //Color(const Eigen::Vector3i &color, int alpha)
+      //  : Color(color.cast<float>() / 255.f, alpha / 255.f) { }
+
+    //Color(const Eigen::Vector3f &color) : Color(color, 1.0f) {}
+
+    //Color(const Eigen::Vector3i &color)
+      //  : Color((Vector3f)(color.cast<float>() / 255.f)) { }
+
+    //Color(const Eigen::Vector4i &color)
+      //  : Color((Vector4f)(color.cast<float>() / 255.f)) { }
+
+    Color(float intensity, float alpha)
+    { _d.r = _d.g = _d.b = intensity; _d.a = alpha; }
+
+    Color(int intensity, int alpha)
+    { _d.r = _d.g = _d.b = (intensity / 255.f); _d.a = alpha / 255.f; }
+
+    Color(float r, float g, float b, float a)
+    {  _d.r = r; _d.g = g; _d.b = b; _d.a = a;  }
+
+    Color(int r, int g, int b, int a)
+    {  _d.r = r/255.f; _d.g = g/255.f; _d.b = b/255.f; _d.a = a/255.f;  }
+
+    /// Construct a color vector from MatrixBase (needed to play nice with Eigen)
+    //template <typename Derived> Color(const Eigen::MatrixBase<Derived>& p)
+      //  : Base(p) { }
+
+    /// Assign a color vector from MatrixBase (needed to play nice with Eigen)
+    /*template <typename Derived> Color &operator=(const Eigen::MatrixBase<Derived>& p) {
+        this->Base::operator=(p);
+        return *this;
+    }*/
+
+    /// Return a reference to the red channel
+    float &r() { return _d.r; }
+    /// Return a reference to the red channel (const version)
+    const float &r() const { return _d.r; }
+    /// Return a reference to the green channel
+    float &g() { return _d.g; }
+    /// Return a reference to the green channel (const version)
+    const float &g() const { return _d.g; }
+    /// Return a reference to the blue channel
+    float &b() { return _d.b; }
+    /// Return a reference to the blue channel (const version)
+    const float &b() const { return _d.b; }
+
+    float &a() { return _d.a; }
+    const float &a() const { return _d.a; }
+
+    void setAlpha(float a) { _d.a = a; }
+
+    Color withAlpha(float a) const {
+        Color c = *this;
+        c._d.a = a;
+        return c;
+    }
+
+    bool operator!=(const Color& c)
+    {
+        return !(c.a() == a() && c.r() == r() && c.g() == g() && c.b() == b());
+    }
+
+    Color contrastingColor() const {
+        float luminance = r() * 0.299f + g() * 0.587f + b() * 0.144f;
+        return Color(luminance < 0.5f ? 1.f : 0.f, 1.f);
+    }
+
+    Color operator*(float m) const
+    {
+        return Color(r()*m, g()*m, b()*m, a()*m);
+    }
+
+    Color operator+(const Color& c) const
+    {
+        return Color(r() + c.r(), g() + c.g(), b() + c.b(), a() + c.a());
+    }
+
+    inline operator const NVGcolor &() const {
+        return reinterpret_cast<const NVGcolor &>(this->_d);
+    }
+private:
+    struct _Data {
+        union {
+            float rgba[4];
+            struct {
+                float r,g,b,a;
+            };
+        };
+    };
+    _Data _d;
+};
+
+
+/// Determine whether an icon ID is a texture loaded via nvgImageIcon
+inline bool nvgIsImageIcon(int value) { return value < 1024; }
+
+/// Determine whether an icon ID is a font-based icon (e.g. from the entypo.ttf font)
+inline bool nvgIsFontIcon(int value) { return value >= 1024; }
+
+/// Static initialization; should be called once before invoking any NanoGUI functions
+extern NANOGUI_EXPORT void init();
+
+/// Static shutdown; should be called before the application terminates
+extern NANOGUI_EXPORT void shutdown();
+
+/// Enter the application main loop
+extern NANOGUI_EXPORT void mainloop();
+
+/// Request the application main loop to terminate
+extern NANOGUI_EXPORT void leave();
+
+/**
+ * \brief Open a native file open/save dialog.
+ *
+ * \param filetypes
+ *     Pairs of permissible formats with descriptions like
+ *     <tt>("png", "Portable Network Graphics")</tt>
+ */
+extern NANOGUI_EXPORT std::string file_dialog(const std::vector<std::pair<std::string, std::string>> &filetypes, bool save);
+
+#if defined(__APPLE__)
+/**
+ * \brief Move to the application bundle's parent directory
+ *
+ * This is function is convenient when deploying .app bundles on OSX. It
+ * adjusts the file path to the parent directory containing the bundle.
+ */
+extern NANOGUI_EXPORT void chdir_to_bundle_parent();
+#endif
+
+/**
+ * \brief Convert a single UTF32 character code to UTF8
+ *
+ * NanoGUI uses this to convert the icon character codes
+ * defined in entypo.h
+ */
+extern NANOGUI_EXPORT std::array<char, 8> utf8(int c);
+
+/// Load a directory of PNG images and upload them to the GPU (suitable for use with ImagePanel)
+extern NANOGUI_EXPORT std::vector<std::pair<int, std::string>>
+    loadImageDirectory(NVGcontext *ctx, const std::string &path);
+
+/// Convenience function for instanting a PNG icon from the application's data segment (via bin2c)
+#define nvgImageIcon(ctx, name) nanogui::__nanogui_get_image(ctx, #name, name##_png, name##_png_size)
+/// Helper function used by nvgImageIcon
+extern NANOGUI_EXPORT int __nanogui_get_image(NVGcontext *ctx, const std::string &name, uint8_t *data, uint32_t size);
+
+namespace math
+{
+    //! Constant for PI.
+    const double PI64		= 3.1415926535897932384626433832795028841971693993751;
+
+    const float ROUNDING_ERROR_f32 = 0.000001f;
+    //! 64bit constant for converting from degrees to radians (formally known as GRAD_PI2)
+    const double DEGTORAD64 = PI64 / 180.0;
+    const double ROUNDING_ERROR_f64 = 0.00000001;
+    const double RADTODEG64 = 180.0 / PI64;
+
+    template<class T>
+    inline bool isEqual(const T a, const T b)
+    {
+        return (a + ROUNDING_ERROR_f32 >= b) && (a - ROUNDING_ERROR_f32 <= b);
+    }
+
+    template<class T>
+    inline bool isEqual(const T a, const T b, const T tolerance)
+    {
+        return (a + tolerance >= b) && (a - tolerance <= b);
+    }
+}
+
+template <class T>
+class Vec2
+{
+public:
+  //! Default constructor (null vector)
+  Vec2() : _x(0), _y(0) {}
+  //! Constructor with two different values
+  Vec2(T nx, T ny) : _x(nx), _y(ny) {}
+  //! Constructor with the same value for both members
+  explicit Vec2(T n) : _x(n), _y(n) {}
+  //! Copy constructor
+  Vec2(const Vec2<T>& other) : _x(other._x), _y(other._y) {}
+
+  static Vec2 Constant(T v) { return Vec2(v,v); }
+  static Vec2 Zero() { return Vec2(0,0); }
+
+  // operators
+  Vec2<T> operator-() const { return Vec2<T>(-_x, -_y); }
+
+  Vec2<T>& operator=(const Vec2<T>& other) { _x = other._x; _y = other._y; return *this; }
+
+  Vec2<T> operator+(const Vec2<T>& other) const { return Vec2<T>(_x + other._x, _y + other._y); }
+  Vec2<T>& operator+=(const Vec2<T>& other) { _x+=other._x; _y+=other._y; return *this; }
+  Vec2<T> operator+(const T v) const { return Vec2<T>(_x + v, _y + v); }
+  Vec2<T>& operator+=(const T v) { _x+=v; _y+=v; return *this; }
+
+  Vec2<T> operator-(const Vec2<T>& other) const { return Vec2<T>(_x - other._x, _y - other._y); }
+  Vec2<T>& operator-=(const Vec2<T>& other) { _x-=other._x; _y-=other._y; return *this; }
+  Vec2<T> operator-(const T v) const { return Vec2<T>(_x - v, _y - v); }
+  Vec2<T>& operator-=(const T v) { _x-=v; _y-=v; return *this; }
+
+  Vec2<T> operator*(const Vec2<T>& other) const { return Vec2<T>(_x * other._x, _y * other._y); }
+  Vec2<T>& operator*=(const Vec2<T>& other) { _x*=other._x; _y*=other._y; return *this; }
+  Vec2<T> operator*(const T v) const { return Vec2<T>(_x * v, _y * v); }
+  Vec2<T>& operator*=(const T v) { _x*=v; _y*=v; return *this; }
+
+  Vec2<T> operator/(const Vec2<T>& other) const { return Vec2<T>(_x / other._x, _y / other._y); }
+  Vec2<T>& operator/=(const Vec2<T>& other) { _x/=other._x; _y/=other._y; return *this; }
+  Vec2<T> operator/(const T v) const { return Vec2<T>(_x / v, _y / v); }
+  Vec2<T>& operator/=(const T v) { _x/=v; _y/=v; return *this; }
+
+  //! sort in order X, Y. Equality with rounding tolerance.
+  bool operator<=(const Vec2<T>& other) const
+  {
+    return (_x<other._x || math::isEqual(_x, other._x)) ||
+           (math::isEqual(_x, other._x) && (_y<other._y || math::isEqual(_y, other._y)));
+  }
+
+  //! sort in order X, Y. Equality with rounding tolerance.
+  bool operator>=(const Vec2<T>&other) const
+  {
+    return (_x>other._x || math::isEqual(_x, other._x)) ||
+            (math::isEqual(_x, other._x) && (_y>other.Y || math::isEqual(_y, other._y)));
+  }
+
+  //! sort in order X, Y. Difference must be above rounding tolerance.
+  bool operator<(const Vec2<T>&other) const
+  {
+    return (_x<other._x && !math::isEqual(_x, other._x)) ||
+           (math::isEqual(_x, other.X) && _y<other.Y && !math::isEqual(_y, other._y));
+  }
+
+  //! sort in order X, Y. Difference must be above rounding tolerance.
+  bool operator>(const Vec2<T>&other) const
+  {
+    return (_x>other._x && !math::isEqual(_x, other._x)) ||
+           (math::isEqual(_x, other._x) && _y>other._y && !math::isEqual(_y, other._y));
+  }
+
+  bool operator==(const Vec2<T>& other) const { return IsEqual(other, math::ROUNDING_ERROR_f32); }
+  bool operator!=(const Vec2<T>& other) const { return !IsEqual(other, math::ROUNDING_ERROR_f32); }
+
+  // functions
+
+  //! Checks if this vector equals the other one.
+  /** Takes floating point rounding errors into account.
+  \param other Vector to compare with.
+  \return True if the two vector are (almost) equal, else false. */
+  bool IsEqual(const Vec2<T>& other, float tolerance) const
+  {
+    return math::isEqual<T>(_x, other._x, tolerance) && math::isEqual<T>(_y, other._y, tolerance);
+  }
+
+  Vec2<T>& set(T nx, T ny) {_x=nx; _y=ny; return *this; }
+  Vec2<T>& set(const Vec2<T>& p) { _x=p._x; _y=p._y; return *this; }
+
+  //! Gets the length of the vector.
+  /** \return The length of the vector. */
+  float getLength() const { return sqrt( (float)_x*(float)_x + (float)_y*(float)_y ); }
+
+  //! Get the squared length of this vector
+  /** This is useful because it is much faster than getLength().
+  \return The squared length of the vector. */
+  T getLengthSQ() const { return _x*_x + _y*_y; }
+
+  //! Get the dot product of this vector with another.
+  /** \param other Other vector to take dot product with.
+  \return The dot product of the two vectors. */
+  T dotProduct(const Vec2<T>& other) const
+  {
+    return _x*other._x + _y*other._y;
+  }
+
+  template< class A >
+  Vec2<A> As()
+  {
+    return Vec2<A>( (A)_x, (A)_y );
+  }
+
+  template< class A >
+  Vec2<A> As() const
+  {
+    return Vec2<A>( (A)_x, (A)_y );
+  }
+
+  //! Gets distance from another point.
+  /** Here, the vector is interpreted as a point in 2-dimensional space.
+  \param other Other vector to measure from.
+  \return Distance from other point. */
+  float getDistanceFrom(const Vec2<T>& other) const
+  {
+          return Vec2<T>(_x - other._x, _y - other._y).getLength();
+  }
+
+  //! Returns squared distance from another point.
+  /** Here, the vector is interpreted as a point in 2-dimensional space.
+  \param other Other vector to measure from.
+  \return Squared distance from other point. */
+  T getDistanceFromSQ(const Vec2<T>& other) const
+  {
+          return Vec2<T>(_x - other._x, _y - other._y).getLengthSQ();
+  }
+
+  //! rotates the point anticlockwise around a center by an amount of degrees.
+  /** \param degrees Amount of degrees to rotate by, anticlockwise.
+  \param center Rotation center.
+  \return This vector after transformation. */
+  Vec2<T>& rotateBy(float degrees, const Vec2<T>& center=Vec2<T>())
+  {
+    degrees *= math::DEGTORAD64;
+            const float cs = cos(degrees);
+            const float sn = sin(degrees);
+
+            _x -= center._x;
+            _y -= center._y;
+
+            set((T)(_x*cs - _y*sn), (T)(_x*sn + _y*cs));
+
+            _x += center._x;
+            _y += center._y;
+            return *this;
+  }
+
+  //! Normalize the vector.
+  /** The null vector is left untouched.
+  \return Reference to this vector, after normalization. */
+  Vec2<T>& normalize()
+  {
+    float length = (float)(_x*_x + _y*_y);
+
+    if (math::isEqual(length, 0.f))
+                    return *this;
+    length = 1.f / sqrt( length );
+    _x = (T)(_x * length);
+    _y = (T)(_y * length);
+        return *this;
+  }
+
+  //! Calculates the angle of this vector in degrees in the trigonometric sense.
+  /** 0 is to the right (3 o'clock), values increase counter-clockwise.
+  This method has been suggested by Pr3t3nd3r.
+  \return Returns a value between 0 and 360. */
+  float getAngleTrig() const
+  {
+    if (_y == 0)
+      return _x < 0 ? 180 : 0;
+    else if (_x == 0)
+      return _y < 0 ? 270 : 90;
+
+    if ( _y > 0)
+    {
+      if (_x > 0)
+        return atanf((float)_y/(float)_x) * math::RADTODEG64;
+      else
+        return 180.0-atanf((float)_y/-(float)_x) * math::RADTODEG64;
+    }
+    else
+    {
+      if (_x > 0)
+        return 360.0-atanf(-(float)_y/(float)_x) * math::RADTODEG64;
+      else
+        return 180.0+atanf(-(float)_y/-(float)_x) * math::RADTODEG64;
+    }
+  }
+
+  //! Calculates the angle of this vector in degrees in the counter trigonometric sense.
+  /** 0 is to the right (3 o'clock), values increase clockwise.
+  \return Returns a value between 0 and 360. */
+  inline float getAngle() const
+  {
+    if (_y == 0) // corrected thanks to a suggestion by Jox
+            return _x < 0 ? 180 : 0;
+    else if (_x == 0)
+            return _y < 0 ? 90 : 270;
+
+    // don't use getLength here to avoid precision loss with s32 vectors
+    float tmp = _y / sqrt((float)(_x*_x + _y*_y));
+    tmp = atanf( sqrt(1.f - tmp*tmp) / tmp) * math::RADTODEG64;
+
+    if (_x>0 && _y>0)
+      return tmp + 270;
+    else if (_x>0 && _y<0)
+      return tmp + 90;
+    else if (_x<0 && _y<0)
+      return 90 - tmp;
+    else if (_x<0 && _y>0)
+      return 270 - tmp;
+
+    return tmp;
+  }
+
+  //! Calculates the angle between this vector and another one in degree.
+  /** \param b Other vector to test with.
+  \return Returns a value between 0 and 90. */
+  inline float getAngleWith(const Vec2<T>& b) const
+  {
+    double tmp = _x*b._x + _y*b._y;
+
+    if (tmp == 0.0)
+      return 90.0;
+
+    tmp = tmp / sqrtf((float)((_x*_x + _y*_y) * (b._x*b._x + b._y*b._y)));
+    if (tmp < 0.0)
+      tmp = -tmp;
+
+    return atanf(sqrtf(1 - tmp*tmp) / tmp) * math::RADTODEG64;
+  }
+
+  //! Returns if this vector interpreted as a point is on a line between two other points.
+  /** It is assumed that the point is on the line.
+  \param begin Beginning vector to compare between.
+  \param end Ending vector to compare between.
+  \return True if this vector is between begin and end, false if not. */
+  bool isBetweenPoints(const Vec2<T>& begin, const Vec2<T>& end) const
+  {
+    if (begin._x != end._x)
+    {
+      return ((begin._x <= _x && _x <= end._x) ||
+              (begin._x >= _x && _x >= end._x));
+    }
+    else
+    {
+      return ((begin._y <= _y && _y <= end._y) ||
+              (begin._y >= _y && _y >= end._y));
+    }
+  }
+
+  T& seq(int index)
+  {
+    return index == 0 ? _x : _y;
+  }
+
+  const T& seq(int index) const
+  {
+    return index == 0 ? _x : _y;
+  }
+
+  //! Creates an interpolated vector between this vector and another vector.
+  /** \param other The other vector to interpolate with.
+  \param d Interpolation value between 0.0f (all the other vector) and 1.0f (all this vector).
+  Note that this is the opposite direction of interpolation to getInterpolated_quadratic()
+  \return An interpolated vector.  This vector is not modified. */
+  Vec2<T> getInterpolated(const Vec2<T>& other, T d) const
+  {
+    float inv = 1.0f - (float)d;
+    return Vec2<T>((T)(other._x*inv + _x*d), (T)(other._y*inv + _y*d));
+  }
+
+  //! Creates a quadratically interpolated vector between this and two other vectors.
+  /** \param v2 Second vector to interpolate with.
+  \param v3 Third vector to interpolate with (maximum at 1.0f)
+  \param d Interpolation value between 0.0f (all this vector) and 1.0f (all the 3rd vector).
+  Note that this is the opposite direction of interpolation to getInterpolated() and interpolate()
+  \return An interpolated vector. This vector is not modified. */
+  Vec2<T> getInterpolated_quadratic(const Vec2<T>& v2, const Vec2<T>& v3, const T d) const
+  {
+    // this*(1-d)*(1-d) + 2 * v2 * (1-d) + v3 * d * d;
+    const float inv = 1.0f - d;
+    const float mul0 = inv * inv;
+    const float mul1 = 2.0f * d * inv;
+    const float mul2 = d * d;
+
+    return Vec2<T> ( (T)(_x * mul0 + v2.X * mul1 + v3.X * mul2),
+                        (T)(_y * mul0 + v2.Y * mul1 + v3.Y * mul2));
+  }
+
+  Vec2<T> cwiseMax(T rx, T ry) const
+  {
+      return Vec2<T>(std::max(x(), rx), std::max(y(), ry));
+  }
+
+  Vec2<T> cwiseMax(const Vec2<T>& o) const
+  {
+      return Vec2<T>(std::max(x(), o.x()), std::max(y(), o.y()));
+  }
+
+  Vec2<T> cwiseMin(const Vec2<T>& o) const
+  {
+      return Vec2<T>(std::min(x(), o.x()), std::min(y(), o.y()));
+  }
+
+  //! Sets this vector to the linearly interpolated vector between a and b.
+  /** \param a first vector to interpolate with, maximum at 1.0f
+  \param b second vector to interpolate with, maximum at 0.0f
+  \param d Interpolation value between 0.0f (all vector b) and 1.0f (all vector a)
+  Note that this is the opposite direction of interpolation to getInterpolated_quadratic()
+  */
+  Vec2<T>& interpolate(const Vec2<T>& a, const Vec2<T>& b, const T d)
+  {
+    _x = (T)((float)b._x + ( ( a._x - b._x ) * d ));
+    _y = (T)((float)b._y + ( ( a._y - b._y ) * d ));
+    return *this;
+  }
+
+  inline T x() const { return _x; }
+  inline T y() const { return _y; }
+
+  inline T& rx() { return _x; }
+  inline T& ry() { return _y; }
+
+  inline void setX( T xv ) { _x = xv; }
+  inline void setY( T yv ) { _y = yv; }
+
+  template <class B>
+  inline Vec2<B> cast() const { return Vec2<B>(static_cast<B>(x()), static_cast<B>(y())); }
+
+protected:
+  //! X coordinate of vector.
+  T _x;
+
+  //! Y coordinate of vector.
+  T _y;
+};
+
+typedef Vec2<int> Vector2i;
+typedef Vec2<float> Vector2f;
+
 /// Reference counted object base class
 class NANOGUI_EXPORT Object {
 public:
@@ -536,6 +1131,10 @@ protected:
     virtual ~Theme() { };
 };
 
+
+class Layout;
+class Window;
+class Label;
 /**
  * \brief Base class of all widgets
  *
