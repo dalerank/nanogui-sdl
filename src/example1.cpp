@@ -16,7 +16,6 @@
 #include <include/toolbutton.h>
 #include <include/progressbar.h>
 #include <include/textbox.h>
-#include <include/vscrollpanel.h>
 #include <include/formhelper.h>
 #include <include/picogui.h>
 #if defined(_WIN32)

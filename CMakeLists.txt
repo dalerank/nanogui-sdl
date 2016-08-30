@@ -138,7 +138,6 @@ add_library(nanogui ${NANOGUISDL_LIBRARY_TYPE}
   include/picogui.h src/picogui.cpp
   include/progressbar.h src/progressbar.cpp
   include/textbox.h src/textbox.cpp
-  include/vscrollpanel.h src/vscrollpanel.cpp
   include/formhelper.h
   include/toolbutton.h
   include/opengl.h
