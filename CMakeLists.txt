@@ -134,7 +134,6 @@ add_library(nanogui ${NANOGUISDL_LIBRARY_TYPE}
   nanogui_resources.cpp
   include/common.h src/common.cpp
   include/picogui.h src/picogui.cpp
-  include/formhelper.h
   include/opengl.h
   include/vector2.h
 )
