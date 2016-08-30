@@ -136,10 +136,7 @@ add_library(nanogui ${NANOGUISDL_LIBRARY_TYPE}
   include/screen.h src/screen.cpp
   include/label.h src/label.cpp
   include/picogui.h src/picogui.cpp
-  include/progressbar.h src/progressbar.cpp
-  include/textbox.h src/textbox.cpp
   include/formhelper.h
-  include/toolbutton.h
   include/opengl.h
   include/vector2.h
 )

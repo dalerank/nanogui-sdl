@@ -13,7 +13,6 @@
 
 #include <include/screen.h>
 #include <include/label.h>
-#include <include/progressbar.h>
 #include <include/textbox.h>
 #include <include/formhelper.h>
 #if defined(_WIN32)
