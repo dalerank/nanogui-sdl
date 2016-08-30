@@ -140,7 +140,6 @@ add_library(nanogui ${NANOGUISDL_LIBRARY_TYPE}
   include/progressbar.h src/progressbar.cpp
   include/textbox.h src/textbox.cpp
   include/vscrollpanel.h src/vscrollpanel.cpp
-  include/graph.h src/graph.cpp
   include/formhelper.h
   include/toolbutton.h
   include/opengl.h
