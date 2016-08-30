@@ -13,7 +13,6 @@
 
 #include <include/opengl.h>
 #include <include/screen.h>
-#include <include/theme.h>
 #include <include/picogui.h>
 #include <iostream>
 #include <map>

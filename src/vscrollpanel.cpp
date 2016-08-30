@@ -11,7 +11,6 @@
 */
 
 #include <include/vscrollpanel.h>
-#include <include/theme.h>
 #include <include/opengl.h>
 
 NAMESPACE_BEGIN(nanogui)

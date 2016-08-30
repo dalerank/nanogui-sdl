@@ -10,7 +10,6 @@
 */
 
 #include <include/label.h>
-#include <include/theme.h>
 #include <include/opengl.h>
 
 NAMESPACE_BEGIN(nanogui)

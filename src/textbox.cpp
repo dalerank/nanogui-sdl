@@ -16,7 +16,6 @@
 #include <include/screen.h>
 #include <include/textbox.h>
 #include <include/opengl.h>
-#include <include/theme.h>
 #include <SDL2/SDL.h>
 #include <regex>
 
