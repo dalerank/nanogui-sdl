@@ -12,8 +12,6 @@
 
 #pragma once
 
-#include <include/screen.h>
-#include <include/label.h>
 #include <include/picogui.h>
 #include <cassert>
 

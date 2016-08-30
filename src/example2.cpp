@@ -11,9 +11,6 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <include/screen.h>
-#include <include/label.h>
-#include <include/textbox.h>
 #include <include/formhelper.h>
 #if defined(_WIN32)
 #include <windows.h>

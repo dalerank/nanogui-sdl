@@ -11,8 +11,6 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <include/screen.h>
-#include <include/label.h>
 #include <include/formhelper.h>
 #include <include/picogui.h>
 #if defined(_WIN32)
