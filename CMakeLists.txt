@@ -6,9 +6,14 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     set(CMAKE_CXX_FLAGS "-std=c++11")
 endif()
 
+if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ext/eigen/Eigen")
+  message(FATAL_ERROR "The NanoGUI-SDL dependency repositories (Eigen, etc.) are missing! "
+    "You probably did not clone the project with --recursive. It is possible to recover "
+    "by calling \"git submodule update --init --recursive\"")
+endif()
+
 option(NANOGUISDL_BUILD_EXAMPLE "Build NanoGUI example application?" ON)
 option(NANOGUISDL_BUILD_SHARED  "Build NanoGUI as a shared library?" ON)
-option(NANOGUISDL_BUILD_EXAMPLESDL  "Build NanoGUI examples with SDL2?" ON)
 
 # Required libraries for linking against nanogui (all targets)
 set(NANOGUISDL_EXTRA_LIBS "")
@@ -74,16 +79,8 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
   add_definitions( -DEIGEN_DONT_ALIGN )
 endif()
 
-if(NANOGUISDL_BUILD_EXAMPLESDL)
-  set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
-
-  find_package(SDL2 REQUIRED)
-
-  list(APPEND NANOGUISDL_EXTRA_LIBS ${SDL2_LIBRARY})
- endif()
-
 # Required core libraries on various platforms
-if (WIN32) 
+if (WIN32)
   list(APPEND NANOGUISDL_EXTRA_LIBS opengl32)
 elseif (APPLE)
   find_library(cocoa_library Cocoa)
@@ -93,10 +90,26 @@ elseif (APPLE)
   list(APPEND NANOGUISDL_EXTRA_LIBS ${cocoa_library} ${opengl_library} ${corevideo_library} ${iokit_library})
   list(APPEND LIBNANOGUISDL_EXTRA_SOURCE src/darwin.mm)
 elseif(CMAKE_SYSTEM MATCHES "Linux")
-  list(APPEND NANOGUISDL_EXTRA_LIBS GL Xxf86vm Xrandr Xinerama Xcursor Xi X11 pthread dl rt)
+  list(APPEND NANOGUISDL_EXTRA_LIBS GL Xxf86vm Xrandr Xinerama Xcursor Xi X11 pthread dl rt SDL2)
 endif()
 
-include_directories(ext ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(ext ext/eigen ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+
+# Run simple C converter to put font files into the data segment
+add_executable(bin2c resources/bin2c.c)
+set(bin2c_cmdline nanogui_resources.cpp nanogui_resources.h)
+file(GLOB resources "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.ttf")
+foreach(file ${resources})
+  list(APPEND bin2c_cmdline ${file})
+endforeach()
+
+# Run bin2c on resource files
+add_custom_command(
+  OUTPUT nanogui_resources.cpp nanogui_resources.h
+  COMMAND bin2c ARGS ${bin2c_cmdline}
+  DEPENDS bin2c ${resources}
+  COMMENT "Running bin2c"
+  PRE_BUILD VERBATIM)
 
 # Needed to generated files
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
@@ -115,11 +128,35 @@ add_library(nanogui ${NANOGUISDL_LIBRARY_TYPE}
   # Merge GLEW into the NanoGUI library (only if needed)
   ${LIBNANOGUISDL_EXTRA_SOURCE}
   # Fonts etc.
-  include/picogui.h src/picogui.cpp
-  src/picogui_resources.cpp
+  nanogui_resources.cpp
+  include/common.h src/common.cpp
+  include/widget.h src/widget.cpp
+  include/theme.h src/theme.cpp
+  include/layout.h src/layout.cpp
+  include/screen.h src/screen.cpp
+  include/label.h src/label.cpp
+  include/window.h src/window.cpp
+  include/popup.h src/popup.cpp
+  include/checkbox.h src/checkbox.cpp
+  include/button.h src/button.cpp
+  include/popupbutton.h src/popupbutton.cpp
+  include/combobox.h src/combobox.cpp
+  include/progressbar.h src/progressbar.cpp
+  include/slider.h src/slider.cpp
+  include/messagedialog.h src/messagedialog.cpp
+  include/textbox.h src/textbox.cpp
+  include/imagepanel.h src/imagepanel.cpp
+  include/imageview.h src/imageview.cpp
+  include/vscrollpanel.h src/vscrollpanel.cpp
+  include/colorwheel.h src/colorwheel.cpp
+  include/colorpicker.h src/colorpicker.cpp
+  include/graph.h src/graph.cpp
+  include/formhelper.h
+  include/toolbutton.h
+  include/opengl.h
+  include/nanogui.h
 )
 
-message(${NANOGUISDL_EXTRA_LIBS})
 # Compile/link flags for NanoGUI
 set_property(TARGET nanogui APPEND PROPERTY COMPILE_DEFINITIONS "NANOGUI_BUILD ")
 
@@ -171,7 +208,6 @@ endif()
 if(NANOGUISDL_BUILD_EXAMPLE)
   add_executable(example1 src/example1.cpp)
   add_executable(example2 src/example2.cpp)
-
   target_link_libraries(example1 nanogui ${NANOGUI_EXTRA_LIBS})
   target_link_libraries(example2 nanogui ${NANOGUI_EXTRA_LIBS})
 

@@ -11,12 +11,29 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <include/picogui.h>
+#include <include/screen.h>
+#include <include/window.h>
+#include <include/layout.h>
+#include <include/label.h>
+#include <include/checkbox.h>
+#include <include/button.h>
+#include <include/toolbutton.h>
+#include <include/popupbutton.h>
+#include <include/combobox.h>
+#include <include/progressbar.h>
+#include <include/entypo.h>
+#include <include/messagedialog.h>
+#include <include/textbox.h>
+#include <include/slider.h>
+#include <include/imagepanel.h>
+#include <include/imageview.h>
+#include <include/vscrollpanel.h>
+#include <include/colorwheel.h>
+#include <include/graph.h>
+#include <include/formhelper.h>
 #if defined(_WIN32)
 #include <windows.h>
 #endif
-
-#include <cmath>
 #include <iostream>
 #include <SDL2/SDL.h>
 
@@ -32,7 +49,7 @@ class TestWindow : public nanogui::Screen
 {
 public:
     TestWindow( SDL_Window* pwindow, int rwidth, int rheight )
-      : nanogui::Screen( pwindow, Vector2i(rwidth, rheight), "SDL_gui Test")
+      : nanogui::Screen( pwindow, Eigen::Vector2i(rwidth, rheight), "SDL_gui Test")
       {
         mProgress = nullptr;
         using namespace nanogui;
@@ -213,7 +230,7 @@ public:
           auto* layout = new GridLayout(Orientation::Horizontal, 2,
                                          Alignment::Middle, 15, 5);
           layout->setColAlignment({ Alignment::Maximum, Alignment::Fill });
-          layout->setSpacing(Vector2i(0, 10));
+          layout->setSpacing(0, 10);
           window.setLayout(layout);
 
           window.add<Label>("Floating point :", "sans-bold");

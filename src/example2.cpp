@@ -11,7 +11,26 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <include/picogui.h>
+#include <include/screen.h>
+#include <include/window.h>
+#include <include/layout.h>
+#include <include/label.h>
+#include <include/checkbox.h>
+#include <include/button.h>
+#include <include/toolbutton.h>
+#include <include/popupbutton.h>
+#include <include/combobox.h>
+#include <include/progressbar.h>
+#include <include/entypo.h>
+#include <include/messagedialog.h>
+#include <include/textbox.h>
+#include <include/slider.h>
+#include <include/imagepanel.h>
+#include <include/imageview.h>
+#include <include/vscrollpanel.h>
+#include <include/colorwheel.h>
+#include <include/graph.h>
+#include <include/formhelper.h>
 #if defined(_WIN32)
 #include <windows.h>
 #endif
@@ -82,7 +101,7 @@ int main(int /* argc */, char ** /* argv */)
 
     bool enabled = true;
     FormHelper *gui = new FormHelper(screen);
-    ref<Window> rwindow = gui->addWindow(Vector2i(10, 10), "Form helper example");
+    ref<Window> rwindow = gui->addWindow(Eigen::Vector2i(10, 10), "Form helper example");
     gui->addGroup("Basic types");
     gui->addVariable("bool", bvar);
     gui->addVariable("string", strval);
