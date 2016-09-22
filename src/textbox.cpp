@@ -320,7 +320,7 @@ bool TextBox::focusEvent(bool focused) {
 bool TextBox::keyboardEvent(int key, int /* scancode */, int action, int modifiers)
 {
     if (mEditable && focused()) {
-        if (action == SDL_KEYDOWN /*|| action == GLFW_REPEAT*/)
+        if (action == SDL_PRESSED /*|| action == GLFW_REPEAT*/)
         {
             if (key == SDLK_LEFT )
             {
