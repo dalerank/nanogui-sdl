@@ -14,7 +14,13 @@
 #include <windows.h>
 #endif
 #include <include/opengl.h>
-#include <SDL/SDL.h>
+
+#ifdef NANOGUI_LINUX
+    #include <SDL2/SDL.h>
+#else
+    #include <SDL/SDL.h>
+#endif
+
 #include <map>
 #include <thread>
 #include <chrono>

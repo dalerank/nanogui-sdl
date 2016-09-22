@@ -104,8 +104,6 @@
   PFNGLUNIFORM2FVPROC glUniform2fv;
 #endif
 
-/* Allow enforcing the GL2 implementation of NanoVG */
-#define NANOVG_GL2_IMPLEMENTATION
 #include <SDL2/SDL.h>
 #include <nanovg/nanovg_gl.h>
 
@@ -223,7 +221,7 @@ void Screen::onEvent(SDL_Event& event)
         return;
 
       SDL_Keymod mods = SDL_GetModState();
-      keyCallbackEvent(event.key.keysym.mod, event.key.keysym.scancode, event.key.state, mods);
+      keyCallbackEvent(event.key.keysym.sym, event.key.keysym.scancode, event.key.state, mods);
     }
     break;
 
@@ -242,11 +240,20 @@ void Screen::initialize(SDL_Window* window)
     _window = window;    
     SDL_GetWindowSize( window, &mSize[0], &mSize[1]);
     SDL_GetWindowSize( window, &mFBSize[0], &mFBSize[1]);
-
+    
+    int flags = NVG_STENCIL_STROKES | NVG_ANTIALIAS;
 #ifdef NDEBUG
-    mNVGContext = nvgCreateGL2(NVG_STENCIL_STROKES | NVG_ANTIALIAS);
-#else
-    mNVGContext = nvgCreateGL2(NVG_STENCIL_STROKES | NVG_ANTIALIAS | NVG_DEBUG);
+    flags |= NVG_DEBUG;
+#endif
+
+#ifdef NANOVG_GL2_IMPLEMENTATION
+    mNVGContext = nvgCreateGL2(flags);
+#elif defined(NANOVG_GL3_IMPLEMENTATION)
+    mNVGContext = nvgCreateGL3(flags);
+#elif defined(NANOVG_GLES2_IMPLEMENTATION)
+    mNVGContext = nvgCreateGLES2(flags);
+#elif defined(NANOVG_GLES3_IMPLEMENTATION)
+    mNVGContext = nvgCreateGLES3(flags);
 #endif
     if (mNVGContext == nullptr)
         throw std::runtime_error("Could not initialize NanoVG!");
@@ -265,8 +272,15 @@ void Screen::initialize(SDL_Window* window)
 Screen::~Screen()
 {
     __nanogui_screens.erase(_window);
-    if (mNVGContext)
-        nvgDeleteGL2(mNVGContext);
+#ifdef NANOVG_GL2_IMPLEMENTATION
+    nvgDeleteGL2(mNVGContext);
+#elif DNANOVG_GL3_IMPLEMENTATION
+    nvgDeleteGL3(mNVGContext);
+#elif DNANOVG_GLES2_IMPLEMENTATION
+    nvgDeleteGLES2(mNVGContext);
+#elif DNANOVG_GLES3_IMPLEMENTATION
+    nvgDeleteGLES3(mNVGContext);
+#endif
 }
 
 void Screen::setVisible(bool visible)

@@ -15,7 +15,12 @@
 #include <include/window.h>
 #include <include/opengl.h>
 #include <include/screen.h>
-#include <SDL/SDL.h>
+
+#ifdef NANOGUI_LINUX
+    #include <SDL2/SDL.h>
+#else
+    #include <SDL/SDL.h>
+#endif
 
 NAMESPACE_BEGIN(nanogui)
 

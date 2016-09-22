@@ -35,7 +35,12 @@
 #include <windows.h>
 #endif
 #include <iostream>
-#include <SDL2/SDL.h>
+#ifdef NANOGUI_LINUX
+    #include <SDL2/SDL.h>
+    #include <SDL2/SDL_opengl.h>
+#else
+    #include <SDL/SDL_opengl.h>
+#endif
 
 using std::cout;
 using std::cerr;
@@ -66,12 +71,30 @@ int main(int /* argc */, char ** /* argv */)
 
     SDL_Window *window;        // Declare a pointer to an SDL_Window
 
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+#ifdef NANOVG_GL2_IMPLEMENTATION
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION,2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION,0);
+#elif defined(NANOVG_GL3_IMPLEMENTATION)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION,3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION,3);
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);
-
+#elif defined(NANOVG_GLES2_IMPLEMENTATION)
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION,2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION,0);
+#elif defined(NANOVG_GLES3_IMPLEMENTATION)
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION,3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION,0);
+#endif
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     int winWidth = 1024;
     int winHeight = 768;
 
@@ -94,8 +117,6 @@ int main(int /* argc */, char ** /* argv */)
     }
 
     auto context = SDL_GL_CreateContext(window);
-
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED );
 
     Screen *screen = new Screen( window, Vector2i(winWidth, winHeight), "NanoGUI test");
 
@@ -145,14 +166,12 @@ int main(int /* argc */, char ** /* argv */)
                 screen->onEvent( e );
             }
 
-            SDL_SetRenderDrawColor(renderer, 0xd3, 0xd3, 0xd3, 0xff );
-            SDL_RenderClear( renderer );
+            glViewport(0, 0, winWidth, winHeight);
+            
+            glClearColor(0.9f, 0.9f, 0.9f, 1);
+            glClear(GL_COLOR_BUFFER_BIT);
 
             screen->drawAll();
-
-            SDL_SetRenderDrawColor(renderer, 0xff, 0, 0, 0xff );
-            SDL_Rect r{ 0, 0, 20, 30 };
-            SDL_RenderFillRect( renderer, &r );
 
             //Update screen
             SDL_GL_SwapWindow(window);
