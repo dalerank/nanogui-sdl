@@ -91,6 +91,7 @@ elseif (APPLE)
   list(APPEND LIBNANOGUISDL_EXTRA_SOURCE src/darwin.mm)
 elseif(CMAKE_SYSTEM MATCHES "Linux")
   list(APPEND NANOGUISDL_EXTRA_LIBS GL Xxf86vm Xrandr Xinerama Xcursor Xi X11 pthread dl rt SDL2)
+  add_definitions(-DNANOGUI_LINUX)
 endif()
 
 include_directories(ext ext/eigen ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
