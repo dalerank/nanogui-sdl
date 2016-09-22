@@ -223,7 +223,7 @@ void Screen::onEvent(SDL_Event& event)
         return;
 
       SDL_Keymod mods = SDL_GetModState();
-      keyCallbackEvent(event.key.keysym.mod, event.key.keysym.scancode, event.key.state, mods);
+      keyCallbackEvent(event.key.keysym.sym, event.key.keysym.scancode, event.key.state, mods);
     }
     break;
 
