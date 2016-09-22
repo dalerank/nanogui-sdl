@@ -248,11 +248,11 @@ void Screen::initialize(SDL_Window* window)
 
 #ifdef NANOVG_GL2_IMPLEMENTATION
     mNVGContext = nvgCreateGL2(flags);
-#elif DNANOVG_GL3_IMPLEMENTATION
+#elif defined(NANOVG_GL3_IMPLEMENTATION)
     mNVGContext = nvgCreateGL3(flags);
-#elif DNANOVG_GLES2_IMPLEMENTATION
+#elif defined(NANOVG_GLES2_IMPLEMENTATION)
     mNVGContext = nvgCreateGLES2(flags);
-#elif DNANOVG_GLES3_IMPLEMENTATION
+#elif defined(NANOVG_GLES3_IMPLEMENTATION)
     mNVGContext = nvgCreateGLES3(flags);
 #endif
     if (mNVGContext == nullptr)
