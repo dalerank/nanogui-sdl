@@ -15,6 +15,18 @@ endif()
 option(NANOGUISDL_BUILD_EXAMPLE "Build NanoGUI example application?" ON)
 option(NANOGUISDL_BUILD_SHARED  "Build NanoGUI as a shared library?" ON)
 
+if(NANOGUI_GL_IMPLEMENTION MATCHES "gl2" OR NOT DEFINED NANOGUI_GL_IMPLEMENTION)
+    add_definitions(-DNANOVG_GL2_IMPLEMENTATION)
+elseif(NANOGUI_GL_IMPLEMENTION MATCHES "gl3")
+    add_definitions(-DNANOVG_GL3_IMPLEMENTATION)
+elseif(NANOGUI_GL_IMPLEMENTION MATCHES "gles2")
+    add_definitions(-DNANOVG_GLES2_IMPLEMENTATION)
+elseif(NANOGUI_GL_IMPLEMENTION MATCHES "gles3")
+    add_definitions(-DNANOVG_GLES3_IMPLEMENTATION)
+else()
+    message(FATAL_ERROR "Unknown GL implementaion. Use one of gl2, gl3, gles2, gles3.")
+endif()
+
 # Required libraries for linking against nanogui (all targets)
 set(NANOGUISDL_EXTRA_LIBS "")
 
