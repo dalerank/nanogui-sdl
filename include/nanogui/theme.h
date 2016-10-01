@@ -14,8 +14,8 @@
 #ifndef __NGSDL_THEME_INCLUDE_H__
 #define __NGSDL_THEME_INCLUDE_H__
 
-#include <include/common.h>
-#include <include/object.h>
+#include <nanogui/common.h>
+#include <nanogui/object.h>
 
 NAMESPACE_BEGIN(nanogui)
 

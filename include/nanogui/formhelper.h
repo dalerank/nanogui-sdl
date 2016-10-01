@@ -12,13 +12,13 @@
 
 #pragma once
 
-#include <include/screen.h>
-#include <include/label.h>
-#include <include/checkbox.h>
-#include <include/textbox.h>
-#include <include/combobox.h>
-#include <include/colorpicker.h>
-#include <include/layout.h>
+#include <nanogui/screen.h>
+#include <nanogui/label.h>
+#include <nanogui/checkbox.h>
+#include <nanogui/textbox.h>
+#include <nanogui/combobox.h>
+#include <nanogui/colorpicker.h>
+#include <nanogui/layout.h>
 #include <cassert>
 
 NAMESPACE_BEGIN(nanogui)

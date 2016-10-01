@@ -9,9 +9,9 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <include/slider.h>
-#include <include/theme.h>
-#include <include/opengl.h>
+#include <nanogui/slider.h>
+#include <nanogui/theme.h>
+#include <nanogui/opengl.h>
 
 NAMESPACE_BEGIN(nanogui)
 

@@ -12,7 +12,7 @@
 #ifndef __NGSDL_WINDOW_H__
 #define __NGSDL_WINDOW_H__
 
-#include <include/widget.h>
+#include <nanogui/widget.h>
 
 NAMESPACE_BEGIN(nanogui)
 

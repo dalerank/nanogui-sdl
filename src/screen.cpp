@@ -11,11 +11,11 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <include/screen.h>
-#include <include/theme.h>
-#include <include/opengl.h>
-#include <include/window.h>
-#include <include/popup.h>
+#include <nanogui/screen.h>
+#include <nanogui/theme.h>
+#include <nanogui/opengl.h>
+#include <nanogui/window.h>
+#include <nanogui/popup.h>
 #include <iostream>
 #include <map>
 

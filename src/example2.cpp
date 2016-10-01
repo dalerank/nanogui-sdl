@@ -11,26 +11,26 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <include/screen.h>
-#include <include/window.h>
-#include <include/layout.h>
-#include <include/label.h>
-#include <include/checkbox.h>
-#include <include/button.h>
-#include <include/toolbutton.h>
-#include <include/popupbutton.h>
-#include <include/combobox.h>
-#include <include/progressbar.h>
-#include <include/entypo.h>
-#include <include/messagedialog.h>
-#include <include/textbox.h>
-#include <include/slider.h>
-#include <include/imagepanel.h>
-#include <include/imageview.h>
-#include <include/vscrollpanel.h>
-#include <include/colorwheel.h>
-#include <include/graph.h>
-#include <include/formhelper.h>
+#include <nanogui/screen.h>
+#include <nanogui/window.h>
+#include <nanogui/layout.h>
+#include <nanogui/label.h>
+#include <nanogui/checkbox.h>
+#include <nanogui/button.h>
+#include <nanogui/toolbutton.h>
+#include <nanogui/popupbutton.h>
+#include <nanogui/combobox.h>
+#include <nanogui/progressbar.h>
+#include <nanogui/entypo.h>
+#include <nanogui/messagedialog.h>
+#include <nanogui/textbox.h>
+#include <nanogui/slider.h>
+#include <nanogui/imagepanel.h>
+#include <nanogui/imageview.h>
+#include <nanogui/vscrollpanel.h>
+#include <nanogui/colorwheel.h>
+#include <nanogui/graph.h>
+#include <nanogui/formhelper.h>
 #if defined(_WIN32)
 #include <windows.h>
 #endif

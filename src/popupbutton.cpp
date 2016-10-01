@@ -9,10 +9,10 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <include/popupbutton.h>
-#include <include/entypo.h>
-#include <include/theme.h>
-#include <include/opengl.h>
+#include <nanogui/popupbutton.h>
+#include <nanogui/entypo.h>
+#include <nanogui/theme.h>
+#include <nanogui/opengl.h>
 
 NAMESPACE_BEGIN(nanogui)
 
@@ -23,7 +23,7 @@ PopupButton::PopupButton(Widget *parent, const std::string &caption,
     setFlags(Flags::ToggleButton | Flags::PopupButton);
 
     Window *parentWindow = window();
-    mPopup = &parentWindow->parent()->add<Popup>(window());
+    mPopup = parentWindow->parent()->add<Popup>(window());
     mPopup->setSize(Vector2i(320, 250));
 }
 

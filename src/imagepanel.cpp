@@ -10,8 +10,8 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <include/imagepanel.h>
-#include <include/opengl.h>
+#include <nanogui/imagepanel.h>
+#include <nanogui/opengl.h>
 
 NAMESPACE_BEGIN(nanogui)
 

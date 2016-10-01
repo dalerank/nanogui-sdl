@@ -12,11 +12,11 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <include/window.h>
-#include <include/screen.h>
-#include <include/textbox.h>
-#include <include/opengl.h>
-#include <include/theme.h>
+#include <nanogui/window.h>
+#include <nanogui/screen.h>
+#include <nanogui/textbox.h>
+#include <nanogui/opengl.h>
+#include <nanogui/theme.h>
 #include <SDL2/SDL.h>
 #include <regex>
 

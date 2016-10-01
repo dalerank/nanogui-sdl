@@ -9,11 +9,11 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <include/checkbox.h>
+#include <nanogui/checkbox.h>
 #include <nanovg/nanovg.h>
 #include <SDL2/SDL.h>
-#include <include/theme.h>
-#include <include/entypo.h>
+#include <nanogui/theme.h>
+#include <nanogui/entypo.h>
 
 NAMESPACE_BEGIN(nanogui)
 

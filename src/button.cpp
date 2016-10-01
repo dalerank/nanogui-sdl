@@ -1,7 +1,7 @@
 /*
     src/button.cpp -- [Normal/Toggle/Radio/Popup] Button widget
 
-    NanoGUI was developed by Wenzel Jakob <wenzel@inf.ethz.ch>.
+    NanoGUI was developed by Wenzel Jakob <wenzel.jakob@epfl.ch>.
     The widget drawing code is based on the NanoVG demo application
     by Mikko Mononen.
 
@@ -9,10 +9,12 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <include/button.h>
+#include <nanogui/button.h>
+#include <nanogui/theme.h>
+#include <nanogui/opengl.h>
+#include <nanovg/nanovg.h>
 #include <SDL2/SDL.h>
-#include <include/theme.h>
-#include <include/opengl.h>
+#include <nanogui/serializer/core.h>
 
 NAMESPACE_BEGIN(nanogui)
 
@@ -46,14 +48,13 @@ Vector2i Button::preferredSize(NVGcontext *ctx) const {
     return Vector2i((int)(tw + iw) + 20, fontSize + 10);
 }
 
-bool Button::mouseButtonEvent(const Vector2i &p, int button, bool down, int modifiers)
-{
+bool Button::mouseButtonEvent(const Vector2i &p, int button, bool down, int modifiers) {
     Widget::mouseButtonEvent(p, button, down, modifiers);
     /* Temporarily increase the reference count of the button in case the
        button causes the parent window to be destructed */
     ref<Button> self = this;
 
-    if (button == SDL_BUTTON_LEFT && mEnabled) {
+    if (button ==  SDL_BUTTON_LEFT && mEnabled) {
         bool pushedBackup = mPushed;
         if (down) {
             if (mFlags & RadioButton) {
@@ -81,7 +82,7 @@ bool Button::mouseButtonEvent(const Vector2i &p, int button, bool down, int modi
                     Button *b = dynamic_cast<Button *>(widget);
                     if (b != this && b && (b->flags() & PopupButton) && b->mPushed) {
                         b->mPushed = false;
-                        if(b->mChangeCallback)
+                        if (b->mChangeCallback)
                             b->mChangeCallback(false);
                     }
                 }
@@ -141,6 +142,7 @@ void Button::draw(NVGcontext *ctx) {
     nvgFill(ctx);
 
     nvgBeginPath(ctx);
+    nvgStrokeWidth(ctx, 1.0f);
     nvgRoundedRect(ctx, mPos.x() + 0.5f, mPos.y() + (mPushed ? 0.5f : 1.5f), mSize.x() - 1,
                    mSize.y() - 1 - (mPushed ? 0.0f : 1.0f), mTheme->mButtonCornerRadius);
     nvgStrokeColor(ctx, mTheme->mBorderLight);
@@ -218,11 +220,27 @@ void Button::draw(NVGcontext *ctx) {
     nvgText(ctx, textPos.x(), textPos.y() + 1, mCaption.c_str(), nullptr);
 }
 
-Button::Button(Widget* parent, const std::string& caption,
-               const std::function<void ()>& callback, int icon)
-  : Button( parent, caption, icon )
-{
-  setCallback( callback );
+void Button::save(Serializer &s) const {
+    Widget::save(s);
+    s.set("caption", mCaption);
+    s.set("icon", mIcon);
+    s.set("iconPosition", (int) mIconPosition);
+    s.set("pushed", mPushed);
+    s.set("flags", mFlags);
+    s.set("backgroundColor", mBackgroundColor);
+    s.set("textColor", mTextColor);
+}
+
+bool Button::load(Serializer &s) {
+    if (!Widget::load(s)) return false;
+    if (!s.get("caption", mCaption)) return false;
+    if (!s.get("icon", mIcon)) return false;
+    if (!s.get("iconPosition", mIconPosition)) return false;
+    if (!s.get("pushed", mPushed)) return false;
+    if (!s.get("flags", mFlags)) return false;
+    if (!s.get("backgroundColor", mBackgroundColor)) return false;
+    if (!s.get("textColor", mTextColor)) return false;
+    return true;
 }
 
 NAMESPACE_END(nanogui)

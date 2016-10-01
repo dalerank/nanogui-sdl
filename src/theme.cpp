@@ -11,9 +11,9 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <include/theme.h>
-#include <include/opengl.h>
-#include <include/nanogui_resources.h>
+#include <nanogui/theme.h>
+#include <nanogui/opengl.h>
+#include <nanogui/nanogui_resources.h>
 
 NAMESPACE_BEGIN(nanogui)
 

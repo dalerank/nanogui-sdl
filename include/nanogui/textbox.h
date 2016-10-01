@@ -14,8 +14,8 @@
 
 #pragma once
 
-#include <include/compat.h>
-#include <include/widget.h>
+#include <nanogui/compat.h>
+#include <nanogui/widget.h>
 #include <sstream>
 
 NAMESPACE_BEGIN(nanogui)

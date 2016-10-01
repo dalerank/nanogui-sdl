@@ -11,8 +11,8 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <include/colorwheel.h>
-#include <include/theme.h>
+#include <nanogui/colorwheel.h>
+#include <nanogui/theme.h>
 #include <nanovg/nanovg.h>
 #include <Eigen/QR>
 #include <Eigen/Geometry>

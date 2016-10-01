@@ -9,11 +9,11 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include <include/screen.h>
+#include <nanogui/screen.h>
 #if defined(_WIN32)
 #include <windows.h>
 #endif
-#include <include/opengl.h>
+#include <nanogui/opengl.h>
 
 #ifdef NANOGUI_LINUX
     #include <SDL2/SDL.h>
@@ -281,6 +281,18 @@ std::string file_dialog(const std::vector<std::pair<std::string, std::string>> &
 #endif
 }
 #endif
+
+void Object::decRef(bool dealloc) const noexcept {
+    --m_refCount;
+    if (m_refCount == 0 && dealloc) {
+        delete this;
+    } else if (m_refCount < 0) {
+        fprintf(stderr, "Internal error: Object reference count < 0!\n");
+        abort();
+    }
+}
+
+Object::~Object() { }
 
 NAMESPACE_END(nanogui)
 
