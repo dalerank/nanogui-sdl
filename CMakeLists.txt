@@ -165,6 +165,9 @@ add_library(nanogui ${NANOGUISDL_LIBRARY_TYPE}
   include/nanogui/colorwheel.h src/colorwheel.cpp
   include/nanogui/colorpicker.h src/colorpicker.cpp
   include/nanogui/graph.h src/graph.cpp
+  include/nanogui/tabheader.h src/tabheader.cpp
+  include/nanogui/tabwidget.h src/tabwidget.cpp
+  include/nanogui/stackedwidget.h src/stackedwidget.cpp
   include/nanogui/formhelper.h
   include/nanogui/toolbutton.h
   include/nanogui/opengl.h

@@ -3,7 +3,7 @@
 
     The text box widget was contributed by Christian Schueller.
 
-    NanoGUI was developed by Wenzel Jakob <wenzel@inf.ethz.ch>.
+    NanoGUI was developed by Wenzel Jakob <wenzel.jakob@epfl.ch>.
     The widget drawing code is based on the NanoVG demo application
     by Mikko Mononen.
 
@@ -13,7 +13,7 @@
 
 #include <nanogui/theme.h>
 #include <nanogui/opengl.h>
-#include <nanogui/nanogui_resources.h>
+#include <nanogui_resources.h>
 
 NAMESPACE_BEGIN(nanogui)
 
@@ -25,6 +25,13 @@ Theme::Theme(NVGcontext *ctx) {
     mWindowHeaderHeight               = 30;
     mWindowDropShadowSize             = 10;
     mButtonCornerRadius               = 2;
+    mTabBorderWidth                   = 0.75f;
+    mTabInnerMargin                   = 5;
+    mTabMinButtonWidth                = 20;
+    mTabMaxButtonWidth                = 160;
+    mTabControlWidth                  = 20;
+    mTabButtonHorizontalPadding       = 10;
+    mTabButtonVerticalPadding         = 2;
 
     mDropShadow                       = Color(0, 128);
     mTransparent                      = Color(0, 0);

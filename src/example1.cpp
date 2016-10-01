@@ -30,6 +30,7 @@
 #include <nanogui/vscrollpanel.h>
 #include <nanogui/colorwheel.h>
 #include <nanogui/graph.h>
+#include <nanogui/tabwidget.h>
 #include <nanogui/formhelper.h>
 #if defined(_WIN32)
 #include <windows.h>
@@ -214,82 +215,82 @@ public:
           auto& window = wdg<Window>("Misc. widgets");
           window.setPosition(Vector2i(425,15));
           window.setLayout(new GroupLayout());
-          /*TabWidget* tabWidget = window->add<TabWidget>();
+          TabWidget* tabWidget = window.add<TabWidget>();
 
-                  Widget* layer = tabWidget->createTab("Color Wheel");
-                  layer->setLayout(new GroupLayout());
+          Widget* layer = tabWidget->createTab("Color Wheel");
+          layer->setLayout(new GroupLayout());
 
-                  // Use overloaded variadic add to fill the tab widget with Different tabs.
-                  layer->add<Label>("Color wheel widget", "sans-bold");
-                  layer->add<ColorWheel>();
+          // Use overloaded variadic add to fill the tab widget with Different tabs.
+          layer->add<Label>("Color wheel widget", "sans-bold");
+          layer->add<ColorWheel>();
 
-                  layer = tabWidget->createTab("Function Graph");
-                  layer->setLayout(new GroupLayout());
+          layer = tabWidget->createTab("Function Graph");
+          layer->setLayout(new GroupLayout());
 
-                  layer->add<Label>("Function graph widget", "sans-bold");
+          layer->add<Label>("Function graph widget", "sans-bold");
 
-                  Graph *graph = layer->add<Graph>("Some Function");
+          Graph *graph = layer->add<Graph>("Some Function");
 
-                  graph->setHeader("E = 2.35e-3");
-                  graph->setFooter("Iteration 89");
-                  VectorXf &func = graph->values();
-                  func.resize(100);
+          graph->setHeader("E = 2.35e-3");
+          graph->setFooter("Iteration 89");
+          VectorXf &func = graph->values();
+          func.resize(100);
+          for (int i = 0; i < 100; ++i)
+              func[i] = 0.5f * (0.5f * std::sin(i / 10.f) +
+                                0.5f * std::cos(i / 23.f) + 1);
+
+          // Dummy tab used to represent the last tab button.
+          tabWidget->createTab("+");
+
+          // A simple counter.
+          int counter = 1;
+          tabWidget->setCallback([tabWidget, this, counter] (int index) mutable {
+              if (index == (tabWidget->tabCount()-1)) {
+                  // When the "+" tab has been clicked, simply add a new tab.
+                  std::string tabName = "Dynamic " + std::to_string(counter);
+                  Widget* layerDyn = tabWidget->createTab(index, tabName);
+                  layerDyn->setLayout(new GroupLayout());
+                  layerDyn->add<Label>("Function graph widget", "sans-bold");
+                  Graph *graphDyn = layerDyn->add<Graph>("Dynamic function");
+
+                  graphDyn->setHeader("E = 2.35e-3");
+                  graphDyn->setFooter("Iteration " + std::to_string(index*counter));
+                  VectorXf &funcDyn = graphDyn->values();
+                  funcDyn.resize(100);
                   for (int i = 0; i < 100; ++i)
-                      func[i] = 0.5f * (0.5f * std::sin(i / 10.f) +
-                                        0.5f * std::cos(i / 23.f) + 1);
+                      funcDyn[i] = 0.5f *
+                          std::abs((0.5f * std::sin(i / 10.f + counter) +
+                                    0.5f * std::cos(i / 23.f + 1 + counter)));
+                  ++counter;
+                  // We must invoke perform layout from the screen instance to keep everything in order.
+                  // This is essential when creating tabs dynamically.
+                  performLayout();
+                  // Ensure that the newly added header is visible on screen
+                  tabWidget->ensureTabVisible(index);
 
-                  // Dummy tab used to represent the last tab button.
-                  tabWidget->createTab("+");
+              }
+          });
+          tabWidget->setActiveTab(0);
 
-                  // A simple counter.
-                  int counter = 1;
-                  tabWidget->setCallback([tabWidget, this, counter] (int index) mutable {
-                      if (index == (tabWidget->tabCount()-1)) {
-                          // When the "+" tab has been clicked, simply add a new tab.
-                          string tabName = "Dynamic " + to_string(counter);
-                          Widget* layerDyn = tabWidget->createTab(index, tabName);
-                          layerDyn->setLayout(new GroupLayout());
-                          layerDyn->add<Label>("Function graph widget", "sans-bold");
-                          Graph *graphDyn = layerDyn->add<Graph>("Dynamic function");
+          // A button to go back to the first tab and scroll the window.
+          auto& panel = window.wdg<Widget>();
+          panel.add<Label>("Jump to tab: ");
+          panel.setLayout(new BoxLayout(Orientation::Horizontal,
+                                         Alignment::Middle, 0, 6));
 
-                          graphDyn->setHeader("E = 2.35e-3");
-                          graphDyn->setFooter("Iteration " + to_string(index*counter));
-                          VectorXf &funcDyn = graphDyn->values();
-                          funcDyn.resize(100);
-                          for (int i = 0; i < 100; ++i)
-                              funcDyn[i] = 0.5f *
-                                  std::abs((0.5f * std::sin(i / 10.f + counter) +
-                                            0.5f * std::cos(i / 23.f + 1 + counter)));
-                          ++counter;
-                          // We must invoke perform layout from the screen instance to keep everything in order.
-                          // This is essential when creating tabs dynamically.
-                          performLayout();
-                          // Ensure that the newly added header is visible on screen
-                          tabWidget->ensureTabVisible(index);
+          auto ib = panel.add<IntBox<int>>();
+          ib->setEditable(true);
 
-                      }
-                  });
-                  tabWidget->setActiveTab(0);
-
-                  // A button to go back to the first tab and scroll the window.
-                  panel = window->add<Widget>();
-                  panel->add<Label>("Jump to tab: ");
-                  panel->setLayout(new BoxLayout(Orientation::Horizontal,
-                                                 Alignment::Middle, 0, 6));
-
-                  auto ib = panel->add<IntBox<int>>();
-                  ib->setEditable(true);
-
-                  b = panel->add<Button>("", ENTYPO_ICON_FORWARD);
-                  b->setFixedSize(Vector2i(22, 22));
-                  ib->setFixedHeight(22);
-                  b->setCallback([tabWidget, ib] {
-                      int value = ib->value();
-                      if (value >= 0 && value < tabWidget->tabCount()) {
-                          tabWidget->setActiveTab(value);
-                          tabWidget->ensureTabVisible(value);
-                      }
-                  });*/
+          auto b = panel.add<Button>("", ENTYPO_ICON_FORWARD);
+          b->setFixedSize(Vector2i(22, 22));
+          ib->setFixedHeight(22);
+          b->setCallback([tabWidget, ib] {
+              int value = ib->value();
+              if (value >= 0 && value < tabWidget->tabCount()) {
+                  tabWidget->setActiveTab(value);
+                  tabWidget->ensureTabVisible(value);
+              }
+          });
         }
 
         {
