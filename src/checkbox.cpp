@@ -1,7 +1,7 @@
 /*
     src/checkbox.cpp -- Two-state check box widget
 
-    NanoGUI was developed by Wenzel Jakob <wenzel@inf.ethz.ch>.
+    NanoGUI was developed by Wenzel Jakob <wenzel.jakob@epfl.ch>.
     The widget drawing code is based on the NanoVG demo application
     by Mikko Mononen.
 
@@ -10,10 +10,12 @@
 */
 
 #include <nanogui/checkbox.h>
+#include <nanogui/opengl.h>
 #include <nanovg/nanovg.h>
 #include <SDL2/SDL.h>
 #include <nanogui/theme.h>
 #include <nanogui/entypo.h>
+#include <nanogui/serializer/core.h>
 
 NAMESPACE_BEGIN(nanogui)
 
@@ -23,22 +25,16 @@ CheckBox::CheckBox(Widget *parent, const std::string &caption,
       mCallback(callback) { }
 
 bool CheckBox::mouseButtonEvent(const Vector2i &p, int button, bool down,
-                                int modifiers)
-{
+                                int modifiers) {
     Widget::mouseButtonEvent(p, button, down, modifiers);
     if (!mEnabled)
         return false;
 
-    if (button == SDL_BUTTON_LEFT )
-    {
-        if (down)
-        {
+    if (button == SDL_BUTTON_LEFT) {
+        if (down) {
             mPushed = true;
-        }
-        else if (mPushed)
-        {
-            if (contains(p))
-            {
+        } else if (mPushed) {
+            if (contains(p)) {
                 mChecked = !mChecked;
                 if (mCallback)
                     mCallback(mChecked);
@@ -93,6 +89,21 @@ void CheckBox::draw(NVGcontext *ctx) {
                 mPos.y() + mSize.y() * 0.5f, utf8(ENTYPO_ICON_CHECK).data(),
                 nullptr);
     }
+}
+
+void CheckBox::save(Serializer &s) const {
+    Widget::save(s);
+    s.set("caption", mCaption);
+    s.set("pushed", mPushed);
+    s.set("checked", mChecked);
+}
+
+bool CheckBox::load(Serializer &s) {
+    if (!Widget::load(s)) return false;
+    if (!s.get("caption", mCaption)) return false;
+    if (!s.get("pushed", mPushed)) return false;
+    if (!s.get("checked", mChecked)) return false;
+    return true;
 }
 
 NAMESPACE_END(nanogui)
