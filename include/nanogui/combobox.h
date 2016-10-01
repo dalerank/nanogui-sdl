@@ -44,6 +44,11 @@ public:
     const std::vector<std::string> &itemsShort() const { return mItemsShort; }
 
     ComboBox& withItems(const std::vector<std::string>& items) {setItems(items); return *this;}
+
+    bool scrollEvent(const Vector2i &p, const Vector2f &rel);
+
+    virtual void save(Serializer &s) const;
+    virtual bool load(Serializer &s);
 protected:
     std::vector<std::string> mItems, mItemsShort;
     std::function<void(int)> mCallback;
