@@ -1,13 +1,10 @@
 /*
     src/textbox.cpp -- Fancy text box with builtin regular
     expression-based validation
-
     The text box widget was contributed by Christian Schueller.
-
-    NanoGUI was developed by Wenzel Jakob <wenzel@inf.ethz.ch>.
+    NanoGUI was developed by Wenzel Jakob <wenzel.jakob@epfl.ch>.
     The widget drawing code is based on the NanoVG demo application
     by Mikko Mononen.
-
     All rights reserved. Use of this source code is governed by a
     BSD-style license that can be found in the LICENSE.txt file.
 */
@@ -399,9 +396,9 @@ bool TextBox::focusEvent(bool focused) {
 
 bool TextBox::keyboardEvent(int key, int /* scancode */, int action, int modifiers) {
     if (mEditable && focused()) {
-        if (action == SDL_KEYDOWN /*|| action == GLFW_REPEAT*/) {
+        if (action == SDL_PRESSED) {
             if (key == SDLK_LEFT) {
-                if (modifiers == SDLK_LSHIFT) {
+                if (modifiers & KMOD_SHIFT) {
                     if (mSelectionPos == -1)
                         mSelectionPos = mCursorPos;
                 } else {
@@ -411,7 +408,7 @@ bool TextBox::keyboardEvent(int key, int /* scancode */, int action, int modifie
                 if (mCursorPos > 0)
                     mCursorPos--;
             } else if (key == SDLK_RIGHT) {
-                if (modifiers == SDLK_LSHIFT) {
+                if (modifiers & KMOD_SHIFT) {
                     if (mSelectionPos == -1)
                         mSelectionPos = mCursorPos;
                 } else {
@@ -421,7 +418,7 @@ bool TextBox::keyboardEvent(int key, int /* scancode */, int action, int modifie
                 if (mCursorPos < (int) mValueTemp.length())
                     mCursorPos++;
             } else if (key == SDLK_HOME) {
-                if (modifiers == SDLK_LSHIFT) {
+                if (modifiers & KMOD_SHIFT) {
                     if (mSelectionPos == -1)
                         mSelectionPos = mCursorPos;
                 } else {
@@ -430,7 +427,7 @@ bool TextBox::keyboardEvent(int key, int /* scancode */, int action, int modifie
 
                 mCursorPos = 0;
             } else if (key == SDLK_END) {
-                if (modifiers == SDLK_LSHIFT) {
+                if (modifiers & KMOD_SHIFT) {
                     if (mSelectionPos == -1)
                         mSelectionPos = mCursorPos;
                 } else {
@@ -454,23 +451,15 @@ bool TextBox::keyboardEvent(int key, int /* scancode */, int action, int modifie
             else if (key == SDLK_RETURN) {
                 if (!mCommitted)
                     focusEvent(false);
-            }
-            else if (key == SDLK_a && modifiers == SDLK_RCTRL)
-            {
+            } else if (key == SDLK_a && modifiers & SYSTEM_COMMAND_MOD) {
                 mCursorPos = (int) mValueTemp.length();
                 mSelectionPos = 0;
-            }
-            else if (key == SDLK_x && modifiers == SDLK_RCTRL)
-            {
+            } else if (key == SDLK_x && modifiers & SYSTEM_COMMAND_MOD) {
                 copySelection();
                 deleteSelection();
-            }
-            else if (key == SDLK_c && modifiers == SDLK_RCTRL)
-            {
+            } else if (key == SDLK_c && modifiers & SYSTEM_COMMAND_MOD) {
                 copySelection();
-            }
-            else if (key == SDLK_v && modifiers == SDLK_RCTRL)
-            {
+            } else if (key == SDLK_v && modifiers & SYSTEM_COMMAND_MOD) {
                 deleteSelection();
                 pasteFromClipboard();
             }
@@ -528,7 +517,7 @@ bool TextBox::copySelection() {
         if (begin > end)
             std::swap(begin, end);
 
-        SDL_SetClipboardText( mValueTemp.substr(begin, end).c_str());
+        SDL_SetClipboardText(mValueTemp.substr(begin, end).c_str());
         return true;
     }
 
@@ -537,8 +526,9 @@ bool TextBox::copySelection() {
 
 void TextBox::pasteFromClipboard() {
     Screen *sc = dynamic_cast<Screen *>(this->window()->parent());
-    std::string str( SDL_GetClipboardText() );
-    mValueTemp.insert(mCursorPos, str);
+    const char* cbstr = SDL_GetClipboardText();
+    if (cbstr)
+        mValueTemp.insert(mCursorPos, std::string(cbstr));
 }
 
 bool TextBox::deleteSelection() {
@@ -567,7 +557,7 @@ void TextBox::updateCursor(NVGcontext *, float lastx,
                            const NVGglyphPosition *glyphs, int size) {
     // handle mouse cursor events
     if (mMouseDownPos.x() != -1) {
-        if (mMouseDownModifier == SDLK_LSHIFT) {
+        if (mMouseDownModifier == KMOD_SHIFT) {
             if (mSelectionPos == -1)
                 mSelectionPos = mCursorPos;
         } else
@@ -669,3 +659,4 @@ bool TextBox::load(Serializer &s) {
 }
 
 NAMESPACE_END(nanogui)
+

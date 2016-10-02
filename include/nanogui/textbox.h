@@ -1,13 +1,14 @@
 /*
     nanogui/textbox.h -- Fancy text box with builtin regular
     expression-based validation
-
     The text box widget was contributed by Christian Schueller.
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7885f8084f73e978a31a8d14d7aff1bca8bbafab
     NanoGUI was developed by Wenzel Jakob <wenzel.jakob@epfl.ch>.
     The widget drawing code is based on the NanoVG demo application
     by Mikko Mononen.
-
     All rights reserved. Use of this source code is governed by a
     BSD-style license that can be found in the LICENSE.txt file.
 */
@@ -236,7 +237,10 @@ private:
  * \class FloatBox textbox.h nanogui/textbox.h
  *
  * \brief A specialization of TextBox representing floating point values.
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7885f8084f73e978a31a8d14d7aff1bca8bbafab
  * Template parameters should be float types, e.g. ``float``, ``double``,
  * ``float64_t``, etc.
  */
@@ -345,3 +349,4 @@ private:
 };
 
 NAMESPACE_END(nanogui)
+
