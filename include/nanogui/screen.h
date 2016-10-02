@@ -55,6 +55,9 @@ public:
     /// Set window size
     void setSize(const Vector2i& size);
 
+    /// Return the ratio between pixel and device coordinates (e.g. >= 2 on Mac Retina displays)
+    float pixelRatio() const { return mPixelRatio; }
+
     /// Draw the Screen contents
     virtual void drawAll();
 
