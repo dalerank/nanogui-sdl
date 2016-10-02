@@ -1,7 +1,7 @@
 /*
     src/window.cpp -- Top-level window widget
 
-    NanoGUI was developed by Wenzel Jakob <wenzel@inf.ethz.ch>.
+    NanoGUI was developed by Wenzel Jakob <wenzel.jakob@epfl.ch>.
     The widget drawing code is based on the NanoVG demo application
     by Mikko Mononen.
 
@@ -15,14 +15,14 @@
 #include <nanogui/screen.h>
 #include <nanogui/layout.h>
 #include <SDL2/SDL.h>
+#include <nanogui/serializer/core.h>
 
 NAMESPACE_BEGIN(nanogui)
 
 Window::Window(Widget *parent, const std::string &title)
     : Widget(parent), mTitle(title), mButtonPanel(nullptr), mModal(false), mDrag(false) { }
 
-Vector2i Window::preferredSize(NVGcontext *ctx) const
-{
+Vector2i Window::preferredSize(NVGcontext *ctx) const {
     if (mButtonPanel)
         mButtonPanel->setVisible(false);
     Vector2i result = Widget::preferredSize(ctx);
@@ -47,8 +47,7 @@ Widget *Window::buttonPanel() {
     return mButtonPanel;
 }
 
-void Window::performLayout(NVGcontext *ctx)
-{
+void Window::performLayout(NVGcontext *ctx) {
     if (!mButtonPanel) {
         Widget::performLayout(ctx);
     } else {
@@ -107,9 +106,12 @@ void Window::draw(NVGcontext *ctx) {
         nvgBeginPath(ctx);
         nvgRoundedRect(ctx, mPos.x(), mPos.y(), mSize.x(), hh, cr);
         nvgStrokeColor(ctx, mTheme->mWindowHeaderSepTop);
-        nvgScissor(ctx, mPos.x(), mPos.y(), mSize.x(), 0.5f);
+
+        nvgSave(ctx);
+        nvgIntersectScissor(ctx, mPos.x(), mPos.y(), mSize.x(), 0.5f);
         nvgStroke(ctx);
         nvgResetScissor(ctx);
+        nvgRestore(ctx);
 
         nvgBeginPath(ctx);
         nvgMoveTo(ctx, mPos.x() + 0.5f, mPos.y() + hh - 1.5f);
@@ -165,8 +167,7 @@ bool Window::mouseDragEvent(const Vector2i &, const Vector2i &rel,
 bool Window::mouseButtonEvent(const Vector2i &p, int button, bool down, int modifiers) {
     if (Widget::mouseButtonEvent(p, button, down, modifiers))
         return true;
-    if (button == SDL_BUTTON_LEFT)
-    {
+    if (button == SDL_BUTTON_LEFT) {
         mDrag = down && (p.y() - mPos.y()) < mTheme->mWindowHeaderHeight;
         return true;
     }
@@ -180,6 +181,20 @@ bool Window::scrollEvent(const Vector2i &p, const Vector2f &rel) {
 
 void Window::refreshRelativePlacement() {
     /* Overridden in \ref Popup */
+}
+
+void Window::save(Serializer &s) const {
+    Widget::save(s);
+    s.set("title", mTitle);
+    s.set("modal", mModal);
+}
+
+bool Window::load(Serializer &s) {
+    if (!Widget::load(s)) return false;
+    if (!s.get("title", mTitle)) return false;
+    if (!s.get("modal", mModal)) return false;
+    mDrag = false;
+    return true;
 }
 
 NAMESPACE_END(nanogui)
