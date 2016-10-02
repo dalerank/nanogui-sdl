@@ -1,13 +1,14 @@
 /*
     nanogui/popupbutton.h -- Button which launches a popup widget
 
-    NanoGUI was developed by Wenzel Jakob <wenzel@inf.ethz.ch>.
+    NanoGUI was developed by Wenzel Jakob <wenzel.jakob@epfl.ch>.
     The widget drawing code is based on the NanoVG demo application
     by Mikko Mononen.
 
     All rights reserved. Use of this source code is governed by a
     BSD-style license that can be found in the LICENSE.txt file.
 */
+/** \file */
 
 #pragma once
 
@@ -17,6 +18,11 @@
 
 NAMESPACE_BEGIN(nanogui)
 
+/**
+ * \class PopupButton popupbutton.h nanogui/popupbutton.h
+ *
+ * \brief Button which launches a popup widget.
+ */
 class NANOGUI_EXPORT PopupButton : public Button {
 public:
     PopupButton(Widget *parent, const std::string &caption = "Untitled",
@@ -27,12 +33,16 @@ public:
     int chevronIcon() const { return mChevronIcon; }
 
     Popup *popup() { return mPopup; }
-    const Popup* popup() const { return mPopup; }
+    const Popup *popup() const { return mPopup; }
 
-    virtual void draw(NVGcontext* ctx);
-    virtual Vector2i preferredSize(NVGcontext *ctx) const;
-    virtual void performLayout(NVGcontext *ctx);
+    virtual void draw(NVGcontext* ctx) override;
+    virtual Vector2i preferredSize(NVGcontext *ctx) const override;
+    virtual void performLayout(NVGcontext *ctx) override;
 
+    virtual void save(Serializer &s) const override;
+    virtual bool load(Serializer &s) override;
+
+    PopupButton& withChevron(int icon) { setChevronIcon(icon); return *this; }
 protected:
     Popup *mPopup;
     int mChevronIcon;

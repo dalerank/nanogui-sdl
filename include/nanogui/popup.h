@@ -2,13 +2,14 @@
     nanogui/popup.h -- Simple popup widget which is attached to another given
     window (can be nested)
 
-    NanoGUI was developed by Wenzel Jakob <wenzel@inf.ethz.ch>.
+    NanoGUI was developed by Wenzel Jakob <wenzel.jakob@epfl.ch>.
     The widget drawing code is based on the NanoVG demo application
     by Mikko Mononen.
 
     All rights reserved. Use of this source code is governed by a
     BSD-style license that can be found in the LICENSE.txt file.
 */
+/** \file */
 
 #pragma once
 
@@ -17,6 +18,8 @@
 NAMESPACE_BEGIN(nanogui)
 
 /**
+ * \class Popup popup.h nanogui/popup.h
+ *
  * \brief Popup window for combo boxes, popup buttons, nested dialogs etc.
  *
  * Usually the Popup instance is constructed by another widget (e.g. \ref PopupButton)
@@ -43,13 +46,16 @@ public:
     const Window *parentWindow() const { return mParentWindow; }
 
     /// Invoke the associated layout generator to properly place child widgets, if any
-    virtual void performLayout(NVGcontext *ctx);
+    virtual void performLayout(NVGcontext *ctx) override;
 
     /// Draw the popup window
-    virtual void draw(NVGcontext* ctx);
+    virtual void draw(NVGcontext* ctx) override;
+
+    virtual void save(Serializer &s) const override;
+    virtual bool load(Serializer &s) override;
 protected:
     /// Internal helper function to maintain nested window position values
-    virtual void refreshRelativePlacement();
+    virtual void refreshRelativePlacement() override;
 
 protected:
     Window *mParentWindow;

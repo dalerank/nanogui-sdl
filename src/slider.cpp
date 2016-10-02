@@ -1,7 +1,7 @@
 /*
     nanogui/slider.cpp -- Fractional slider widget with mouse control
 
-    NanoGUI was developed by Wenzel Jakob <wenzel@inf.ethz.ch>.
+    NanoGUI was developed by Wenzel Jakob <wenzel.jakob@epfl.ch>.
     The widget drawing code is based on the NanoVG demo application
     by Mikko Mononen.
 
@@ -12,6 +12,7 @@
 #include <nanogui/slider.h>
 #include <nanogui/theme.h>
 #include <nanogui/opengl.h>
+#include <nanogui/serializer/core.h>
 
 NAMESPACE_BEGIN(nanogui)
 
@@ -83,17 +84,32 @@ void Slider::draw(NVGcontext* ctx) {
         mTheme->mBorderLight);
 
     nvgBeginPath(ctx);
-    nvgCircle(ctx, knobPos.x(), knobPos.y(), kr);
+    nvgCircle(ctx, knobPos.x(), knobPos.y(), kr*mKnobRadKoeff.outter);
     nvgStrokeColor(ctx, mTheme->mBorderDark);
     nvgFillPaint(ctx, knob);
     nvgStroke(ctx);
     nvgFill(ctx);
     nvgBeginPath(ctx);
-    nvgCircle(ctx, knobPos.x(), knobPos.y(), kr/2);
+    nvgCircle(ctx, knobPos.x(), knobPos.y(), kr*mKnobRadKoeff.inner);
     nvgFillColor(ctx, Color(150, mEnabled ? 255 : 100));
     nvgStrokePaint(ctx, knobReverse);
     nvgStroke(ctx);
     nvgFill(ctx);
+}
+
+void Slider::save(Serializer &s) const {
+    Widget::save(s);
+    s.set("value", mValue);
+    s.set("highlightedRange", mHighlightedRange);
+    s.set("highlightColor", mHighlightColor);
+}
+
+bool Slider::load(Serializer &s) {
+    if (!Widget::load(s)) return false;
+    if (!s.get("value", mValue)) return false;
+    if (!s.get("highlightedRange", mHighlightedRange)) return false;
+    if (!s.get("highlightColor", mHighlightColor)) return false;
+    return true;
 }
 
 NAMESPACE_END(nanogui)
