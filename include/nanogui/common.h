@@ -107,6 +107,7 @@ struct GLFWcursor;
 
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
+/*
 // Define command key for windows/mac/linux
 #ifdef __APPLE__
 /// If on OSX, maps to ``GLFW_MOD_SUPER``.  Otherwise, maps to ``GLFW_MOD_CONTROL``.
@@ -115,6 +116,8 @@ struct GLFWcursor;
 /// If on OSX, maps to ``GLFW_MOD_SUPER``.  Otherwise, maps to ``GLFW_MOD_CONTROL``.
 #define SYSTEM_COMMAND_MOD GLFW_MOD_CONTROL
 #endif
+*/
+#define SYSTEM_COMMAND_MOD KMOD_CTRL
 
 NAMESPACE_BEGIN(nanogui)
 
