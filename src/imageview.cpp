@@ -33,7 +33,7 @@ namespace {
         strings.push_back(text.substr(previous));
         return strings;
     }
-
+#if defined(NANOVG_GL3_IMPLEMENTATION)
     constexpr char const *const defaultImageViewVertexShader =
         R"(#version 330
         uniform vec2 scaleFactor;
@@ -57,11 +57,97 @@ namespace {
         void main() {
             color = texture(image, uv);
         })";
+#elif defined(NANOVG_GL2_IMPLEMENTATION)
+    constexpr char const *const defaultImageViewVertexShader =
+        R"(#version 100
+        uniform vec2 scaleFactor;
+        uniform vec2 position;
+        attribute vec2 vertex;
+        varying vec2 uv;
+        void main() {
+            uv = vertex;
+            vec2 scaledVertex = (vertex * scaleFactor) + position;
+            gl_Position  = vec4(2.0*scaledVertex.x - 1.0,
+                                1.0 - 2.0*scaledVertex.y,
+                                0.0, 1.0);
+
+        })";
+
+    constexpr char const *const defaultImageViewFragmentShader =
+        R"(#version 100
+        #ifdef GL_FRAGMENT_PRECISION_HIGH
+        # define maxfragp highp
+        #else
+        # define maxfragp medp
+        #endif
+        uniform sampler2D image;
+        varying maxfragp vec2 uv;
+        void main() {
+            gl_FragColor = texture2D(image, uv);
+        })";
+#elif defined(NANOVG_GLES3_IMPLEMENTATION)
+    constexpr char const *const defaultImageViewVertexShader =
+        R"(#version 300 es
+        uniform vec2 scaleFactor;
+        uniform vec2 position;
+        in vec2 vertex;
+        out vec2 uv;
+        void main() {
+            uv = vertex;
+            vec2 scaledVertex = (vertex * scaleFactor) + position;
+            gl_Position  = vec4(2.0*scaledVertex.x - 1.0,
+                                1.0 - 2.0*scaledVertex.y,
+                                0.0, 1.0);
+
+        })";
+
+    constexpr char const *const defaultImageViewFragmentShader =
+        R"(#version 300 es
+        #ifdef GL_FRAGMENT_PRECISION_HIGH
+        # define maxfragp highp
+        #else
+        # define maxfragp medp
+        #endif
+        uniform sampler2D image;
+        in maxfragp vec2 uv;
+        out maxfragp vec4 color;
+        void main() {
+            color = texture(image, uv);
+        })";
+#elif defined(NANOVG_GLES2_IMPLEMENTATION)
+    constexpr char const *const defaultImageViewVertexShader =
+        R"(#version 100
+        uniform vec2 scaleFactor;
+        uniform vec2 position;
+        attribute vec2 vertex;
+        varying vec2 uv;
+        void main() {
+            uv = vertex;
+            vec2 scaledVertex = (vertex * scaleFactor) + position;
+            gl_Position  = vec4(2.0*scaledVertex.x - 1.0,
+                                1.0 - 2.0*scaledVertex.y,
+                                0.0, 1.0);
+
+        })";
+
+    constexpr char const *const defaultImageViewFragmentShader =
+        R"(#version 100
+        #ifdef GL_FRAGMENT_PRECISION_HIGH
+        # define maxfragp highp
+        #else
+        # define maxfragp medp
+        #endif
+        uniform sampler2D image;
+        varying maxfragp vec2 uv;
+        void main() {
+            gl_FragColor = texture2D(image, uv);
+        })";
+#endif
 
 }
 
-ImageView::ImageView(Widget* parent, GLuint imageID)
-    : Widget(parent), mImageID(imageID), mScale(1.0f), mOffset(Vector2f::Zero()),
+ImageView::ImageView(Widget* parent, const GLTexture &texture)
+    : Widget(parent), mTexture(texture), mScale(1.0f), mOffset(Vector2f::Zero()),
     mFixedScale(false), mFixedOffset(false), mPixelInfoCallback(nullptr) {
     updateImageParameters();
     mShader.init("ImageViewShader", defaultImageViewVertexShader,
@@ -80,14 +166,15 @@ ImageView::ImageView(Widget* parent, GLuint imageID)
     mShader.bind();
     mShader.uploadIndices(indices);
     mShader.uploadAttrib("vertex", vertices);
+    mShader.unbind();
 }
 
 ImageView::~ImageView() {
     mShader.free();
 }
 
-void ImageView::bindImage(GLuint imageId) {
-    mImageID = imageId;
+void ImageView::bindImage(const GLTexture &texture) {
+    mTexture = texture;
     updateImageParameters();
     fit();
 }
@@ -301,12 +388,13 @@ void ImageView::draw(NVGcontext* ctx) {
     glScissor(positionInScreen.x() * r, (screenSize.y() - positionInScreen.y() - size().y()) * r,
               size().x()*r, size().y()*r);
     mShader.bind();
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, mImageID);
+    mTexture.bind();
     mShader.setUniform("image", 0);
     mShader.setUniform("scaleFactor", scaleFactor);
     mShader.setUniform("position", imagePosition);
     mShader.drawIndexed(GL_TRIANGLES, 0, 2);
+    mTexture.unbind();
+    mShader.unbind();
     glDisable(GL_SCISSOR_TEST);
 
     if (helpersVisible())
@@ -315,12 +403,7 @@ void ImageView::draw(NVGcontext* ctx) {
 
 
 void ImageView::updateImageParameters() {
-    // Query the width of the OpenGL texture.
-    glBindTexture(GL_TEXTURE_2D, mImageID);
-    GLint w, h;
-    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
-    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
-    mImageSize = Vector2i(w, h);
+    mImageSize = Vector2i(mTexture.getWidth(), mTexture.getHeight());
 }
 
 void ImageView::drawWidgetBorder(NVGcontext* ctx) const {

@@ -9,9 +9,11 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
+#include <nanovg/stb_image.h>
 #include <nanogui/glutil.h>
 #include <iostream>
 #include <fstream>
+
 
 extern PFNGLCREATESHADERPROC glCreateShader;
 extern PFNGLSHADERSOURCEPROC glShaderSource;
@@ -177,6 +179,11 @@ bool GLShader::init(const std::string &name,
 void GLShader::bind() {
     glUseProgram(mProgramShader);
     glBindVertexArray(mVertexArrayObject);
+}
+
+void GLShader::unbind() {
+    glUseProgram(0);
+    glBindVertexArray(0);
 }
 
 GLint GLShader::attrib(const std::string &name, bool warn) const {
@@ -476,6 +483,101 @@ void GLFramebuffer::downloadTGA(const std::string &filename) {
 
 //  ----------------------------------------------------
 
+GLTexture::GLTexture() : mWidth(0), mHeight(0), mBpp(0), mTextureUnit(0), mTextureId(new GLTextureId()) {
+}
+
+GLTexture::GLTexture(const std::string &filename) : mWidth(0), mHeight(0), mBpp(0), mTextureUnit(0),
+    mTextureId(new GLTextureId()) {
+    load(filename);
+}
+
+GLTexture::GLTexture(const GLTexture &texture) :
+    mWidth(texture.mWidth), mHeight(texture.mHeight), mBpp(texture.mBpp), mTextureUnit(texture.mTextureUnit),
+    mTextureId(texture.mTextureId), mTextureFileName(texture.mTextureFileName),
+    mPixelData(texture.mPixelData) {
+
+}
+
+GLTexture::GLTexture(GLTexture &&texture) :
+    mWidth(texture.mWidth), mHeight(texture.mHeight), mBpp(texture.mBpp), mTextureUnit(texture.mTextureUnit),
+    mTextureId(std::move(texture.mTextureId)), mTextureFileName(std::move(texture.mTextureFileName)),
+    mPixelData(std::move(texture.mPixelData))
+{
+
+}
+
+GLTexture::~GLTexture() {
+}
+
+void GLTexture::load(const std::string &filename) {
+    mTextureFileName = filename;
+    mPixelData = pixelData(stbi_load(filename.c_str(), &mWidth, &mHeight, &mBpp, 0), stbi_image_free);
+    if (!mPixelData) {
+        throw std::invalid_argument("Can't load " + filename);
+    }
+    GLenum internalFormat, format;
+    switch (mBpp) {
+        case 4:
+            internalFormat = GL_RGBA8;
+            format = GL_RGBA;
+            break;
+        case 3:
+            internalFormat = GL_RGB8;
+            format = GL_RGB;
+            break;
+        case 2:
+            internalFormat = GL_RG8;
+            format = GL_RG;
+            break;
+        case 1:
+            internalFormat = GL_R8;
+            format = GL_R;
+            break;
+        default:
+            throw std::runtime_error("Unknown image format");
+    }
+
+    mBpp = 8 * mBpp;
+
+    glBindTexture(GL_TEXTURE_2D, mTextureId->mTextureId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, mWidth, mHeight, 0, format, GL_UNSIGNED_BYTE, mPixelData.get());
+}
+
+void GLTexture::bind() {
+    glActiveTexture(GL_TEXTURE0 + mTextureUnit);
+    glBindTexture(GL_TEXTURE_2D, mTextureId->mTextureId);
+}
+
+void GLTexture::unbind() {
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+GLTexture &GLTexture::operator =(const GLTexture &other) {
+    mPixelData = other.mPixelData;
+    mTextureId = other.mTextureId;
+    mTextureUnit = other.mTextureUnit;
+    mTextureFileName = other.mTextureFileName;
+    mWidth = other.mWidth;
+    mHeight = other.mHeight;
+    mBpp = other.mBpp;
+    return *this;
+}
+
+GLTexture &GLTexture::operator =(GLTexture &&other) {
+    mPixelData = std::move(other.mPixelData);
+    mTextureId = std::move(other.mTextureId);
+    mTextureUnit = other.mTextureUnit;
+    mTextureFileName = std::move(other.mTextureFileName);
+    mWidth = other.mWidth;
+    mHeight = other.mHeight;
+    mBpp = other.mBpp;
+    return *this;
+}
+
+//  ----------------------------------------------------
 Eigen::Vector3f project(const Eigen::Vector3f &obj,
                         const Eigen::Matrix4f &model,
                         const Eigen::Matrix4f &proj,
