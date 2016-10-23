@@ -403,7 +403,7 @@ void ImageView::draw(NVGcontext* ctx) {
 
 
 void ImageView::updateImageParameters() {
-    mImageSize = Vector2i(mTexture.getWidth(), mTexture.getHeight());
+    mImageSize = Vector2i(mTexture.width(), mTexture.height());
 }
 
 void ImageView::drawWidgetBorder(NVGcontext* ctx) const {
