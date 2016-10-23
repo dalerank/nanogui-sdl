@@ -463,6 +463,15 @@ public:
 
     GLTexture(const std::string &filename);
 
+    /// Create an empty texture filled with RGB color
+    GLTexture(int w, int h, GLubyte r, GLubyte g, GLubyte b);
+
+    /// Create an empty texture filled with RGBA color
+    GLTexture(int w, int h, GLubyte r, GLubyte g, GLubyte b, GLubyte a);
+
+    /// Create an empty texture filled with RGBA color
+    GLTexture(int w, int h, Color color);
+
     GLTexture(const GLTexture &texture);
 
     GLTexture(GLTexture &&texture);
@@ -471,27 +480,40 @@ public:
 
     void load(const std::string &filename);
 
+    void createRGBTexture(int w, int h, GLubyte r, GLubyte g, GLubyte b);
+
+    inline void createRGBTexture(int w, int h, Color color) { createRGBTexture(w, h, (GLubyte) (color.r() * 255),
+                                                                               (GLubyte) (color.g() * 255),
+                                                                               (GLubyte) (color.b() * 255));}
+
+    void createRGBATexture(int w, int h, GLubyte r, GLubyte g, GLubyte b, GLubyte a);
+
+    inline void createRGBATexture(int w, int h, Color color) { createRGBATexture(w, h, (GLubyte) (color.r() * 255),
+                                                                                (GLubyte) (color.g() * 255),
+                                                                                (GLubyte) (color.b() * 255),
+                                                                                (GLubyte) (color.w() * 255)); }
+
     ///Set parameters for texture. You must bind the texture before use.
     void setTexParameter(GLenum parameter, GLint value) { glTexParameteri(GL_TEXTURE_2D, parameter, value); }
 
     ///Set parameters for texture. You must bind the texture before use.
     GLTexture &withTexParameter(GLenum parameter, GLint value) { setTexParameter(parameter, value); return *this; }
 
-    glTextureId_ptr getTextureId() { return mTextureId; }
+    inline  glTextureId_ptr textureId() { return mTextureId; }
 
     void setTextureUnit(GLuint textureUnit) { mTextureUnit = textureUnit; }
     GLTexture &withTextureUnit(GLuint textureUnit) { setTextureUnit(textureUnit); return *this; }
-    GLuint getTextureUnit() { return mTextureUnit; }
+    inline GLuint textureUnit() { return mTextureUnit; }
 
-    GLuint getWidth() { return mWidth; }
-    GLuint getHeight() { return mHeight; }
-    GLuint getBpp() { return mBpp; }
+    inline GLuint width() { return mWidth; }
+    inline GLuint height() { return mHeight; }
+    inline GLuint bpp() { return mBpp; }
 
     void bind();
 
     void unbind();
 
-    pixelData getPixelData() { return mPixelData; }
+    inline pixelData getPixelData() { return mPixelData; }
 
     GLTexture &operator =(const GLTexture &other);
     GLTexture &operator =(GLTexture &&other);
