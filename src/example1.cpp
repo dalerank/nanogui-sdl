@@ -56,74 +56,6 @@ using std::endl;
 
 using namespace nanogui;
 
-class GLTexture {
-public:
-    using handleType = std::unique_ptr<uint8_t[], void(*)(void*)>;
-    GLTexture() = default;
-    GLTexture(const std::string& textureName)
-        : mTextureName(textureName), mTextureId(0) {}
-
-    GLTexture(const std::string& textureName, GLint textureId)
-        : mTextureName(textureName), mTextureId(textureId) {}
-
-    GLTexture(const GLTexture& other) = delete;
-    GLTexture(GLTexture&& other) noexcept
-        : mTextureName(std::move(other.mTextureName)),
-        mTextureId(other.mTextureId) {
-        other.mTextureId = 0;
-    }
-    GLTexture& operator=(const GLTexture& other) = delete;
-    GLTexture& operator=(GLTexture&& other) noexcept {
-        mTextureName = std::move(other.mTextureName);
-        std::swap(mTextureId, other.mTextureId);
-        return *this;
-    }
-    ~GLTexture() noexcept {
-        if (mTextureId)
-            glDeleteTextures(1, &mTextureId);
-    }
-
-    GLuint texture() const { return mTextureId; }
-    const std::string& textureName() const { return mTextureName; }
-
-    /**
-    *  Load a file in memory and create an OpenGL texture.
-    *  Returns a handle type (an std::unique_ptr) to the loaded pixels.
-    */
-    handleType load(const std::string& fileName) {
-        if (mTextureId) {
-            glDeleteTextures(1, &mTextureId);
-            mTextureId = 0;
-        }
-        int force_channels = 0;
-        int w, h, n;
-        handleType textureData(stbi_load(fileName.c_str(), &w, &h, &n, force_channels), stbi_image_free);
-        if (!textureData)
-            throw std::invalid_argument("Could not load texture data from file " + fileName);
-        glGenTextures(1, &mTextureId);
-        glBindTexture(GL_TEXTURE_2D, mTextureId);
-        GLint internalFormat;
-        GLint format;
-        switch (n) {
-            case 1: internalFormat = GL_R8; format = GL_RED; break;
-            case 2: internalFormat = GL_RG8; format = GL_RG; break;
-            case 3: internalFormat = GL_RGB8; format = GL_RGB; break;
-            case 4: internalFormat = GL_RGBA8; format = GL_RGBA; break;
-            default: internalFormat = 0; format = 0; break;
-        }
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, w, h, 0, format, GL_UNSIGNED_BYTE, textureData.get());
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        return textureData;
-    }
-
-private:
-    std::string mTextureName;
-    GLuint mTextureId;
-};
-
 class TestWindow : public nanogui::Screen
 {
 public:
@@ -226,16 +158,14 @@ public:
 
           // Load all of the images by creating a GLTexture object and saving the pixel data.
           for (auto& icon : icons) {
-              GLTexture texture(icon.second);
-              auto data = texture.load(resourcesFolderPath + icon.second + ".png");
-              mImagesData.emplace_back(std::move(texture), std::move(data));
+              mImagesData.emplace_back(GLTexture(resourcesFolderPath + icon.second + ".png"));
           }
 
-          auto imageView = img_window.add<ImageView>(mImagesData[0].first.texture());
+          auto imageView = img_window.add<ImageView>(mImagesData[0]);
                  mCurrentImage = 0;
                  // Change the active textures.
                  imgPanel.setCallback([this, imageView, imgPanel](int i) {
-                     imageView->bindImage(mImagesData[i].first.texture());
+                     imageView->bindImage(mImagesData[i]);
                      mCurrentImage = i;
                      cout << "Selected item " << i << '\n';
                  });
@@ -243,12 +173,13 @@ public:
                  imageView->setPixelInfoThreshold(20);
                  imageView->setPixelInfoCallback(
                      [this, imageView](const Vector2i& index) -> std::pair<std::string, Color> {
-                     auto& imageData = mImagesData[mCurrentImage].second;
+                     auto&& imageData = mImagesData[mCurrentImage].getPixelData();
                      auto& textureSize = imageView->imageSize();
                      std::string stringData;
                      uint16_t channelSum = 0;
                      for (int i = 0; i != 4; ++i) {
-                         auto& channelData = imageData[4*index.y()*textureSize.x() + 4*index.x() + i];
+                         uint8_t *data = (uint8_t*)imageData.get();
+                         auto& channelData = data[4*index.y()*textureSize.x() + 4*index.x() + i];
                          channelSum += channelData;
                          stringData += (std::to_string(static_cast<int>(channelData)) + "\n");
                      }
@@ -497,7 +428,7 @@ public:
     }
 private:
     nanogui::ProgressBar *mProgress;
-    using imagesDataType = std::vector<std::pair<GLTexture, GLTexture::handleType>>;
+    using imagesDataType = std::vector<GLTexture>;
     imagesDataType mImagesData;
     int mCurrentImage;
 };

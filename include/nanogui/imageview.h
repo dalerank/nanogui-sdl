@@ -27,10 +27,10 @@ NAMESPACE_BEGIN(nanogui)
  */
 class NANOGUI_EXPORT ImageView : public Widget {
 public:
-    ImageView(Widget* parent, GLuint imageID);
+    ImageView(Widget* parent, const GLTexture &texture);
     ~ImageView();
 
-    void bindImage(GLuint imageId);
+    void bindImage(const GLTexture &texture);
 
     GLShader& imageShader() { return mShader; }
 
@@ -132,7 +132,7 @@ public:
     void performLayout(NVGcontext* ctx) override;
     void draw(NVGcontext* ctx) override;
 
-    ImageView& withImage(int img) { bindImage(img); return *this; }
+    ImageView& withImage(const GLTexture &texture) { bindImage(texture); return *this; }
 
 private:
     // Helper image methods.
@@ -148,9 +148,9 @@ private:
     void writePixelInfo(NVGcontext* ctx, const Vector2f& cellPosition,
                         const Vector2i& pixel, const float stride) const;
 
+    GLTexture mTexture;
     // Image parameters.
     GLShader mShader;
-    GLuint mImageID;
     Vector2i mImageSize;
 
     // Image display parameters.

@@ -15,6 +15,7 @@
 #include <nanogui/opengl.h>
 #include <Eigen/Geometry>
 #include <map>
+#include <memory>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace half_float { class half; }
@@ -123,6 +124,9 @@ public:
 
     /// Select this shader for subsequent draw calls
     void bind();
+
+    /// Unbind this shader
+    void unbind();
 
     /// Release underlying OpenGL objects
     void free();
@@ -421,6 +425,107 @@ protected:
 
 //  ----------------------------------------------------
 
+/**
+ * \class GLTexture glutil.h nanogui/glutil.h
+ *
+ * \brief Helper class for loading textures.
+ */
+class GLTexture {
+public:
+    using pixelData = std::shared_ptr<uint8_t>;
+
+    struct GLTextureId {
+        GLTextureId() {
+            glGenTextures(1, &mTextureId);
+        }
+
+        GLTextureId(const GLTextureId &textureId) : mTextureId(textureId.mTextureId) {
+
+        }
+
+        GLTextureId(GLTextureId &&textureId) : mTextureId(textureId.mTextureId) {
+            textureId.mTextureId = 0;
+        }
+
+        GLTextureId(const GLuint &textureId) : mTextureId(textureId) {}
+
+        ~GLTextureId() {
+            glBindTexture(GL_TEXTURE_2D, 0);
+            glDeleteTextures(1, &mTextureId);
+        }
+
+        GLuint mTextureId;
+    };
+
+    using glTextureId_ptr = std::shared_ptr<GLTextureId>;
+
+    GLTexture();
+
+    GLTexture(const std::string &filename);
+
+    /// Create an empty texture filled with RGB color
+    GLTexture(int w, int h, GLubyte r, GLubyte g, GLubyte b);
+
+    /// Create an empty texture filled with RGBA color
+    GLTexture(int w, int h, GLubyte r, GLubyte g, GLubyte b, GLubyte a);
+
+    /// Create an empty texture filled with RGBA color
+    GLTexture(int w, int h, Color color);
+
+    GLTexture(const GLTexture &texture);
+
+    GLTexture(GLTexture &&texture);
+
+    ~GLTexture();
+
+    void load(const std::string &filename);
+
+    void createRGBTexture(int w, int h, GLubyte r, GLubyte g, GLubyte b);
+
+    inline void createRGBTexture(int w, int h, Color color) { createRGBTexture(w, h, (GLubyte) (color.r() * 255),
+                                                                               (GLubyte) (color.g() * 255),
+                                                                               (GLubyte) (color.b() * 255));}
+
+    void createRGBATexture(int w, int h, GLubyte r, GLubyte g, GLubyte b, GLubyte a);
+
+    inline void createRGBATexture(int w, int h, Color color) { createRGBATexture(w, h, (GLubyte) (color.r() * 255),
+                                                                                (GLubyte) (color.g() * 255),
+                                                                                (GLubyte) (color.b() * 255),
+                                                                                (GLubyte) (color.w() * 255)); }
+
+    ///Set parameters for texture. You must bind the texture before use.
+    void setTexParameter(GLenum parameter, GLint value) { glTexParameteri(GL_TEXTURE_2D, parameter, value); }
+
+    ///Set parameters for texture. You must bind the texture before use.
+    GLTexture &withTexParameter(GLenum parameter, GLint value) { setTexParameter(parameter, value); return *this; }
+
+    inline  glTextureId_ptr textureId() { return mTextureId; }
+
+    void setTextureUnit(GLuint textureUnit) { mTextureUnit = textureUnit; }
+    GLTexture &withTextureUnit(GLuint textureUnit) { setTextureUnit(textureUnit); return *this; }
+    inline GLuint textureUnit() { return mTextureUnit; }
+
+    inline GLuint width() { return mWidth; }
+    inline GLuint height() { return mHeight; }
+    inline GLuint bpp() { return mBpp; }
+
+    void bind();
+
+    void unbind();
+
+    inline pixelData getPixelData() { return mPixelData; }
+
+    GLTexture &operator =(const GLTexture &other);
+    GLTexture &operator =(GLTexture &&other);
+private:
+    std::string mTextureFileName;
+    glTextureId_ptr mTextureId;
+    GLuint mTextureUnit;
+    int mWidth, mHeight;
+    int mBpp;
+    pixelData mPixelData;
+};
+//  ----------------------------------------------------
 /**
  * \struct Arcball glutil.h nanogui/glutil.h
  *

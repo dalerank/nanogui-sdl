@@ -9,53 +9,55 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
+#include <nanovg/stb_image.h>
 #include <nanogui/glutil.h>
 #include <iostream>
 #include <fstream>
 
+
 extern PFNGLCREATESHADERPROC glCreateShader;
 extern PFNGLSHADERSOURCEPROC glShaderSource;
-extern PFNGLCOMPILESHADERPROC glCompileShader ;
-extern PFNGLGETSHADERIVPROC glGetShaderiv ;
-extern PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog ;
-extern PFNGLLINKPROGRAMPROC glLinkProgram ;
-extern PFNGLGETPROGRAMIVPROC glGetProgramiv ;
-extern PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog ;
-extern PFNGLGENVERTEXARRAYSPROC glGenVertexArrays ;
-extern PFNGLBINDVERTEXARRAYPROC glBindVertexArray ;
-extern PFNGLBINDBUFFERPROC glBindBuffer ;
-extern PFNGLGETATTRIBLOCATIONPROC  glGetAttribLocation ;
-extern PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation ;
-extern PFNGLGENBUFFERSPROC  glGenBuffers ;
+extern PFNGLCOMPILESHADERPROC glCompileShader;
+extern PFNGLGETSHADERIVPROC glGetShaderiv;
+extern PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
+extern PFNGLLINKPROGRAMPROC glLinkProgram;
+extern PFNGLGETPROGRAMIVPROC glGetProgramiv;
+extern PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
+extern PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
+extern PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
+extern PFNGLBINDBUFFERPROC glBindBuffer;
+extern PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
+extern PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
+extern PFNGLGENBUFFERSPROC glGenBuffers;
 extern PFNGLBINDATTRIBLOCATIONPROC glBindAttribLocation;
 extern PFNGLGETUNIFORMBLOCKINDEXPROC glGetUniformBlockIndex;
 extern PFNGLUNIFORMBLOCKBINDINGPROC glUniformBlockBinding;
-extern PFNGLBUFFERDATAPROC  glBufferData ;
-extern PFNGLDISABLEVERTEXATTRIBARRAYPROC  glDisableVertexAttribArray ;
-extern PFNGLENABLEVERTEXATTRIBARRAYPROC  glEnableVertexAttribArray ;
-extern PFNGLGETBUFFERSUBDATAPROC  glGetBufferSubData ;
-extern PFNGLVERTEXATTRIBPOINTERPROC  glVertexAttribPointer ;
-extern PFNGLDELETEBUFFERSPROC  glDeleteBuffers ;
-extern PFNGLBINDFRAMEBUFFERPROC  glBindFramebuffer ;
-extern PFNGLBINDRENDERBUFFERPROC  glBindRenderbuffer ;
-extern PFNGLRENDERBUFFERSTORAGEPROC  glRenderbufferStorage ;
-extern PFNGLDELETEVERTEXARRAYSPROC  glDeleteVertexArrays ;
-extern PFNGLDELETEPROGRAMPROC  glDeleteProgram ;
-extern PFNGLDELETESHADERPROC  glDeleteShader ;
-extern PFNGLGENRENDERBUFFERSPROC  glGenRenderbuffers ;
-extern PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC  glRenderbufferStorageMultisample ;
-extern PFNGLGENFRAMEBUFFERSPROC  glGenFramebuffers ;
-extern PFNGLFRAMEBUFFERRENDERBUFFERPROC  glFramebufferRenderbuffer ;
-extern PFNGLCHECKFRAMEBUFFERSTATUSPROC  glCheckFramebufferStatus ;
-extern PFNGLDELETERENDERBUFFERSPROC  glDeleteRenderbuffers ;
-extern PFNGLBLITFRAMEBUFFERPROC glBlitFramebuffer ;
+extern PFNGLBUFFERDATAPROC glBufferData;
+extern PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray;
+extern PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
+extern PFNGLGETBUFFERSUBDATAPROC glGetBufferSubData;
+extern PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
+extern PFNGLDELETEBUFFERSPROC glDeleteBuffers;
+extern PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
+extern PFNGLBINDRENDERBUFFERPROC glBindRenderbuffer;
+extern PFNGLRENDERBUFFERSTORAGEPROC glRenderbufferStorage;
+extern PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
+extern PFNGLDELETEPROGRAMPROC glDeleteProgram;
+extern PFNGLDELETESHADERPROC glDeleteShader;
+extern PFNGLGENRENDERBUFFERSPROC glGenRenderbuffers;
+extern PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC glRenderbufferStorageMultisample;
+extern PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
+extern PFNGLFRAMEBUFFERRENDERBUFFERPROC glFramebufferRenderbuffer;
+extern PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus;
+extern PFNGLDELETERENDERBUFFERSPROC glDeleteRenderbuffers;
+extern PFNGLBLITFRAMEBUFFERPROC glBlitFramebuffer;
 extern PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
 extern PFNGLBINDBUFFERRANGEPROC glBindBufferRange;
 extern PFNGLSTENCILOPSEPARATEPROC glStencilOpSeparate;
 extern PFNGLUNIFORM2FVPROC glUniform2fv;
-extern PFNGLCREATEPROGRAMPROC glCreateProgram ;
-extern PFNGLATTACHSHADERPROC glAttachShader ;
-extern PFNGLUSEPROGRAMPROC glUseProgram ;
+extern PFNGLCREATEPROGRAMPROC glCreateProgram;
+extern PFNGLATTACHSHADERPROC glAttachShader;
+extern PFNGLUSEPROGRAMPROC glUseProgram;
 extern PFNGLBINDBUFFERBASEPROC glBindBufferBase;
 
 NAMESPACE_BEGIN(nanogui)
@@ -110,10 +112,10 @@ static GLuint createShader_helper(GLint type, const std::string &name,
 }
 
 bool GLShader::initFromFiles(
-    const std::string &name,
-    const std::string &vertex_fname,
-    const std::string &fragment_fname,
-    const std::string &geometry_fname) {
+        const std::string &name,
+        const std::string &vertex_fname,
+        const std::string &fragment_fname,
+        const std::string &geometry_fname) {
     auto file_to_string = [](const std::string &filename) -> std::string {
         if (filename.empty())
             return "";
@@ -139,11 +141,11 @@ bool GLShader::init(const std::string &name,
     glGenVertexArrays(1, &mVertexArrayObject);
     mName = name;
     mVertexShader =
-        createShader_helper(GL_VERTEX_SHADER, name, defines, vertex_str);
+            createShader_helper(GL_VERTEX_SHADER, name, defines, vertex_str);
     mGeometryShader =
-        createShader_helper(GL_GEOMETRY_SHADER, name, defines, geometry_str);
+            createShader_helper(GL_GEOMETRY_SHADER, name, defines, geometry_str);
     mFragmentShader =
-        createShader_helper(GL_FRAGMENT_SHADER, name, defines, fragment_str);
+            createShader_helper(GL_FRAGMENT_SHADER, name, defines, fragment_str);
 
     if (!mVertexShader || !mFragmentShader)
         return false;
@@ -177,6 +179,11 @@ bool GLShader::init(const std::string &name,
 void GLShader::bind() {
     glUseProgram(mProgramShader);
     glBindVertexArray(mVertexArrayObject);
+}
+
+void GLShader::unbind() {
+    glUseProgram(0);
+    glBindVertexArray(0);
 }
 
 GLint GLShader::attrib(const std::string &name, bool warn) const {
@@ -250,7 +257,7 @@ void GLShader::uploadAttrib(const std::string &name, uint32_t size, int dim,
 }
 
 void GLShader::downloadAttrib(const std::string &name, uint32_t size, int /* dim */,
-                             uint32_t compSize, GLuint /* glType */, uint8_t *data) {
+                              uint32_t compSize, GLuint /* glType */, uint8_t *data) {
     auto it = mBufferObjects.find(name);
     if (it == mBufferObjects.end())
         throw std::runtime_error("downloadAttrib(" + mName + ", " + name + ") : buffer not found!");
@@ -309,12 +316,18 @@ void GLShader::drawIndexed(int type, uint32_t offset_, uint32_t count_) {
     size_t count = count_;
 
     switch (type) {
-        case GL_TRIANGLES: offset *= 3; count *= 3; break;
-        case GL_LINES: offset *= 2; count *= 2; break;
+        case GL_TRIANGLES:
+            offset *= 3;
+            count *= 3;
+            break;
+        case GL_LINES:
+            offset *= 2;
+            count *= 2;
+            break;
     }
 
     glDrawElements(type, (GLsizei) count, GL_UNSIGNED_INT,
-                   (const void *)(offset * sizeof(uint32_t)));
+                   (const void *) (offset * sizeof(uint32_t)));
 }
 
 void GLShader::drawArray(int type, uint32_t offset, uint32_t count) {
@@ -331,10 +344,14 @@ void GLShader::free() {
     if (mVertexArrayObject)
         glDeleteVertexArrays(1, &mVertexArrayObject);
 
-    glDeleteProgram(mProgramShader); mProgramShader = 0;
-    glDeleteShader(mVertexShader);   mVertexShader = 0;
-    glDeleteShader(mFragmentShader); mFragmentShader = 0;
-    glDeleteShader(mGeometryShader); mGeometryShader = 0;
+    glDeleteProgram(mProgramShader);
+    mProgramShader = 0;
+    glDeleteShader(mVertexShader);
+    mVertexShader = 0;
+    glDeleteShader(mFragmentShader);
+    mFragmentShader = 0;
+    glDeleteShader(mGeometryShader);
+    mGeometryShader = 0;
 }
 
 //  ----------------------------------------------------
@@ -432,7 +449,7 @@ void GLFramebuffer::blit() {
 void GLFramebuffer::downloadTGA(const std::string &filename) {
     uint8_t *temp = new uint8_t[mSize.prod() * 4];
 
-    std::cout << "Writing \"" << filename  << "\" (" << mSize.x() << "x" << mSize.y() << ") .. ";
+    std::cout << "Writing \"" << filename << "\" (" << mSize.x() << "x" << mSize.y() << ") .. ";
     std::cout.flush();
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, mFramebuffer);
@@ -443,7 +460,7 @@ void GLFramebuffer::downloadTGA(const std::string &filename) {
     uint32_t rowSize = mSize.x() * 4;
     uint32_t halfHeight = mSize.y() / 2;
     uint8_t *line = (uint8_t *) alloca(rowSize);
-    for (uint32_t i=0, j=mSize.y()-1; i<halfHeight; ++i) {
+    for (uint32_t i = 0, j = mSize.y() - 1; i < halfHeight; ++i) {
         memcpy(line, temp + i * rowSize, rowSize);
         memcpy(temp + i * rowSize, temp + j * rowSize, rowSize);
         memcpy(temp + j * rowSize, line, rowSize);
@@ -456,11 +473,15 @@ void GLFramebuffer::downloadTGA(const std::string &filename) {
     fputc(0, tga); /* ID */
     fputc(0, tga); /* Color map */
     fputc(2, tga); /* Image type */
-    fputc(0, tga); fputc(0, tga); /* First entry of color map (unused) */
-    fputc(0, tga); fputc(0, tga); /* Length of color map (unused) */
+    fputc(0, tga);
+    fputc(0, tga); /* First entry of color map (unused) */
+    fputc(0, tga);
+    fputc(0, tga); /* Length of color map (unused) */
     fputc(0, tga); /* Color map entry size (unused) */
-    fputc(0, tga); fputc(0, tga);  /* X offset */
-    fputc(0, tga); fputc(0, tga);  /* Y offset */
+    fputc(0, tga);
+    fputc(0, tga);  /* X offset */
+    fputc(0, tga);
+    fputc(0, tga);  /* Y offset */
     fputc(mSize.x() % 256, tga); /* Width */
     fputc(mSize.x() / 256, tga); /* continued */
     fputc(mSize.y() % 256, tga); /* Height */
@@ -476,6 +497,157 @@ void GLFramebuffer::downloadTGA(const std::string &filename) {
 
 //  ----------------------------------------------------
 
+GLTexture::GLTexture() : mWidth(0), mHeight(0), mBpp(0), mTextureUnit(0), mTextureId(new GLTextureId()) {
+}
+
+GLTexture::GLTexture(const std::string &filename) : mWidth(0), mHeight(0), mBpp(0), mTextureUnit(0),
+                                                    mTextureId(new GLTextureId()) {
+    load(filename);
+}
+
+GLTexture::GLTexture(int w, int h, GLubyte r, GLubyte g, GLubyte b) : mWidth(0), mHeight(0), mBpp(0), mTextureUnit(0),
+                                                            mTextureId(new GLTextureId()) {
+    createRGBTexture(w, h, r, g, b);
+}
+
+GLTexture::GLTexture(int w, int h, GLubyte r, GLubyte g, GLubyte b, GLubyte a) : mWidth(0), mHeight(0), mBpp(0), mTextureUnit(0),
+                                                                                 mTextureId(new GLTextureId()) {
+    createRGBATexture(w, h, r, g, b, a);
+}
+
+GLTexture::GLTexture(int w, int h, Color color) : mWidth(0), mHeight(0), mBpp(0), mTextureUnit(0),
+                                                  mTextureId(new GLTextureId()) {
+    createRGBATexture(w, h, color);
+}
+
+GLTexture::GLTexture(const GLTexture &texture) :
+        mWidth(texture.mWidth), mHeight(texture.mHeight), mBpp(texture.mBpp), mTextureUnit(texture.mTextureUnit),
+        mTextureId(texture.mTextureId), mTextureFileName(texture.mTextureFileName),
+        mPixelData(texture.mPixelData) {
+
+}
+
+GLTexture::GLTexture(GLTexture &&texture) :
+        mWidth(texture.mWidth), mHeight(texture.mHeight), mBpp(texture.mBpp), mTextureUnit(texture.mTextureUnit),
+        mTextureId(std::move(texture.mTextureId)), mTextureFileName(std::move(texture.mTextureFileName)),
+        mPixelData(std::move(texture.mPixelData)) {
+
+}
+
+GLTexture::~GLTexture() {
+}
+
+void GLTexture::load(const std::string &filename) {
+    mTextureFileName = filename;
+    mPixelData = pixelData(stbi_load(filename.c_str(), &mWidth, &mHeight, &mBpp, 0), stbi_image_free);
+    if (!mPixelData) {
+        throw std::invalid_argument("Can't load " + filename);
+    }
+    GLenum internalFormat, format;
+    switch (mBpp) {
+        case 4:
+            internalFormat = GL_RGBA8;
+            format = GL_RGBA;
+            break;
+        case 3:
+            internalFormat = GL_RGB8;
+            format = GL_RGB;
+            break;
+        case 2:
+            internalFormat = GL_RG8;
+            format = GL_RG;
+            break;
+        case 1:
+            internalFormat = GL_R8;
+            format = GL_R;
+            break;
+        default:
+            throw std::runtime_error("Unknown image format");
+    }
+
+    mBpp = 8 * mBpp;
+
+    glBindTexture(GL_TEXTURE_2D, mTextureId->mTextureId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, mWidth, mHeight, 0, format, GL_UNSIGNED_BYTE, mPixelData.get());
+}
+
+void GLTexture::createRGBTexture(int w, int h, GLubyte r, GLubyte g, GLubyte b) {
+    mWidth = w;
+    mHeight = h;
+    mBpp = 3;
+    std::size_t size = w * h * mBpp;
+    stbi_uc *pData = new stbi_uc[size];
+    for (int i = 0; i < size; i+=mBpp) {
+        stbi_uc *ptr = &pData[i];
+        *ptr = r;
+        *(ptr + 1) = g;
+        *(ptr + 2) = b;
+    }
+    mPixelData = pixelData (pData, [](void *data) {delete[] data;});
+    glActiveTexture(mTextureUnit);
+    glBindTexture(GL_TEXTURE_2D, mTextureId->mTextureId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, mWidth, mHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, mPixelData.get());
+    mBpp *= 8;
+}
+
+void GLTexture::createRGBATexture(int w, int h, GLubyte r, GLubyte g, GLubyte b, GLubyte a) {
+    mWidth = w;
+    mHeight = h;
+    mBpp = 4;
+    std::size_t size = w * h * mBpp;
+    stbi_uc *pData = new stbi_uc[size];
+    for (int i = 0; i < size; i+=mBpp) {
+        stbi_uc *ptr = &pData[i];
+        *ptr = r;
+        *(ptr + 1) = g;
+        *(ptr + 2) = b;
+        *(ptr + 3) = a;
+    }
+    mPixelData = pixelData (pData, [](void *data) {delete[] data;});
+    glActiveTexture(mTextureUnit);
+    glBindTexture(GL_TEXTURE_2D, mTextureId->mTextureId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, mWidth, mHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, mPixelData.get());
+    mBpp *= 8;
+}
+void GLTexture::bind() {
+    glActiveTexture(GL_TEXTURE0 + mTextureUnit);
+    glBindTexture(GL_TEXTURE_2D, mTextureId->mTextureId);
+}
+
+void GLTexture::unbind() {
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+GLTexture &GLTexture::operator=(const GLTexture &other) {
+    mPixelData = other.mPixelData;
+    mTextureId = other.mTextureId;
+    mTextureUnit = other.mTextureUnit;
+    mTextureFileName = other.mTextureFileName;
+    mWidth = other.mWidth;
+    mHeight = other.mHeight;
+    mBpp = other.mBpp;
+    return *this;
+}
+
+GLTexture &GLTexture::operator=(GLTexture &&other) {
+    mPixelData = std::move(other.mPixelData);
+    mTextureId = std::move(other.mTextureId);
+    mTextureUnit = other.mTextureUnit;
+    mTextureFileName = std::move(other.mTextureFileName);
+    mWidth = other.mWidth;
+    mHeight = other.mHeight;
+    mBpp = other.mBpp;
+    return *this;
+}
+
+//  ----------------------------------------------------
 Eigen::Vector3f project(const Eigen::Vector3f &obj,
                         const Eigen::Matrix4f &model,
                         const Eigen::Matrix4f &proj,
