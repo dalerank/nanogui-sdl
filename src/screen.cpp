@@ -325,12 +325,13 @@ void Screen::drawWidgets()
         return;
 
     //SDL_GL_MakeCurrent( _window, _glcontext );
-    //glfwGetFramebufferSize(mGLFWWindow, &mFBSize[0], &mFBSize[1]);
+    SDL_GL_GetDrawableSize(_window, &mFBSize[0], &mFBSize[1]);
     SDL_GetWindowSize( _window, &mSize[0], &mSize[1]);
     glViewport(0, 0, mFBSize[0], mFBSize[1]);
 
     /* Calculate pixel ratio for hi-dpi devices. */
     mPixelRatio = (float) mFBSize[0] / (float) mSize[0];
+    
     nvgBeginFrame(mNVGContext, mSize[0], mSize[1], mPixelRatio);
 
     draw(mNVGContext);
