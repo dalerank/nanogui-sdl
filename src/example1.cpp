@@ -474,7 +474,7 @@ int main(int /* argc */, char ** /* argv */)
       SDL_WINDOWPOS_UNDEFINED,  //    int y: initial y position
       winWidth,                      //    int w: width, in pixels
       winHeight,                      //    int h: height, in pixels
-      SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN          //    Uint32 flags: window options, see docs
+      SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN  | SDL_WINDOW_ALLOW_HIGHDPI        //    Uint32 flags: window options, see docs
     );
 
     // Check that the window was successfully made
