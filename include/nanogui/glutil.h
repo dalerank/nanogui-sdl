@@ -430,7 +430,7 @@ protected:
  *
  * \brief Helper class for loading textures.
  */
-class GLTexture {
+class NANOGUI_EXPORT GLTexture {
 public:
     using pixelData = std::shared_ptr<uint8_t>;
 

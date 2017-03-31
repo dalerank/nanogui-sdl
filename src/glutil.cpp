@@ -59,6 +59,9 @@ extern PFNGLCREATEPROGRAMPROC glCreateProgram;
 extern PFNGLATTACHSHADERPROC glAttachShader;
 extern PFNGLUSEPROGRAMPROC glUseProgram;
 extern PFNGLBINDBUFFERBASEPROC glBindBufferBase;
+#if defined(NANOVG_GLES3_IMPLEMENTATION)
+extern PFNGLDRAWBUFFERSPROC glDrawBuffers;
+#endif
 
 NAMESPACE_BEGIN(nanogui)
 
@@ -408,7 +411,12 @@ void GLFramebuffer::init(const Vector2i &size, int nSamples) {
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mDepth);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mDepth);
 
+#if defined(NANOVG_GLES3_IMPLEMENTATION)
+    GLuint attachments[1] = {GL_COLOR_ATTACHMENT0};
+    glDrawBuffers(1, attachments);
+#else
     glDrawBuffer(GL_COLOR_ATTACHMENT0);
+#endif
     glReadBuffer(GL_COLOR_ATTACHMENT0);
 
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -438,7 +446,12 @@ void GLFramebuffer::release() {
 void GLFramebuffer::blit() {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, mFramebuffer);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+#if defined(NANOVG_GLES3_IMPLEMENTATION)
+    GLuint attachments[1] = {GL_BACK};
+    glDrawBuffers(1, attachments);
+#else
     glDrawBuffer(GL_BACK);
+#endif
 
     glBlitFramebuffer(0, 0, mSize.x(), mSize.y(), 0, 0, mSize.x(), mSize.y(),
                       GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);

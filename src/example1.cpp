@@ -54,6 +54,11 @@ using std::endl;
 
 #undef main
 
+extern "C" {
+    typedef GLubyte* (APIENTRY * glGetString_Func)(unsigned int);
+    glGetString_Func glGetStringAPI = NULL;
+}
+
 using namespace nanogui;
 
 class TestWindow : public nanogui::Screen
@@ -435,6 +440,9 @@ private:
 
 int main(int /* argc */, char ** /* argv */)
 {
+    char rendername[256] = {0};
+    SDL_RendererInfo info;
+
     SDL_Init(SDL_INIT_VIDEO);   // Initialize SDL2
 
     SDL_Window *window;        // Declare a pointer to an SDL_Window
@@ -487,6 +495,18 @@ int main(int /* argc */, char ** /* argv */)
 
     auto context = SDL_GL_CreateContext(window);
 
+    for (int it = 0; it < SDL_GetNumRenderDrivers(); it++) {
+        SDL_GetRenderDriverInfo(it, &info);
+        strcat(rendername, info.name);
+        strcat(rendername, " ");
+    }
+
+    glGetStringAPI = (glGetString_Func)SDL_GL_GetProcAddress("glGetString");
+
+    std::cout << "Available Renderers: " << rendername << std::endl;
+    std::cout << "Vendor     : " << glGetStringAPI(GL_VENDOR) << std::endl;
+    std::cout << "Renderer   : " << glGetStringAPI(GL_RENDERER) << std::endl;
+    std::cout << "Version    : " << glGetStringAPI(GL_VERSION) << std::endl;
 
     //SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED );
 
