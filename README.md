@@ -3,12 +3,12 @@
 NanoGUI-SDL is a SDL port for https://github.com/wjakob/nanogui
 
 ## Example screenshot
-![Screenshot](http://i.imgur.com/fe9nJBm.png "Screenshot")
+![Screenshot](https://github.com/dalerank/nanogui-sdl/blob/master/resources/screenshot1.png "Screenshot")
 
 ## Description
-NanoGUI-SDL builds on [SDL2](http://www.libsdl.org/) for cross-platform OpenGL context
-creation and event handling, [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page) for
-basic vector types, and [NanoVG](https://github.com/memononen/NanoVG) to draw
+NanoGUI-SDL builds on [SDL2](http://www.libsdl.org/) for cross-platform context
+creation and event handling, for
+basic vector types, and [NanoVG/NanoVG-RT](https://github.com/memononen/NanoVG) to draw
 2D primitives.
 
 NanoGUI-SDL currently works on Mac OS X (Clang) Linux (GCC or Clang) and Windows
@@ -45,6 +45,20 @@ auto& textBox = panel.add<TextBox>()
 
 /* Propagate slider changes to the text box */
 slider.setCallback([textBox](float value) { textBox.setValue(std::to_string((int) (value * 100))); });
+
+
+/* Create an empty panel with a horizontal layout */
+window.widget()
+        .boxlayout(BoxLayout::Horizontal, BoxLayout::Middle, 0, 20))
+            /* Add a slider and set defaults */
+            .slider(0.5f, [](Slider* obj, float value) {
+                if (auto* textBox = obj->gfind<TextBox>("slider-textbox"))
+                    textBox->setValue(std::to_string((int) (value * 100)) );
+            }).withFixedWidth(80).and() 
+            /* Add a textbox and set defaults */   
+            .textbox("50", "%").withFixedSize(Vector2i(60, 25))    
+   		        .withId("slider-textbox")
+
 ```
 
 ## "Simple mode"
@@ -53,9 +67,6 @@ Christian Schüller contributed a convenience class that makes it possible to
 create AntTweakBar-style variable manipulators using just a few lines of code.
 For instance, the source code below was used to create the following example
 application.
-
-![Screenshot](https://github.com/wjakob/nanogui/raw/master/resources/screenshot2.png "Screenshot")
-
 
 ```C++
 /// dvar, bar, strvar, etc. are double/bool/string/.. variables

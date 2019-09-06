@@ -1,4 +1,6 @@
-Copyright (c) 2015 Wenzel Jakob <wenzel@inf.ethz.ch>, All rights reserved.
+Copyright (c) 2019 dalerank <dalerankn8@gmail.com>, All rights reserved.
+
+Based on NanoGUI library sources by Wenzel Jakob <wenzel.jakob@epfl.ch>
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:

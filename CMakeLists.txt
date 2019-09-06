@@ -1,41 +1,16 @@
 cmake_minimum_required (VERSION 2.8.3)
 
-project("NanoGUI-SDL")
+project("sdlgui")
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     set(CMAKE_CXX_FLAGS "-std=c++11")
 endif()
 
-if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ext/eigen/Eigen")
-  message(FATAL_ERROR "The NanoGUI-SDL dependency repositories (Eigen, etc.) are missing! "
-    "You probably did not clone the project with --recursive. It is possible to recover "
-    "by calling \"git submodule update --init --recursive\"")
-endif()
+# Required libraries for linking against nngui (all targets)
+set(NNGUI_EXTRA_LIBS "")
 
-option(NANOGUISDL_BUILD_EXAMPLE "Build NanoGUI example application?" ON)
-option(NANOGUISDL_BUILD_SHARED  "Build NanoGUI as a shared library?" ON)
-
-if(NANOGUI_GL_IMPLEMENTATION MATCHES "gl2" OR NOT DEFINED NANOGUI_GL_IMPLEMENTATION)
-    add_definitions(-DNANOVG_GL2_IMPLEMENTATION)
-elseif(NANOGUI_GL_IMPLEMENTATION MATCHES "gl3")
-    add_definitions(-DNANOVG_GL3_IMPLEMENTATION)
-elseif(NANOGUI_GL_IMPLEMENTATION MATCHES "gles2")
-    add_definitions(-DNANOVG_GLES2_IMPLEMENTATION)
-elseif(NANOGUI_GL_IMPLEMENTATION MATCHES "gles3")
-    add_definitions(-DNANOVG_GLES3_IMPLEMENTATION)
-else()
-    message(FATAL_ERROR "Unknown GL implementaion. Use one of gl2, gl3, gles2, gles3.")
-endif()
-
-# Required libraries for linking against nanogui (all targets)
-set(NANOGUISDL_EXTRA_LIBS "")
-
-# Platform-dependent files for libnanogui
-set(LIBNANOGUISDL_EXTRA_SOURCE "")
-
-if(APPLE AND NANOGUISDL_BUILD_SHARED)
-  set(CMAKE_MACOSX_RPATH ON)
-endif()
+# Platform-dependent files for nngui
+set(NNGUI_EXTRA_SOURCE "")
 
 include(CheckCXXCompilerFlag)
 
@@ -47,16 +22,9 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 
-set(BUILD_SHARED_LIBS ${NANOGUI_BUILD_SHARED} CACHE BOOL " " FORCE)
-
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   # Quench annoying deprecation warnings when compiling GLFW on OSX
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-deprecated-declarations")
-endif()
-
-# Shared library mode: add NANOGUI_SHARED flag to all targets
-if (NANOGUISDL_BUILD_SHARED)
-  add_definitions ("-DNANOGUI_SHARED")
 endif()
 
 if (MSVC)
@@ -68,9 +36,6 @@ if (MSVC)
 
   if (NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:SSE2")
-
-    # Disable Eigen vectorization for Windows 32 bit builds (issues with unaligned access segfaults)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DEIGEN_DONT_ALIGN")
   endif()
 endif()
 
@@ -88,152 +53,105 @@ endif()
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   # Enable C++11 mode on GCC / Clang
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-  add_definitions( -DEIGEN_DONT_ALIGN )
 endif()
 
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+
+find_package(SDL2 REQUIRED)
+find_package(SDL2IMAGE REQUIRED)
+find_package(SDL2TTF REQUIRED)
+
+include_directories(${SDL2_INCLUDE_DIR})
+
 # Required core libraries on various platforms
-if (WIN32)
-  list(APPEND NANOGUISDL_EXTRA_LIBS opengl32)
+if (WIN32) 
+  list(APPEND NNGUI_EXTRA_LIBS opengl32)
 elseif (APPLE)
   find_library(cocoa_library Cocoa)
   find_library(opengl_library OpenGL)
   find_library(corevideo_library CoreVideo)
   find_library(iokit_library IOKit)
-  list(APPEND NANOGUISDL_EXTRA_LIBS ${cocoa_library} ${opengl_library} ${corevideo_library} ${iokit_library})
-  list(APPEND LIBNANOGUISDL_EXTRA_SOURCE src/darwin.mm)
+  list(APPEND NNGUI_EXTRA_LIBS ${cocoa_library} ${opengl_library} ${corevideo_library} ${iokit_library})
+  list(APPEND NNGUI_EXTRA_SOURCE darwin.mm)
 elseif(CMAKE_SYSTEM MATCHES "Linux")
-  if(NANOGUI_GL_IMPLEMENTATION MATCHES "gles2" OR NANOGUI_GL_IMPLEMENTATION MATCHES "gles3")
-    list(APPEND NANOGUISDL_EXTRA_LIBS GLESv2)
-  else()
-    list(APPEND NANOGUISDL_EXTRA_LIBS GL)
-  endif()
-  list(APPEND NANOGUISDL_EXTRA_LIBS Xxf86vm Xrandr Xinerama Xcursor Xi X11 pthread dl rt SDL2)
-  add_definitions(-DNANOGUI_LINUX)
+  list(APPEND NNGUI_EXTRA_LIBS GL Xxf86vm Xrandr Xinerama Xcursor Xi X11 pthread dl rt)
 endif()
 
-include_directories(ext ext/eigen include ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}
+                    ${CMAKE_CURRENT_SOURCE_DIR}/include
+                    ${CMAKE_CURRENT_BINARY_DIR})
 
-# Run simple C converter to put font files into the data segment
-add_executable(bin2c resources/bin2c.c)
-set(bin2c_cmdline nanogui_resources.cpp nanogui_resources.h)
-file(GLOB resources "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.ttf")
-foreach(file ${resources})
-  list(APPEND bin2c_cmdline ${file})
-endforeach()
+message(${NNGUI_EXTRA_LIBS})
 
-# Run bin2c on resource files
-add_custom_command(
-  OUTPUT nanogui_resources.cpp nanogui_resources.h
-  COMMAND bin2c ARGS ${bin2c_cmdline}
-  DEPENDS bin2c ${resources}
-  COMMENT "Running bin2c"
-  PRE_BUILD VERBATIM)
-
-# Needed to generated files
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
-# Set library type
-if(NANOGUISDL_BUILD_SHARED)
-  set(NANOGUISDL_LIBRARY_TYPE "SHARED")
-else()
-  set(NANOGUISDL_LIBRARY_TYPE "STATIC")
-endif()
-
-# Compile main NanoGUI library
-add_library(nanogui ${NANOGUISDL_LIBRARY_TYPE}
-  # Merge NanoVG into the NanoGUI library
-  ext/nanovg/nanovg.c
-  # Merge GLEW into the NanoGUI library (only if needed)
-  ${LIBNANOGUISDL_EXTRA_SOURCE}
-  # Fonts etc.
-  nanogui_resources.cpp
-  src/serializer.cpp
-  include/nanogui/common.h src/common.cpp
-  include/nanogui/widget.h src/widget.cpp
-  include/nanogui/theme.h src/theme.cpp
-  include/nanogui/layout.h src/layout.cpp
-  include/nanogui/screen.h src/screen.cpp
-  include/nanogui/label.h src/label.cpp
-  include/nanogui/window.h src/window.cpp
-  include/nanogui/popup.h src/popup.cpp
-  include/nanogui/checkbox.h src/checkbox.cpp
-  include/nanogui/button.h src/button.cpp
-  include/nanogui/popupbutton.h src/popupbutton.cpp
-  include/nanogui/combobox.h src/combobox.cpp
-  include/nanogui/progressbar.h src/progressbar.cpp
-  include/nanogui/slider.h src/slider.cpp
-  include/nanogui/messagedialog.h src/messagedialog.cpp
-  include/nanogui/textbox.h src/textbox.cpp
-  include/nanogui/imagepanel.h src/imagepanel.cpp
-  include/nanogui/imageview.h src/imageview.cpp
-  include/nanogui/vscrollpanel.h src/vscrollpanel.cpp
-  include/nanogui/colorwheel.h src/colorwheel.cpp
-  include/nanogui/colorpicker.h src/colorpicker.cpp
-  include/nanogui/graph.h src/graph.cpp
-  include/nanogui/glutil.h src/glutil.cpp
-  include/nanogui/tabheader.h src/tabheader.cpp
-  include/nanogui/tabwidget.h src/tabwidget.cpp
-  include/nanogui/stackedwidget.h src/stackedwidget.cpp
-  include/nanogui/formhelper.h
-  include/nanogui/toolbutton.h
-  include/nanogui/opengl.h
-  include/nanogui/nanogui.h
+set(NNGUI_BASIC_SOURCE "")
+list(APPEND NNGUI_BASIC_SOURCE
+     sdlgui/button.h
+     sdlgui/checkbox.h
+     sdlgui/colorpicker.h
+     sdlgui/colorwheel.h
+     sdlgui/combobox.h
+     sdlgui/common.h
+     sdlgui/graph.h
+     sdlgui/imagepanel.h
+     sdlgui/imageview.h
+     sdlgui/label.h
+     sdlgui/layout.h
+     sdlgui/messagedialog.h
+     sdlgui/popup.h
+     sdlgui/popupbutton.h
+     sdlgui/progressbar.h
+     sdlgui/screen.h
+     sdlgui/slider.h
+     sdlgui/stackedwidget.h
+     sdlgui/tabheader.h
+     sdlgui/tabwidget.h
+     sdlgui/textbox.h
+     sdlgui/theme.h
+     sdlgui/vscrollpanel.h
+     sdlgui/switchbox.h
+     sdlgui/widget.h
+     sdlgui/window.h
+     sdlgui/nanovg.h
+     sdlgui/nanovg_rt.h
+     
+     sdlgui/button.cpp
+     sdlgui/checkbox.cpp
+     sdlgui/colorpicker.cpp
+     sdlgui/colorwheel.cpp
+     sdlgui/combobox.cpp
+     sdlgui/common.cpp
+     sdlgui/graph.cpp
+     sdlgui/imagepanel.cpp
+     sdlgui/imageview.cpp
+     sdlgui/label.cpp
+     sdlgui/layout.cpp
+     sdlgui/loadimages.cpp
+     sdlgui/messagedialog.cpp
+     sdlgui/resources.cpp
+     sdlgui/popup.cpp
+     sdlgui/popupbutton.cpp
+     sdlgui/progressbar.cpp
+     sdlgui/screen.cpp
+     sdlgui/slider.cpp
+     sdlgui/stackedwidget.cpp
+     sdlgui/tabheader.cpp
+     sdlgui/tabwidget.cpp
+     sdlgui/textbox.cpp
+     sdlgui/switchbox.cpp
+     sdlgui/theme.cpp
+     sdlgui/vscrollpanel.cpp
+     sdlgui/widget.cpp
+     sdlgui/window.cpp
+     sdlgui/nanovg.c
 )
+     
+     # Build example application if desired
+add_executable(example1 ${NNGUI_EXTRA_SOURCE} ${NNGUI_BASIC_SOURCE} example1.cpp )
+set_target_properties(
+    example1 PROPERTIES
+    VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/build/debug")
 
-# Compile/link flags for NanoGUI
-set_property(TARGET nanogui APPEND PROPERTY COMPILE_DEFINITIONS "NANOGUI_BUILD ")
+target_link_libraries(example1 ${NNGUI_EXTRA_LIBS} ${SDL2_LIBRARY} ${SDL2IMAGE_LIBRARY} ${SDL2TTF_LIBRARY})
 
-if (NANOGUISDL_BUILD_SHARED)
-  target_link_libraries(nanogui ${NANOGUISDL_EXTRA_LIBS})
-endif()
-
-if (NOT ${U_CMAKE_BUILD_TYPE} MATCHES DEBUG AND NANOGUI_BUILD_SHARED)
-  # Link-time code generation (only for shared library)
-  if (MSVC)
-    set_property(TARGET nanogui APPEND_STRING PROPERTY LINK_FLAGS "/LTCG ")
-    set_property(TARGET nanogui APPEND_STRING PROPERTY COMPILE_FLAGS "/GL ")
-  elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    set_property(TARGET nanogui APPEND_STRING PROPERTY COMPILE_FLAGS "-fvisibility=hidden ")
-
-    # Check for Link Time Optimization support
-    CHECK_CXX_COMPILER_FLAG("-flto" HAS_LTO_FLAG)
-    if (HAS_LTO_FLAG)
-      set_property(TARGET nanogui APPEND_STRING PROPERTY COMPILE_FLAGS "-flto ")
-    endif()
-  endif()
-endif()
-
-if (NANOGUISDL_BUILD_SHARED AND NOT ${U_CMAKE_BUILD_TYPE} MATCHES DEBUG)
-  if (APPLE)
-    # Strip .dylib library on OSX
-    add_custom_command(TARGET nanogui POST_BUILD COMMAND strip -u -r ${CMAKE_CURRENT_BINARY_DIR}/libnanogui.dylib)
-  elseif(UNIX)
-    # Strip .so library on Linux
-    add_custom_command(TARGET nanogui POST_BUILD COMMAND strip ${CMAKE_CURRENT_BINARY_DIR}/libnanogui.so)
-  endif()
-endif()
-
-# Quench warnings while compiling NanoVG
-if (CMAKE_COMPILER_IS_GNUCC)
-  set_source_files_properties(ext/nanovg/src/nanovg.c PROPERTIES COMPILE_FLAGS -Wno-unused-result)
-elseif(MSVC)
-  set_source_files_properties(ext/nanovg/src/nanovg.c PROPERTIES COMPILE_FLAGS "/wd4005 /wd4456 /wd4457")
-endif()
-
-if (NANOGUISDL_BUILD_SHARED)
-  set_source_files_properties(ext/nanovg/src/nanovg.c PROPERTIES COMPILE_DEFINITIONS "NVG_BUILD;NVG_SHARED")
-else()
-  set_source_files_properties(ext/nanovg/src/nanovg.c PROPERTIES COMPILE_DEFINITIONS "NVG_BUILD")
-endif()
-
-
-# Build example application if desired
-if(NANOGUISDL_BUILD_EXAMPLE)
-  add_executable(example1 src/example1.cpp)
-  add_executable(example2 src/example2.cpp)
-  target_link_libraries(example1 nanogui ${NANOGUI_EXTRA_LIBS})
-  target_link_libraries(example2 nanogui ${NANOGUI_EXTRA_LIBS})
-
-  # Copy icons for example application
-  file(COPY resources/icons DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-endif()
+# Copy icons for example application
+file(COPY resources/icons DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/debug)
