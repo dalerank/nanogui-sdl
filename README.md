@@ -96,13 +96,13 @@ window->center();
 ```
 
 ## Compiling
-Clone the repository and all dependencies (with `git clone --recursive`),
-run CMake to generate Makefiles or CMake/Visual Studio project files, and
+Clone the repository and create folder 'build' on it, go to build
+run '$cmake ..' to generate Makefiles or CMake/Visual Studio project files, and
 the rest should just work automatically.
 
 On Debian/Ubuntu, make sure that you have installed the following packages
 ```bash
-$ apt-get install cmake xorg-dev libglu1-mesa-dev libsdl2.0
+$ apt-get install cmake xorg-dev libglu1-mesa-dev libsdl2.0 libsd2img libsdl2ttf
 ```
 ### License
 
