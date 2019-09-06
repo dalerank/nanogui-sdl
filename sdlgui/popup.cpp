@@ -134,26 +134,56 @@ void Popup::refreshRelativePlacement()
     _pos = mParentWindow->position() + mAnchorPos - Vector2i(0, mAnchorHeight);
 }
 
+void Popup::drawBodyTemp(SDL_Renderer* renderer)
+{
+  int ds = mTheme->mWindowDropShadowSize;
+  int cr = mTheme->mWindowCornerRadius;
+
+  /* Draw a drop shadow */
+  SDL_Color sh = mTheme->mDropShadow.toSdlColor();
+  SDL_FRect shRect{ _pos.x - ds, _pos.y - ds, mSize.x + 2 * ds, mSize.y + 2 * ds };
+  SDL_SetRenderDrawColor(renderer, sh.r, sh.g, sh.b, 64);
+  SDL_RenderFillRectF(renderer, &shRect);
+
+  SDL_Color bg = mTheme->mWindowPopup.toSdlColor();
+  SDL_FRect bgRect{ _pos.x, _pos.y, mSize.x, mSize.y };
+
+  SDL_SetRenderDrawColor(renderer, bg.r, bg.g, bg.b, bg.a);
+  SDL_RenderFillRectF(renderer, &bgRect);
+
+  SDL_Color br = mTheme->mBorderDark.toSdlColor();
+  SDL_SetRenderDrawColor(renderer, br.r, br.g, br.b, br.a);
+
+  SDL_FRect brr{ _pos.x - 1.f, _pos.y - 1.f, width() + 1.5f, height() + 1.5f };
+  SDL_RenderDrawLineF(renderer, brr.x, brr.y, brr.x + brr.w, brr.y);
+  SDL_RenderDrawLineF(renderer, brr.x + brr.w, brr.y, brr.x + brr.w, brr.y + brr.h);
+  SDL_RenderDrawLineF(renderer, brr.x, brr.y + brr.h, brr.x + brr.w, brr.y + brr.h);
+  SDL_RenderDrawLineF(renderer, brr.x, brr.y, brr.x, brr.y + brr.h);
+
+  // Draw window anchor
+  SDL_SetRenderDrawColor(renderer, bg.r, bg.g, bg.b, bg.a);
+  for (int i = 0; i < 15; i++)
+  {
+    SDL_RenderDrawLineF(renderer, _pos.x - 15 + i, _pos.y + mAnchorHeight - i,
+      _pos.x - 15 + i, _pos.y + mAnchorHeight + i);
+  }
+}
+
 void Popup::drawBody(SDL_Renderer* renderer)
 {
   int id = 1;
 
-  AsyncTexturePtr atx;
-  for (auto& txid : _txs)
-  {
-    if (txid->id == id)
-    {
-      atx = txid;
-      break;
-    }
-  }
+  auto atx = std::find_if(_txs.begin(), _txs.end(), [id](auto p) { return p->id == id; });
 
-  if (atx)
+  if (atx != _txs.end())
   {
     Vector2i ap = absolutePosition();
-    atx->perform(renderer);
+    (*atx)->perform(renderer);
     int ds = mTheme->mWindowDropShadowSize;
-    SDL_RenderCopy(renderer, atx->tex, ap - Vector2i(_anchorDx + ds, ds));
+    if ((*atx)->tex.tex)
+      SDL_RenderCopy(renderer, (*atx)->tex, ap - Vector2i(_anchorDx + ds, ds));
+    else
+      drawBodyTemp(renderer);
   }
   else
   {
