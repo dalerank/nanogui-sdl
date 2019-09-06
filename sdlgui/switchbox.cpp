@@ -35,10 +35,9 @@ struct SwitchBox::AsyncTexture
 
       int ww = sb->width();
       int hh = sb->height();
-      NVGcontext *ctx = nvgCreateRT(NVG_DEBUG, ww, hh);
+      NVGcontext *ctx = nvgCreateRT(NVG_DEBUG, ww, hh, 0);
 
       float pxRatio = 1.0f;
-      nvgClearBackgroundRT(ctx, 0, 0, 0, 0.0f);
       nvgBeginFrame(ctx, ww, hh, pxRatio);
 
       Vector2f center = sb->size().cast<float>() * 0.5f;
@@ -104,10 +103,9 @@ struct SwitchBox::AsyncTexture
       Vector2f center(ww/2, hh/2);
       float kr = hh * 0.4f; 
 
-      NVGcontext *ctx = nvgCreateRT(NVG_DEBUG, ww, ww);
+      NVGcontext *ctx = nvgCreateRT(NVG_DEBUG, ww, ww, 0);
 
       float pxRatio = 1.0f;
-      nvgClearBackgroundRT(ctx, 0, 0, 0, 0.0f);
       nvgBeginFrame(ctx, ww, ww, pxRatio);
 
       NVGpaint knob = nvgLinearGradient(ctx, 0, center.y - kr, 0, center.y + kr,

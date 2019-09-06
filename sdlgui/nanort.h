@@ -204,8 +204,8 @@ protected:
   ContainerType container_;
 
   // DISALLOW_EVIL_CONSTRUCTORS(StackContainer);
-  StackContainer(const StackContainer &);
-  void operator=(const StackContainer &);
+  StackContainer(const StackContainer &) = delete;
+  void operator=(const StackContainer &) = delete;
 };
 
 // StackString
@@ -341,11 +341,13 @@ struct float3 {
   // float pad;  // for alignment
 };
 
+const float3* as_float3(const float* v) { return (const float3*)v;  }
+
 inline float3 operator*(float f, const float3 &v) {
   return float3(v.x * f, v.y * f, v.z * f);
 }
 
-inline float3 vcross(float3 a, float3 b) {
+inline float3 vcross(const float3& a, const float3& b) {
   float3 c;
   c[0] = a[1] * b[2] - a[2] * b[1];
   c[1] = a[2] * b[0] - a[0] * b[2];
@@ -353,18 +355,20 @@ inline float3 vcross(float3 a, float3 b) {
   return c;
 }
 
-inline float vdot(float3 a, float3 b) {
+inline float vdot(const float3& a, const float3& b) {
   return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
 
 } // namespace
 
-typedef struct {
-  float t;
-  float u;
-  float v;
-  unsigned int faceID;
-} Intersection;
+struct Intersection {
+  float t = 0.f;
+  float u = 0.f;
+  float v = 0.f;
+  unsigned int faceID = 0.f;
+  Intersection() {}
+  Intersection(float _t, float _u, float _v, unsigned int i) : t(_t), u(_u), v(_v), faceID(i) {}
+} ;
 
 typedef struct {
   float org[3];    // must set
@@ -416,22 +420,10 @@ public:
   }
 
   void Identity(T m[4][4]) {
-    m[0][0] = 1.0;
-    m[0][1] = 0.0;
-    m[0][2] = 0.0;
-    m[0][3] = 0.0;
-    m[1][0] = 0.0;
-    m[1][1] = 1.0;
-    m[1][2] = 0.0;
-    m[1][3] = 0.0;
-    m[2][0] = 0.0;
-    m[2][1] = 0.0;
-    m[2][2] = 1.0;
-    m[2][3] = 0.0;
-    m[3][0] = 0.0;
-    m[3][1] = 0.0;
-    m[3][2] = 0.0;
-    m[3][3] = 1.0;
+    m[0][0] = 1.0; m[0][1] = 0.0; m[0][2] = 0.0; m[0][3] = 0.0;
+    m[1][0] = 0.0; m[1][1] = 1.0; m[1][2] = 0.0; m[1][3] = 0.0;
+    m[2][0] = 0.0; m[2][1] = 0.0; m[2][2] = 1.0; m[2][3] = 0.0;
+    m[3][0] = 0.0; m[3][1] = 0.0; m[3][2] = 0.0; m[3][3] = 1.0;
   }
 
   void Inverse(T m[4][4]) {
@@ -1679,7 +1671,7 @@ const int kMaxStackDepth = 512;
 inline bool IntersectRayAABB(float &tminOut, // [out]
                              float &tmaxOut, // [out]
                              float maxT, float bmin[3], float bmax[3],
-                             float3 rayOrg, float3 rayInvDir,
+                             const float3& rayOrg, const float3& rayInvDir,
                              int rayDirSign[3]) {
   float tmin, tmax;
 
@@ -1728,9 +1720,9 @@ inline bool TriangleIsect(float &tInOut, float &uOut, float &vOut,
                           float epsScale) {
   const float kEPS = std::numeric_limits<float>::epsilon() * epsScale;
 
-  float3 p0(v0[0], v0[1], v0[2]);
-  float3 p1(v1[0], v1[1], v1[2]);
-  float3 p2(v2[0], v2[1], v2[2]);
+  const float3 & p0 = v0;// (v0[0], v0[1], v0[2]);
+  const float3 & p1 = v1;// (v1[0], v1[1], v1[2]);
+  const float3 & p2 = v2;// (v2[0], v2[1], v2[2]);
   float3 e1, e2;
   float3 p, s, q;
 
@@ -1844,62 +1836,40 @@ inline bool MultiHitTestLeafNode(IsectVector &isects, // [inout]
     t = isects.top().t; // current furthest hit distance
   }
 
-  float3 rayOrg;
-  rayOrg[0] = ray.org[0];
-  rayOrg[1] = ray.org[1];
-  rayOrg[2] = ray.org[2];
+  const float3& rayOrg = ray.org;
+  const float3& rayDir = ray.dir;
 
-  float3 rayDir;
-  rayDir[0] = ray.dir[0];
-  rayDir[1] = ray.dir[1];
-  rayDir[2] = ray.dir[2];
-
-  for (unsigned int i = 0; i < numTriangles; i++) {
+  for (unsigned int i = 0; i < numTriangles; i++) 
+  {
     int faceIdx = indices[i + offset];
 
-    int f0 = faces[3 * faceIdx + 0];
-    int f1 = faces[3 * faceIdx + 1];
-    int f2 = faces[3 * faceIdx + 2];
-
-    float3 v0, v1, v2;
-    v0[0] = vertices[3 * f0 + 0];
-    v0[1] = vertices[3 * f0 + 1];
-    v0[2] = vertices[3 * f0 + 2];
-
-    v1[0] = vertices[3 * f1 + 0];
-    v1[1] = vertices[3 * f1 + 1];
-    v1[2] = vertices[3 * f1 + 2];
-
-    v2[0] = vertices[3 * f2 + 0];
-    v2[1] = vertices[3 * f2 + 1];
-    v2[2] = vertices[3 * f2 + 2];
+    const unsigned int* ff = &faces[3 * faceIdx];
+    float3 *v0, *v1, *v2;
+    v0 = (float3*)(vertices + 3 * (*(ff+0)));
+    v1 = (float3*)(vertices + 3 * (*(ff+1)));
+    v2 = (float3*)(vertices + 3 * (*(ff+2)));
 
     float u, v;
-    if (TriangleIsect(t, u, v, v0, v1, v2, rayOrg, rayDir, epsScale)) {
+    if (TriangleIsect(t, u, v, *v0, *v1, *v2, rayOrg, rayDir, epsScale)) 
+    {
       // Update isect state
-      if (isects.size() < (size_t)maxIntersections) {
-        Intersection isect;
-        isect.t = t;
-        isect.u = u;
-        isect.v = v;
-        isect.faceID = faceIdx;
-        isects.push(isect);
+      if (isects.size() < (size_t)maxIntersections) 
+      {
+        isects.emplace(t,u,v,faceIdx);
 
         // Update furthest distance to far.
         t = std::numeric_limits<float>::max();
 
         hit = true;
-      } else {
-        if (t < isects.top().t) {
+      } 
+      else 
+      {
+        if (t < isects.top().t) 
+        {
           // delete furthest intersection and add new intersection.
           isects.pop();
 
-          Intersection isect;
-          isect.t = t;
-          isect.u = u;
-          isect.v = v;
-          isect.faceID = faceIdx;
-          isects.push(isect);
+          isects.emplace(t, u, v, faceIdx);
 
           // Update furthest hit distance
           t = isects.top().t;
@@ -2010,13 +1980,11 @@ inline bool BVHAccel::MultiHitTraverse(StackVector<Intersection, 128> &isects,
   rayInvDir[1] = 1.0f / ray.dir[1];
   rayInvDir[2] = 1.0f / ray.dir[2];
 
-  float3 rayOrg;
-  rayOrg[0] = ray.org[0];
-  rayOrg[1] = ray.org[1];
-  rayOrg[2] = ray.org[2];
+  const float3& rayOrg = *as_float3(ray.org);
 
   float minT, maxT;
-  while (nodeStackIndex >= 0) {
+  while (nodeStackIndex >= 0) 
+  {
     int index = nodeStack[nodeStackIndex];
     BVHNode &node = nodes_[index];
 
@@ -2025,10 +1993,10 @@ inline bool BVHAccel::MultiHitTraverse(StackVector<Intersection, 128> &isects,
     bool hit = IntersectRayAABB(minT, maxT, hitT, node.bmin, node.bmax, rayOrg,
                                 rayInvDir, dirSign);
 
-    if (node.flag == 0) { // branch node
-
-      if (hit) {
-
+    if (node.flag == 0) 
+    { // branch node
+      if (hit) 
+      {
         int orderNear = dirSign[node.axis];
         int orderFar = 1 - orderNear;
 
@@ -2037,10 +2005,14 @@ inline bool BVHAccel::MultiHitTraverse(StackVector<Intersection, 128> &isects,
         nodeStack[++nodeStackIndex] = node.data[orderNear];
       }
 
-    } else { // leaf node
-      if (hit) {
+    } 
+    else 
+    { // leaf node
+      if (hit) 
+      {
         if (MultiHitTestLeafNode(isectPQ, maxIntersections, node, indices_,
-                                 vertices, faces, ray, epsScale_)) {
+                                 vertices, faces, ray, epsScale_)) 
+        {
           // Only update `hitT` when queue is full.
           if (isectPQ.size() >= (size_t)maxIntersections) {
             hitT = isectPQ.top().t;

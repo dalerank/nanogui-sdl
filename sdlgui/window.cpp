@@ -46,10 +46,9 @@ struct Window::AsyncTexture
 
       int realw = ww + 2 * ds + dx; //with + 2*shadow + offset
       int realh = hh + 2 * ds + dy;
-      NVGcontext *ctx = nvgCreateRT(NVG_DEBUG, realw, realh);
+      NVGcontext *ctx = nvgCreateRT(NVG_DEBUG, realw, realh, 0);
 
       float pxRatio = 1.0f;
-      nvgClearBackgroundRT(ctx, 0, 0, 0, 0.0f);
       nvgBeginFrame(ctx, realw, realh, pxRatio);
 
       int cr = mTheme->mWindowCornerRadius;

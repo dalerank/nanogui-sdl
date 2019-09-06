@@ -40,10 +40,9 @@ struct Button::AsyncTexture
 
       int ww = button->width();
       int hh = button->height();
-      NVGcontext *ctx = nvgCreateRT(NVG_DEBUG, ww + 2, hh + 2);
+      NVGcontext *ctx = nvgCreateRT(NVG_DEBUG, ww + 2, hh + 2, 0);
 
       float pxRatio = 1.0f;
-      nvgClearBackgroundRT(ctx, 0, 0, 0, 0.0f);
       nvgBeginFrame(ctx, ww + 2, hh + 2, pxRatio);
 
       NVGcolor gradTop = theme->mButtonGradientTopUnfocused.toNvgColor();

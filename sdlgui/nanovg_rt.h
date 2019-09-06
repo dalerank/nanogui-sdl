@@ -61,7 +61,7 @@ enum NVGcreateFlags {
   NVG_DEBUG = 1 << 2,
 };
 
-NVGcontext *nvgCreateRT(int flags, int w, int h);
+NVGcontext *nvgCreateRT(int flags, int w, int h, int clrColor=0xff);
 void nvgDeleteRT(NVGcontext *ctx);
 void nvgClearBackgroundRT(NVGcontext *ctx, float r, float g, float b, float a); // Clear background.
 unsigned char *nvgReadPixelsRT(NVGcontext *ctx); // Returns RGBA8 pixel data.
@@ -70,10 +70,6 @@ unsigned char *nvgReadPixelsRT(NVGcontext *ctx); // Returns RGBA8 pixel data.
 enum NVGimageFlagsRT {
   NVG_IMAGE_NODELETE = 1 << 16, // Do not delete RT texture handle.
 };
-
-int nvrtCreateImageFromHandle(NVGcontext *ctx, unsigned int textureId, int w,
-                              int h, int flags);
-unsigned int nvrtImageHandle(NVGcontext *ctx, int image);
 
 #ifdef __cplusplus
 }
@@ -1662,6 +1658,7 @@ static void rtnvg__convexFill(RTNVGcontext *rt, RTNVGcall *call) {
       // printf("drawFill: triangleOffset: %d, triangleCount: %d\n",
       // call->triangleOffset, call->triangleCount);
       // Shoot rays.
+      nanort::StackVector<nanort::Intersection, 128> isects;
       for (int y = bound[1]; y < bound[3]; y++) {
         // bound check
         if (y < 0) continue;
@@ -1672,7 +1669,7 @@ static void rtnvg__convexFill(RTNVGcontext *rt, RTNVGcall *call) {
           if (x >= rt->width) continue;
 
           // Use multi-hit ray traversal to detect overdraw.
-          nanort::StackVector<nanort::Intersection, 128> isects;
+          isects.container().clear();
           int maxIsects = 128;
 
           // Simple ortho camera.
@@ -2406,7 +2403,7 @@ static void rtnvg__renderDelete(void *uptr) {
   free(rt);
 }
 
-inline NVGcontext *nvgCreateRT(int flags, int w, int h) {
+inline NVGcontext *nvgCreateRT(int flags, int w, int h, int clrColor) {
   NVGparams params;
   NVGcontext *ctx = NULL;
   RTNVGcontext *rt = (RTNVGcontext *)malloc(sizeof(RTNVGcontext));
@@ -2435,12 +2432,8 @@ inline NVGcontext *nvgCreateRT(int flags, int w, int h) {
   rt->width = w;
   rt->height = h;
   rt->pixels = (unsigned char *)malloc(rt->width * rt->height * 4);
-  for (size_t i = 0; i < rt->width * rt->height; i++) {
-    rt->pixels[4 * i + 0] = 0;
-    rt->pixels[4 * i + 1] = 0;
-    rt->pixels[4 * i + 2] = 0;
-    rt->pixels[4 * i + 3] = 255;
-  }
+  for (size_t i = 0; i < rt->width * rt->height; i++)
+    memcpy(rt->pixels + 4 * i, &clrColor, 4);
 
   ctx = nvgCreateInternal(&params);
   if (ctx == NULL)

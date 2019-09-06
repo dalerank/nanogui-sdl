@@ -35,10 +35,9 @@ struct ProgressBar::AsyncTexture
 
       int ww = pbar->width();
       int hh = pbar->height();
-      NVGcontext *ctx = nvgCreateRT(NVG_DEBUG, ww + 2, hh + 2);
+      NVGcontext *ctx = nvgCreateRT(NVG_DEBUG, ww + 2, hh + 2, 0);
 
       float pxRatio = 1.0f;
-      nvgClearBackgroundRT(ctx, 0, 0, 0, 0.0f);
       nvgBeginFrame(ctx, ww + 2, hh + 2, pxRatio);
 
       NVGpaint paint = nvgBoxGradient(ctx, 1, 1, ww - 2, hh, 3, 4, Color(0, 32).toNvgColor(), Color(0, 92).toNvgColor());
@@ -72,10 +71,9 @@ struct ProgressBar::AsyncTexture
 
       int ww = pbar->width();
       int hh = pbar->height();
-      NVGcontext *ctx = nvgCreateRT(NVG_DEBUG, ww + 2, hh + 2);
+      NVGcontext *ctx = nvgCreateRT(NVG_DEBUG, ww + 2, hh + 2, 0);
 
       float pxRatio = 1.0f;
-      nvgClearBackgroundRT(ctx, 0, 0, 0, 0.0f);
       nvgBeginFrame(ctx, ww + 2, hh + 2, pxRatio);
 
       float value = std::min(std::max(0.0f, pbar->value()), 1.0f);

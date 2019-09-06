@@ -48,10 +48,9 @@ struct TextBox::AsyncTexture
       int realw = ww + 2;
       int realh = hh + 2;
       int dx = 1, dy = 1;
-      NVGcontext *ctx = nvgCreateRT(NVG_DEBUG, realw, realh + 2);
+      NVGcontext *ctx = nvgCreateRT(NVG_DEBUG, realw, realh + 2, 0);
 
       float pxRatio = 1.0f;
-      nvgClearBackgroundRT(ctx, 0, 0, 0, 0.0f);
       nvgBeginFrame(ctx, realw, realh, pxRatio);
 
       NVGpaint bg = nvgBoxGradient(ctx, dx + 1, dy + 1 + 1.0f, ww - 2, hh - 2,

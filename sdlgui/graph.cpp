@@ -33,10 +33,9 @@ struct Graph::AsyncTexture
 
       int ww = graph->width();
       int hh = graph->height();
-      NVGcontext *ctx = nvgCreateRT(NVG_DEBUG, ww, hh);
+      NVGcontext *ctx = nvgCreateRT(NVG_DEBUG, ww, hh, 0);
 
       float pxRatio = 1.0f;
-      nvgClearBackgroundRT(ctx, 0, 0, 0, 0.0f);
       nvgBeginFrame(ctx, ww, hh, pxRatio);
 
       nvgBeginPath(ctx);

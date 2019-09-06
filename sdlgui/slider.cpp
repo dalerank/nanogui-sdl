@@ -38,10 +38,9 @@ struct Slider::AsyncTexture
       int rh = hh / 3;
       auto mRange = slider->range();
       auto mHighlightedRange = slider->highlightedRange();
-      NVGcontext *ctx = nvgCreateRT(NVG_DEBUG, ww, hh);
+      NVGcontext *ctx = nvgCreateRT(NVG_DEBUG, ww, hh, 0);
 
       float pxRatio = 1.0f;
-      nvgClearBackgroundRT(ctx, 0, 0, 0, 0.0f);
       nvgBeginFrame(ctx, ww, hh, pxRatio);
 
       Vector2f center = slider->size().cast<float>() * 0.5f;
@@ -94,10 +93,9 @@ struct Slider::AsyncTexture
       auto mRange = slider->range();
       float mValue = slider->value();
 
-      NVGcontext *ctx = nvgCreateRT(NVG_DEBUG, ww, hh);
+      NVGcontext *ctx = nvgCreateRT(NVG_DEBUG, ww, hh, 0);
 
       float pxRatio = 1.0f;
-      nvgClearBackgroundRT(ctx, 0, 0, 0, 0.0f);
       nvgBeginFrame(ctx, ww, hh, pxRatio);
 
       Vector2f center(hh / 2, hh / 2);
