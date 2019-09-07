@@ -95,15 +95,15 @@ screen->performLayout();
 window->center();
 ```
 
-## Compiling
-Clone the repository and create folder 'build' on it, go to build
-run '$cmake ..' to generate Makefiles or CMake/Visual Studio project files, and
-the rest should just work automatically.
-
-On Debian/Ubuntu, make sure that you have installed the following packages
+## Compiling on windows (MSVC)
 ```bash
-$ apt-get install cmake xorg-dev libglu1-mesa-dev libsdl2.0 libsd2img libsdl2ttf
+$ git clone https://github.com/dalerank/nanogui-sdl
+$ cd nanogui-sdl
+$ make build
+$ cmake ..
+$ sdlgui.sln
 ```
+
 ### License
 
 nanogui-sdl is provided under a BSD-style license that can be found in the
