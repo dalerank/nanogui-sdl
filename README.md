@@ -1,4 +1,4 @@
-# NanoGUI-SDL
+# NanoGUI-SDL [![Build Status](https://travis-ci.org/dalerank/nanogui-sdl.svg?branch=master)](https://travis-ci.org/dalerank/nanogui-sdl)
 
 NanoGUI-SDL is a SDL port for https://github.com/wjakob/nanogui
 
