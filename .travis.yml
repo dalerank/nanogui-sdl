@@ -1,0 +1,62 @@
+language: cpp
+dist: trusty
+sudo: false
+
+# Only build master branch, other branches will have a Pull Request build.
+branches:
+  only:
+    - master
+
+matrix:
+  include:
+    - os: windows
+      script:
+        - export CURSRC=`pwd`
+        - curl https://www.libsdl.org/release/SDL2-2.0.10-win32-x86.zip --output sdl2.zip
+        - 7z e sdl2.zip -obuild/debug -y -r -spf
+        - curl https://www.libsdl.org/release/SDL2-devel-2.0.10-VC.zip --output sdl2-devel.zip
+        - 7z e sdl2-devel.zip -y -r -spf
+        - curl https://www.libsdl.org/projects/SDL_image/release/SDL2_image-2.0.5-win32-x86.zip --output sdl2img.zip
+        - 7z e sdl2img.zip -obuild/debug -y -r -spf
+        - curl https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.0.5-VC.zip --output sdl2img-devel.zip
+        - 7z e sdl2img-devel.zip -y -r -spf
+        - curl https://www.libsdl.org/projects/SDL_ttf/release/SDL2_ttf-2.0.15-win32-x86.zip --output sdl2ttf.zip
+        - 7z e sdl2ttf.zip -obuild/debug -y -r -spf
+        - curl https://www.libsdl.org/projects/SDL_ttf/release/SDL2_ttf-devel-2.0.15-VC.zip --output sdl2ttf-devel.zip
+        - 7z e sdl2ttf-devel.zip -y -r -spf        
+        - mkdir -p build
+        - cd build
+        - cmake --version 
+        - cmake -DSDL2_LIBRARY="$CURSRC/SDL2-2.0.10/lib/x86/sdl2.lib" -DSDL2_INCLUDE_DIR="$CURSRC/sdl2-2.0.10/include" -DSDL2TTF_LIBRARY="$CURSRC/SDL2_ttf-2.0.15/lib/x86/sdl2_ttf.lib" -DSDL2TTF_INCLUDE_DIR="$CURSRC/SDL2_ttf-2.0.15/include" -DSDL2_IMAGE_LIBRARY="$CURSRC/SDL2_image-2.0.5/lib/x86/sdl2_image.lib" -DSDL2_IMAGE_INCLUDE_DIR="$CURSRC/SDL2_image-2.0.5/include" ..
+        - cmake --build .
+#    - os: linux
+#      compiler: gcc-4.9x 
+#      addons:
+#        apt:
+#          sources:
+#            - ubuntu-toolchain-r-test
+#            - deadsnakes
+#            - kubuntu-backports
+#          packages:
+#            - g++-4.9
+#            - libxxf86vm-dev
+#            - libxrandr-dev
+#            - libxinerama-dev
+#            - libxcursor-dev
+#            - libxi-dev
+#            - libx11-dev
+#            - cmake
+#      script:
+#        - mkdir build
+#        - cd build
+#        - cmake --version 
+#        - cmake ..
+#        - cmake --build .
+#    - os: osx
+#      compiler: clang
+#      script:
+#        - mkdir build
+#        - cd build
+#        - cmake --version 
+#        - cmake ..
+#        - cmake --build .

@@ -62,6 +62,8 @@ find_package(SDL2IMAGE REQUIRED)
 find_package(SDL2TTF REQUIRED)
 
 include_directories(${SDL2_INCLUDE_DIR})
+include_directories(${SDL2TTF_INCLUDE_DIR})
+include_directories(${SDL2_IMAGE_INCLUDE_DIR})
 
 # Required core libraries on various platforms
 if (WIN32) 
