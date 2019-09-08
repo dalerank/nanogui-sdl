@@ -84,41 +84,41 @@ void TabHeader::TabButton::drawAtPosition(SDL_Renderer *renderer, const Vector2i
 
         // Draw the background.
         //nvgBeginPath(ctx);
-        SDL_FRect trect{ lx + xPos + 1, ly + yPos + 1, width - 1, height - 1 };
+        SDL_Rect trect{ lx + xPos + 1, ly + yPos + 1, width - 1, height - 1 };
         SDL_Color b = gradTop.toSdlColor();
         SDL_Color bt = gradBot.toSdlColor();
 
         SDL_SetRenderDrawColor(renderer, b.r, b.g, b.b, b.a);
-        SDL_RenderFillRectF(renderer, &trect);
+        SDL_RenderFillRect(renderer, &trect);
     }
 
     if (active) 
     {
       SDL_Color bl = theme->mBorderLight.toSdlColor();
-      SDL_FRect blr{ lx + xPos + 0.5f, ly + yPos + 1.5f, width, height };
+      SDL_Rect blr{ lx + xPos + 1, ly + yPos + 2, width, height };
 
       SDL_SetRenderDrawColor(renderer, bl.r, bl.g, bl.b, bl.a);
-      SDL_RenderDrawLineF(renderer, blr.x, blr.y, blr.x, blr.y + blr.h);
-      SDL_RenderDrawLineF(renderer, blr.x, blr.y, blr.x + blr.w, blr.y);
-      SDL_RenderDrawLineF(renderer, blr.x+blr.w, blr.y, blr.x + blr.w, blr.y + blr.h);
+      SDL_RenderDrawLine(renderer, blr.x, blr.y, blr.x, blr.y + blr.h);
+      SDL_RenderDrawLine(renderer, blr.x, blr.y, blr.x + blr.w, blr.y);
+      SDL_RenderDrawLine(renderer, blr.x+blr.w, blr.y, blr.x + blr.w, blr.y + blr.h);
 
       SDL_Color bd = theme->mBorderDark.toSdlColor();
-      SDL_FRect bdr{ lx + xPos + 0.5f, ly + yPos + 0.5f, width, height };
+      SDL_Rect bdr{ lx + xPos + 1, ly + yPos + 1, width, height };
       
       SDL_SetRenderDrawColor(renderer, bd.r, bd.g, bd.b, bd.a);
-      SDL_RenderDrawLineF(renderer, bdr.x, bdr.y, bdr.x, bdr.y + bdr.h);
-      SDL_RenderDrawLineF(renderer, bdr.x, bdr.y, bdr.x + bdr.w, bdr.y);
-      SDL_RenderDrawLineF(renderer, bdr.x + bdr.w, bdr.y, bdr.x + bdr.w, bdr.y + bdr.h);
+      SDL_RenderDrawLine(renderer, bdr.x, bdr.y, bdr.x, bdr.y + bdr.h);
+      SDL_RenderDrawLine(renderer, bdr.x, bdr.y, bdr.x + bdr.w, bdr.y);
+      SDL_RenderDrawLine(renderer, bdr.x + bdr.w, bdr.y, bdr.x + bdr.w, bdr.y + bdr.h);
     }
     else 
     {
       SDL_Color bd = theme->mBorderDark.toSdlColor();
-      SDL_FRect bdr{ lx + xPos + 0.5f, ly + yPos + 1.5f, width, height - 1 };
+      SDL_Rect bdr{ lx + xPos + 1, ly + yPos + 2, width, height - 1 };
 
       SDL_SetRenderDrawColor(renderer, bd.r, bd.g, bd.b, bd.a);
-      SDL_RenderDrawLineF(renderer, bdr.x, bdr.y, bdr.x, bdr.y + bdr.h);
-      SDL_RenderDrawLineF(renderer, bdr.x, bdr.y, bdr.x + bdr.w, bdr.y);
-      SDL_RenderDrawLineF(renderer, bdr.x + bdr.w, bdr.y, bdr.x + bdr.w, bdr.y + bdr.h);
+      SDL_RenderDrawLine(renderer, bdr.x, bdr.y, bdr.x, bdr.y + bdr.h);
+      SDL_RenderDrawLine(renderer, bdr.x, bdr.y, bdr.x + bdr.w, bdr.y);
+      SDL_RenderDrawLine(renderer, bdr.x + bdr.w, bdr.y, bdr.x + bdr.w, bdr.y + bdr.h);
     }
 
     // Draw the text with some padding
@@ -165,8 +165,8 @@ void TabHeader::TabButton::drawInactiveBorderAt(SDL_Renderer *renderer, const Ve
 
     SDL_Color c = color.toSdlColor();
     SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a);
-    SDL_FRect r{ xPos + offset, yPos + offset, width - offset, height - offset };
-    SDL_RenderDrawRectF(renderer, &r);
+    SDL_Rect r{ xPos + offset, yPos + offset, width - offset, height - offset };
+    SDL_RenderDrawRect(renderer, &r);
 }
 
 

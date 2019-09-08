@@ -270,10 +270,10 @@ void ImageView::draw(SDL_Renderer* renderer)
       Vector2i borderPosition = Vector2i{ ap.x, ap.y } + mOffset.toint();
       Vector2i borderSize = scaledImageSizeF().toint();
 
-      SDL_FRect br{ borderPosition.x + 1, borderPosition.y + 1,  borderSize.x - 2, borderSize.y - 2 };
+      SDL_Rect br{ borderPosition.x + 1, borderPosition.y + 1,  borderSize.x - 2, borderSize.y - 2 };
 
-      PntFRect r = sfrect2pntfrect(br);
-      PntFRect wr = { ap.x, ap.y, ap.x + width(), ap.y + height() };
+      PntRect r = srect2pntrect(br);
+      PntRect wr = { ap.x, ap.y, ap.x + width(), ap.y + height() };
 
       if (r.x1 <= wr.x1) r.x1 = wr.x1;
       if (r.x2 >= wr.x2) r.x2 = wr.x2;
@@ -296,9 +296,9 @@ void ImageView::draw(SDL_Renderer* renderer)
         positionAfterOffset.y = absolutePosition().y;
       }
       SDL_Rect imgrect{ix, iy, iw, ih};
-      SDL_FRect rect{ positionAfterOffset.x, positionAfterOffset.y, imgrect.w, imgrect.h};
+      SDL_Rect rect{ positionAfterOffset.x, positionAfterOffset.y, imgrect.w, imgrect.h};
 
-      SDL_RenderCopyF(renderer, mTexture, &imgrect, &rect);
+      SDL_RenderCopy(renderer, mTexture, &imgrect, &rect);
     }
 
     drawWidgetBorder(renderer, ap);
@@ -320,16 +320,16 @@ void ImageView::drawWidgetBorder(SDL_Renderer* renderer, const SDL_Point& ap) co
 {
   SDL_Color lc = mTheme->mBorderLight.toSdlColor();
 
-  SDL_FRect lr{ ap.x - 0.5f, ap.y - 0.5f, mSize.x + 1, mSize.y + 1 };
+  SDL_Rect lr{ ap.x - 1, ap.y - 1, mSize.x + 2, mSize.y + 2 };
 
   SDL_SetRenderDrawColor(renderer, lc.r, lc.g, lc.b, lc.a);
-  SDL_RenderDrawRectF(renderer, &lr);
+  SDL_RenderDrawRect(renderer, &lr);
 
   SDL_Color dc = mTheme->mBorderDark.toSdlColor();
-  SDL_FRect dr{ ap.x - 1.0f, ap.y - 1.0f, mSize.x + 2, mSize.y + 2 };
+  SDL_Rect dr{ ap.x - 1, ap.y - 1, mSize.x + 2, mSize.y + 2 };
 
   SDL_SetRenderDrawColor(renderer, dc.r, dc.g, dc.b, dc.a);
-  SDL_RenderDrawRectF(renderer, &dr);
+  SDL_RenderDrawRect(renderer, &dr);
 }
 
 void ImageView::drawImageBorder(SDL_Renderer* renderer, const SDL_Point& ap) const
@@ -337,11 +337,11 @@ void ImageView::drawImageBorder(SDL_Renderer* renderer, const SDL_Point& ap) con
   Vector2i borderPosition = Vector2i{ ap.x, ap.y } + mOffset.toint();
   Vector2i borderSize = scaledImageSizeF().toint();
   
-  SDL_FRect br{ borderPosition.x + 1, borderPosition.y + 1,
+  SDL_Rect br{ borderPosition.x + 1, borderPosition.y + 1,
                 borderSize.x - 2, borderSize.y - 2 };
 
-  PntFRect r = sfrect2pntfrect(br);
-  PntFRect wr = { ap.x, ap.y, ap.x + width(), ap.y + height() };
+  PntRect r = srect2pntrect(br);
+  PntRect wr = { ap.x, ap.y, ap.x + width(), ap.y + height() };
 
   if (r.x1 <= wr.x1) r.x1 = wr.x1;
   if (r.x2 >= wr.x2) r.x2 = wr.x2;
@@ -349,10 +349,10 @@ void ImageView::drawImageBorder(SDL_Renderer* renderer, const SDL_Point& ap) con
   if (r.y2 >= wr.y2) r.y2 = wr.y2;
   
   SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-  if (r.x1 > wr.x1) SDL_RenderDrawLineF(renderer, r.x1, r.y1, r.x1, r.y2 - 1 );
-  if (r.y1 > wr.y1) SDL_RenderDrawLineF(renderer, r.x1, r.y1, r.x2-1, r.y1 );
-  if (r.x2 < wr.x2) SDL_RenderDrawLineF(renderer, r.x2, r.y1, r.x2, r.y2 - 1);
-  if (r.y2 < wr.y2) SDL_RenderDrawLineF(renderer, r.x1, r.y2, r.x2-1, r.y2);
+  if (r.x1 > wr.x1) SDL_RenderDrawLine(renderer, r.x1, r.y1, r.x1, r.y2 - 1 );
+  if (r.y1 > wr.y1) SDL_RenderDrawLine(renderer, r.x1, r.y1, r.x2-1, r.y1 );
+  if (r.x2 < wr.x2) SDL_RenderDrawLine(renderer, r.x2, r.y1, r.x2, r.y2 - 1);
+  if (r.y2 < wr.y2) SDL_RenderDrawLine(renderer, r.x1, r.y2, r.x2-1, r.y2);
 }
 
 void ImageView::drawHelpers(SDL_Renderer* renderer) const 
@@ -364,7 +364,7 @@ void ImageView::drawHelpers(SDL_Renderer* renderer) const
   Vector2f sizeOffsetDifference = sizeF() - mOffset;
   Vector2f scissorSize = sizeOffsetDifference.cmin(sizeF());
 
-  SDL_FRect r{ scissorPosition.x, scissorPosition.y, scissorSize.x, scissorSize.y };
+  SDL_Rect r{ scissorPosition.x, scissorPosition.y, scissorSize.x, scissorSize.y };
   if (gridVisible())
     drawPixelGrid(renderer, upperLeftCorner, lowerRightCorner, mScale);
   if (pixelInfoVisible())

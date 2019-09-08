@@ -326,11 +326,10 @@ private:
 struct PntRect { int x1, y1, x2, y2; };
 struct PntFRect { float x1, y1, x2, y2; };
 
-SDL_FRect clip_rects(SDL_FRect af, const SDL_FRect& bf);
+SDL_Rect clip_rects(SDL_Rect af, const SDL_Rect& bf);
 PntRect clip_rects(PntRect a, const PntRect& b);
 PntRect srect2pntrect(const SDL_Rect& srect);
-PntFRect sfrect2pntfrect(const SDL_FRect& srect);
-SDL_FRect pntrect2srectf(const PntRect& frect);
+SDL_Rect pntrect2srect(const PntRect& frect);
 
 std::string  file_dialog(const std::vector<std::pair<std::string, std::string>> &filetypes, bool save);
 

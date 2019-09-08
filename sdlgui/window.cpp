@@ -218,10 +218,10 @@ void Window::drawBodyTemp(SDL_Renderer* renderer)
   SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
   SDL_RenderFillRect(renderer, &rect);
 
-  SDL_FRect wndBdRect{ ap.x - 1.5f, ap.y - 1.5f, width() + 3.5f, height() + 3.5f };
+  SDL_Rect wndBdRect{ ap.x - 2, ap.y - 2, width() + 4, height() + 4 };
   SDL_Color bd = mTheme->mBorderDark.toSdlColor();
   SDL_SetRenderDrawColor(renderer, bd.r, bd.g, bd.b, bd.a);
-  SDL_RenderDrawRectF(renderer, &wndBdRect);
+  SDL_RenderDrawRect(renderer, &wndBdRect);
 
   SDL_Color headerColor = mTheme->mWindowHeaderGradientTop.toSdlColor();
   SDL_Rect headerRect{ ap.x, ap.y, mSize.x, hh };

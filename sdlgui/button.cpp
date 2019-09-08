@@ -226,27 +226,26 @@ void Button::drawBodyTemp(SDL_Renderer* renderer)
   Vector2i ap = absolutePosition();
   SDL_Color bodyclr = bodyColor().toSdlColor();
 
-  SDL_FRect bodyRect{ ap.x + 1, ap.y + 1.0f, width() - 2, height() - 2 };
+  SDL_Rect bodyRect{ ap.x + 1, ap.y + 1, width() - 2, height() - 2 };
   SDL_SetRenderDrawColor(renderer, bodyclr.r, bodyclr.g, bodyclr.b, bodyclr.a);
-  SDL_RenderFillRectF(renderer, &bodyRect);
+  SDL_RenderFillRect(renderer, &bodyRect);
 
-  SDL_FRect btnRect{ ap.x - 1.5f, ap.y - 1.0f, width() + 3.f, height() + 1 };
+  SDL_Rect btnRect{ ap.x - 1, ap.y - 1, width() + 2, height() + 1 };
   SDL_Color bl = (mPushed ? mTheme->mBorderDark : mTheme->mBorderLight).toSdlColor();
   SDL_SetRenderDrawColor(renderer, bl.r, bl.g, bl.b, bl.a);
-  SDL_FRect blr{ ap.x, ap.y + (mPushed ? 0.5f : 1.5f), width() - 1,
-    height() - 1 - (mPushed ? 0.0f : 1.0f) };
+  SDL_Rect blr{ ap.x, ap.y + (mPushed ? 1 : 2), width() - 1, height() - 1 - (mPushed ? 0 : 1) };
   SDL_RenderDrawLineF(renderer, blr.x, blr.y, blr.x + blr.w, blr.y);
   SDL_RenderDrawLineF(renderer, blr.x, blr.y, blr.x, blr.y + blr.h - 1);
 
   SDL_Color bd = (mPushed ? mTheme->mBorderLight : mTheme->mBorderDark).toSdlColor();
   SDL_SetRenderDrawColor(renderer, bd.r, bd.g, bd.b, bd.a);
-  SDL_FRect bdr{ ap.x, ap.y + 0.5f, width() - 1, height() - 2 };
+  SDL_Rect bdr{ ap.x, ap.y + 1, width() - 1, height() - 2 };
   SDL_RenderDrawLineF(renderer, bdr.x, bdr.y + bdr.h, bdr.x + bdr.w, bdr.y + bdr.h);
   SDL_RenderDrawLineF(renderer, bdr.x + bdr.w, bdr.y, bdr.x + bdr.w, bdr.y + bdr.h);
 
   bd = mTheme->mBorderDark.toSdlColor();
   SDL_SetRenderDrawColor(renderer, bd.r, bd.g, bd.b, bd.a);
-  SDL_RenderDrawRectF(renderer, &btnRect);
+  SDL_RenderDrawRect(renderer, &btnRect);
 }
 
 

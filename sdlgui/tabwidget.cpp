@@ -165,24 +165,24 @@ void TabWidget::draw(SDL_Renderer* renderer)
       int x = getAbsoluteLeft();
       int y = getAbsoluteTop();
       SDL_Color bl = mTheme->mBorderLight.toSdlColor();
-      SDL_FRect blr{ x + 0.5f, y + tabHeight + 1.5f, mSize.x - 1,  mSize.y - tabHeight - 2 };
+      SDL_Rect blr{ x + 1, y + tabHeight + 2, mSize.x - 2,  mSize.y - tabHeight - 2 };
 
       SDL_SetRenderDrawColor(renderer, bl.r, bl.g, bl.b, bl.a);
-      SDL_RenderDrawLineF(renderer, blr.x, blr.y, x + activeArea.first.x, blr.y);
-      SDL_RenderDrawLineF(renderer, x + activeArea.second.x, blr.y, blr.x + blr.w, blr.y);
-      SDL_RenderDrawLineF(renderer, blr.x + blr.w, blr.y, blr.x + blr.w, blr.y + blr.h);
-      SDL_RenderDrawLineF(renderer, blr.x, blr.y, blr.x, blr.y + blr.h);
-      SDL_RenderDrawLineF(renderer, blr.x, blr.y + blr.h, blr.x + blr.w, blr.y + blr.h);
+      SDL_RenderDrawLine(renderer, blr.x, blr.y, x + activeArea.first.x, blr.y);
+      SDL_RenderDrawLine(renderer, x + activeArea.second.x, blr.y, blr.x + blr.w, blr.y);
+      SDL_RenderDrawLine(renderer, blr.x + blr.w, blr.y, blr.x + blr.w, blr.y + blr.h);
+      SDL_RenderDrawLine(renderer, blr.x, blr.y, blr.x, blr.y + blr.h);
+      SDL_RenderDrawLine(renderer, blr.x, blr.y + blr.h, blr.x + blr.w, blr.y + blr.h);
 
       SDL_Color bd = mTheme->mBorderDark.toSdlColor();
-      SDL_FRect bdr{ x + 0.5f, y + tabHeight + 0.5f, mSize.x - 1, mSize.y - tabHeight - 2 };
+      SDL_Rect bdr{ x + 1, y + tabHeight + 1, mSize.x - 2, mSize.y - tabHeight - 2 };
 
       SDL_SetRenderDrawColor(renderer, bd.r, bd.g, bd.b, bd.a);
-      SDL_RenderDrawLineF(renderer, bdr.x, bdr.y, x + activeArea.first.x, bdr.y);
-      SDL_RenderDrawLineF(renderer, x + activeArea.second.x, bdr.y, bdr.x + bdr.w, bdr.y);
-      SDL_RenderDrawLineF(renderer, bdr.x + bdr.w, bdr.y, bdr.x + bdr.w, bdr.y + bdr.h);
-      SDL_RenderDrawLineF(renderer, bdr.x, bdr.y, bdr.x, bdr.y + bdr.h);
-      SDL_RenderDrawLineF(renderer, bdr.x, bdr.y + bdr.h, bdr.x + bdr.w, bdr.y + bdr.h);
+      SDL_RenderDrawLine(renderer, bdr.x, bdr.y, x + activeArea.first.x, bdr.y);
+      SDL_RenderDrawLine(renderer, x + activeArea.second.x, bdr.y, bdr.x + bdr.w, bdr.y);
+      SDL_RenderDrawLine(renderer, bdr.x + bdr.w, bdr.y, bdr.x + bdr.w, bdr.y + bdr.h);
+      SDL_RenderDrawLine(renderer, bdr.x, bdr.y, bdr.x, bdr.y + bdr.h);
+      SDL_RenderDrawLine(renderer, bdr.x, bdr.y + bdr.h, bdr.x + bdr.w, bdr.y + bdr.h);
 
     }
 

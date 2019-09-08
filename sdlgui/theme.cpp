@@ -255,14 +255,4 @@ void SDL_RenderCopy(SDL_Renderer* renderer, Texture& tx, const Vector2i& pos)
   SDL_RenderCopy(renderer, tx.tex, nullptr, &rect);
 }
 
-void SDL_RenderCopyF(SDL_Renderer* renderer, Texture& tx, const Vector2f& pos)
-{
-  if (!tx.tex)
-    return;
-
-  SDL_FRect rect{ pos.x, pos.y, tx.rrect.w, tx.rrect.h };
-  SDL_RenderCopyF(renderer, tx.tex, nullptr, &rect);
-}
-
-
 NAMESPACE_END(sdlgui)

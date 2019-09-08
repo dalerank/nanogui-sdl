@@ -147,24 +147,24 @@ void Popup::drawBodyTemp(SDL_Renderer* renderer)
 
   /* Draw a drop shadow */
   SDL_Color sh = mTheme->mDropShadow.toSdlColor();
-  SDL_FRect shRect{ _pos.x - ds, _pos.y - ds, mSize.x + 2 * ds, mSize.y + 2 * ds };
+  SDL_Rect shRect{ _pos.x - ds, _pos.y - ds, mSize.x + 2 * ds, mSize.y + 2 * ds };
   SDL_SetRenderDrawColor(renderer, sh.r, sh.g, sh.b, 64);
-  SDL_RenderFillRectF(renderer, &shRect);
+  SDL_RenderFillRect(renderer, &shRect);
 
   SDL_Color bg = mTheme->mWindowPopup.toSdlColor();
-  SDL_FRect bgRect{ _pos.x, _pos.y, mSize.x, mSize.y };
+  SDL_Rect bgRect{ _pos.x, _pos.y, mSize.x, mSize.y };
 
   SDL_SetRenderDrawColor(renderer, bg.r, bg.g, bg.b, bg.a);
-  SDL_RenderFillRectF(renderer, &bgRect);
+  SDL_RenderFillRect(renderer, &bgRect);
 
   SDL_Color br = mTheme->mBorderDark.toSdlColor();
   SDL_SetRenderDrawColor(renderer, br.r, br.g, br.b, br.a);
 
-  SDL_FRect brr{ _pos.x - 1.f, _pos.y - 1.f, width() + 1.5f, height() + 1.5f };
-  SDL_RenderDrawLineF(renderer, brr.x, brr.y, brr.x + brr.w, brr.y);
-  SDL_RenderDrawLineF(renderer, brr.x + brr.w, brr.y, brr.x + brr.w, brr.y + brr.h);
-  SDL_RenderDrawLineF(renderer, brr.x, brr.y + brr.h, brr.x + brr.w, brr.y + brr.h);
-  SDL_RenderDrawLineF(renderer, brr.x, brr.y, brr.x, brr.y + brr.h);
+  SDL_Rect brr{ _pos.x - 1, _pos.y - 1, width() + 2, height() + 2 };
+  SDL_RenderDrawLine(renderer, brr.x, brr.y, brr.x + brr.w, brr.y);
+  SDL_RenderDrawLine(renderer, brr.x + brr.w, brr.y, brr.x + brr.w, brr.y + brr.h);
+  SDL_RenderDrawLine(renderer, brr.x, brr.y + brr.h, brr.x + brr.w, brr.y + brr.h);
+  SDL_RenderDrawLine(renderer, brr.x, brr.y, brr.x, brr.y + brr.h);
 
   // Draw window anchor
   SDL_SetRenderDrawColor(renderer, bg.r, bg.g, bg.b, bg.a);

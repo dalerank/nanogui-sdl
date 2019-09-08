@@ -73,7 +73,7 @@ void ImagePanel::draw(SDL_Renderer* renderer)
     int ay = getAbsoluteTop();
 
     PntRect clip = getAbsoluteCliprect();
-    SDL_FRect clipRect = pntrect2srectf(clip);
+    SDL_Rect clipRect = pntrect2srect(clip);
 
     for (size_t i=0; i<mImages.size(); ++i) 
     {
@@ -101,14 +101,14 @@ void ImagePanel::draw(SDL_Renderer* renderer)
         //, 0, mImages[i].first, mMouseIndex == (int)i ? 1.0 : 0.7);
 
         SDL_Color c{ 0, 0, 0, 128 };
-        SDL_FRect shadowPaintRect{ p.x - 1, p.y, mThumbSize + 2, mThumbSize + 2 };
+        SDL_Rect shadowPaintRect{ p.x - 1, p.y, mThumbSize + 2, mThumbSize + 2 };
 
         shadowPaintRect = clip_rects(shadowPaintRect, clipRect);
 
         if (shadowPaintRect.w > 0 && shadowPaintRect.h > 0)
         {
           SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a);
-          SDL_RenderFillRectF(renderer, &shadowPaintRect);
+          SDL_RenderFillRect(renderer, &shadowPaintRect);
         }
 
         SDL_Rect imgPaintRect{ p.x + ix, p.y + iy, iw, ih };
@@ -129,12 +129,12 @@ void ImagePanel::draw(SDL_Renderer* renderer)
 
         SDL_RenderCopy(renderer, mImages[i].tex, &imgSrcRect, &imgPaintRect);
 
-        SDL_FRect brect{ p.x + 0.5f,p.y + 0.5f, mThumbSize - 1,mThumbSize - 1 };
+        SDL_Rect brect{ p.x + 1, p.y + 1, mThumbSize - 2, mThumbSize - 2};
         brect = clip_rects(brect, clipRect);
         if (brect.w > 0 && brect.h > 0)
         {
           SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 80);
-          SDL_RenderDrawRectF(renderer, &brect);
+          SDL_RenderDrawRect(renderer, &brect);
         }
     }
 

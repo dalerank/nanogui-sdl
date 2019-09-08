@@ -41,33 +41,18 @@ SDL_FPoint to_fpnt(const SDL_Point& p) { return SDL_FPoint{ (float)p.x, (float)p
 
 PntRect srect2pntrect(const SDL_Rect& srect)
 {
-  return PntRect{ srect.x, srect.y, srect.x + srect.w, srect.y + srect.h };
-}
-
-PntRect srect2pntrect(const SDL_FRect& srect)
-{
-  return { (int)srect.x, (int)srect.y, (int)srect.x + (int)srect.w, (int)srect.y + (int)srect.h };
-}
-
-PntFRect sfrect2pntfrect(const SDL_FRect& srect)
-{
   return{ srect.x, srect.y, srect.x + srect.w, srect.y + srect.h };
 }
 
-SDL_FRect pntfrect2srectf(const PntFRect& frect)
+SDL_Rect pntrect2srect(const PntRect& frect)
 {
   return{ frect.x1, frect.y1, frect.x2 - frect.x1, frect.y2 - frect.y1 };
 }
 
-SDL_FRect pntrect2srectf(const PntRect& frect)
+SDL_Rect clip_rects(SDL_Rect af, const SDL_Rect& bf)
 {
-  return{ (float)frect.x1, (float)frect.y1, (float)frect.x2 - (float)frect.x1, (float)frect.y2 - (float)frect.y1 };
-}
-
-SDL_FRect clip_rects(SDL_FRect af, const SDL_FRect& bf)
-{
-  PntFRect a{ af.x, af.y, af.x + af.w, af.y + af.h };
-  PntFRect b{ bf.x, bf.y, bf.x + bf.w, bf.y + bf.h };
+  PntRect a{ af.x, af.y, af.x + af.w, af.y + af.h };
+  PntRect b{ bf.x, bf.y, bf.x + bf.w, bf.y + bf.h };
   if (a.x1 < b.x1)
     a.x1 = b.x1;
   if (a.y1 < b.y1)

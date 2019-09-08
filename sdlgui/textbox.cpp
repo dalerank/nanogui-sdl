@@ -361,9 +361,9 @@ void TextBox::draw(SDL_Renderer* renderer)
 
                 // draw selection
                 SDL_Color c = Color(255, 255, 255, 80).toSdlColor();
-                SDL_FRect sr{ oldDrawPos.x + caretx, oldDrawPos.y + 4, selx - caretx, height() - 4 };
+                SDL_Rect sr{ oldDrawPos.x + caretx, oldDrawPos.y + 4, selx - caretx, height() - 4 };
                 SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a);
-                SDL_RenderFillRectF(renderer, &sr);
+                SDL_RenderFillRect(renderer, &sr);
             }
 
             caretLastTickCount = SDL_GetTicks();
@@ -374,7 +374,7 @@ void TextBox::draw(SDL_Renderer* renderer)
 
               SDL_Color c = Color(255, 192, 0, 255).toSdlColor();
               SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a);
-              SDL_RenderDrawLineF(renderer, oldDrawPos.x + caretx, oldDrawPos.y + 4,
+              SDL_RenderDrawLine(renderer, oldDrawPos.x + caretx, oldDrawPos.y + 4,
                 oldDrawPos.x + caretx, oldDrawPos.y + lineh - 3);
             }
         }
