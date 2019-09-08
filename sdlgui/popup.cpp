@@ -32,51 +32,11 @@ struct Popup::AsyncTexture
     Popup* pp = ptr;
     AsyncTexture* self = this;
     std::thread tgr([=]() {
-      Theme* mTheme = pp->theme();
+      std::lock_guard<std::mutex> guard(pp->theme()->loadMutex);
 
-      int ww = pp->width();
-      int hh = pp->height();
-      int ds = mTheme->mWindowDropShadowSize;
-      int dy = 0;
-
-      Vector2i offset(dx + ds, dy + ds);
-
-      int realw = ww + 2 * ds + dx; //with + 2*shadow + offset
-      int realh = hh + 2 * ds + dy;
-      NVGcontext *ctx = nvgCreateRT(NVG_DEBUG, realw, realh, 0);
-
-      float pxRatio = 1.0f;
-      nvgBeginFrame(ctx, realw, realh, pxRatio);
-
-      int cr = mTheme->mWindowCornerRadius;
-
-      /* Draw a drop shadow */
-      NVGpaint shadowPaint = nvgBoxGradient(ctx, offset.x, offset.y, ww, hh, cr * 2, ds * 2,
-                                            mTheme->mDropShadow.toNvgColor(),
-                                            mTheme->mTransparent.toNvgColor());
-
-      nvgBeginPath(ctx);
-      //nvgRect(ctx, offset.x - ds, offset.y - ds, ww + 2 * ds, hh + 2 * ds);
-      nvgRoundedRect(ctx, offset.x - ds, offset.y - ds, ww + 2*ds, hh+2*ds, cr);
-      //nvgPathWinding(ctx, NVG_HOLE);
-      nvgFillPaint(ctx, shadowPaint);
-      nvgFill(ctx);
-
-      /* Draw window */
-      nvgBeginPath(ctx);
-      nvgRoundedRect(ctx, offset.x, offset.y, ww, hh, cr);
-
-      Vector2i base = Vector2i(offset.x + 0, offset.y + pp->anchorHeight());
-      int sign = -1;
-
-      nvgMoveTo(ctx, base.x + 15 * sign, base.y);
-      nvgLineTo(ctx, base.x - 1 * sign, base.y - 15);
-      nvgLineTo(ctx, base.x - 1 * sign, base.y + 15);
-
-      nvgFillColor(ctx, mTheme->mWindowPopup.toNvgColor());
-      nvgFill(ctx);
-      nvgEndFrame(ctx);
-
+      NVGcontext *ctx = nullptr;
+      int realw, realh;
+      pp->rendereBodyTexture(ctx, realw, realh, dx);
       self->tex.rrect = { 0, 0, realw, realh };
       self->ctx = ctx;
     });
@@ -106,11 +66,57 @@ struct Popup::AsyncTexture
 
 };
 
-
 Popup::Popup(Widget *parent, Window *parentWindow)
     : Window(parent, ""), mParentWindow(parentWindow),
       mAnchorPos(Vector2i::Zero()), mAnchorHeight(30)
 {
+}
+
+void Popup::rendereBodyTexture(NVGcontext*& ctx, int& realw, int& realh, int dx)
+{
+  int ww = width();
+  int hh = height();
+  int ds = mTheme->mWindowDropShadowSize;
+  int dy = 0;
+
+  Vector2i offset(dx + ds, dy + ds);
+
+  realw = ww + 2 * ds + dx; //with + 2*shadow + offset
+  realh = hh + 2 * ds + dy;
+  
+  ctx = nvgCreateRT(NVG_DEBUG, realw, realh, 0);
+
+  float pxRatio = 1.0f;
+  nvgBeginFrame(ctx, realw, realh, pxRatio);
+
+  int cr = mTheme->mWindowCornerRadius;
+
+  /* Draw a drop shadow */
+  NVGpaint shadowPaint = nvgBoxGradient(ctx, offset.x, offset.y, ww, hh, cr * 2, ds * 2,
+    mTheme->mDropShadow.toNvgColor(),
+    mTheme->mTransparent.toNvgColor());
+
+  nvgBeginPath(ctx);
+  //nvgRect(ctx, offset.x - ds, offset.y - ds, ww + 2 * ds, hh + 2 * ds);
+  nvgRoundedRect(ctx, offset.x - ds, offset.y - ds, ww + 2 * ds, hh + 2 * ds, cr);
+  //nvgPathWinding(ctx, NVG_HOLE);
+  nvgFillPaint(ctx, shadowPaint);
+  nvgFill(ctx);
+
+  /* Draw window */
+  nvgBeginPath(ctx);
+  nvgRoundedRect(ctx, offset.x, offset.y, ww, hh, cr);
+
+  Vector2i base = Vector2i(offset.x + 0, offset.y + anchorHeight());
+  int sign = -1;
+
+  nvgMoveTo(ctx, base.x + 15 * sign, base.y);
+  nvgLineTo(ctx, base.x - 1 * sign, base.y - 15);
+  nvgLineTo(ctx, base.x - 1 * sign, base.y + 15);
+
+  nvgFillColor(ctx, mTheme->mWindowPopup.toNvgColor());
+  nvgFill(ctx);
+  nvgEndFrame(ctx);
 }
 
 void Popup::performLayout(SDL_Renderer *ctx) 
@@ -176,12 +182,11 @@ void Popup::drawBody(SDL_Renderer* renderer)
   auto atx = std::find_if(_txs.begin(), _txs.end(), [id](auto p) { return p->id == id; });
 
   if (atx != _txs.end())
-  {
-    Vector2i ap = absolutePosition();
+  {  
     (*atx)->perform(renderer);
-    int ds = mTheme->mWindowDropShadowSize;
+    
     if ((*atx)->tex.tex)
-      SDL_RenderCopy(renderer, (*atx)->tex, ap - Vector2i(_anchorDx + ds, ds));
+      SDL_RenderCopy(renderer, (*atx)->tex, getOverrideBodyPos());
     else
       drawBodyTemp(renderer);
   }
@@ -191,6 +196,13 @@ void Popup::drawBody(SDL_Renderer* renderer)
     newtx->load(this, _anchorDx);
     _txs.push_back(newtx);
   }
+}
+
+Vector2i Popup::getOverrideBodyPos()
+{
+  Vector2i ap = absolutePosition();
+  int ds = mTheme->mWindowDropShadowSize;
+  return ap - Vector2i(_anchorDx + ds, ds);
 }
 
 void Popup::draw(SDL_Renderer* renderer)

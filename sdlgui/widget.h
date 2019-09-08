@@ -29,6 +29,7 @@ class VScrollPanel;
 class ProgressBar;
 class Slider;
 class ImagePanel;
+class DropdownBox;
 class TextBox;
 /**
  * \class Widget widget.h sdl_gui/widget.h
@@ -302,6 +303,7 @@ public:
     template<typename... Args>PopupButton& popupbutton(const Args&... args) { return wdg<PopupButton>(args...); }
     template<typename... Args>Label& label(const Args&... args) { return wdg<Label>(args...); }
     template<typename... Args>ProgressBar& progressbar(const Args&... args) { return wdg<ProgressBar>(args...); }
+    template<typename... Args>DropdownBox& dropdownbox(const Args&... args) { return wdg<DropdownBox>(args...); }
     template<typename... Args>ComboBox& combobox(const Args&... args) { return wdg<ComboBox>(args...); }
     template<typename... Args>Button& button(const Args&... args) { return wdg<Button>(args...); }
     template<typename... Args>Widget& widget(const Args&... args) { return wdg<Widget>(args...); }

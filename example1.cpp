@@ -18,6 +18,7 @@
 #include <sdlgui/toolbutton.h>
 #include <sdlgui/popupbutton.h>
 #include <sdlgui/combobox.h>
+#include <sdlgui/dropdownbox.h>
 #include <sdlgui/progressbar.h>
 #include <sdlgui/entypo.h>
 #include <sdlgui/messagedialog.h>
@@ -189,6 +190,7 @@ public:
                               });
 
           pwindow.label("Combo box", "sans-bold").and()
+                 .dropdownbox(std::vector<std::string>{ "Dropdown item 1", "Dropdown item 2", "Dropdown item 3" }).and()
                  .combobox(std::vector<std::string>{ "Combo box item 1", "Combo box item 2", "Combo box item 3"}).and()
                  .label("Check box", "sans-bold").and()
                  .checkbox("Flag 1", [](bool state) { cout << "Check box 1 state: " << state << endl; })
@@ -205,7 +207,6 @@ public:
                         .withFixedWidth(80).and()
                  .textbox("50", "%").withAlignment(TextBox::Alignment::Right)
                     .withId("slider-textbox")
-                    .withFixedSize(Vector2i(60, 25))
                     .withFixedSize(Vector2i(60, 25))
                     .withFontSize(20);
 

@@ -29,75 +29,17 @@ struct Button::AsyncTexture
 
   AsyncTexture(int _id) : id(_id) {};
 
-  void load(Button* ptr, bool pushed, bool focused, bool enabled)
+  void load(Button* ptr)
   {
     Button* button = ptr;
     AsyncTexture* self = this;
     std::thread tgr([=]() {
-      Theme* theme = button->theme();
-      Color backgroundColor = button->backgroundColor();
-      std::lock_guard<std::mutex> guard(theme->loadMutex);
+      std::lock_guard<std::mutex> guard(button->theme()->loadMutex);
 
-      int ww = button->width();
-      int hh = button->height();
-      NVGcontext *ctx = nvgCreateRT(NVG_DEBUG, ww + 2, hh + 2, 0);
-
-      float pxRatio = 1.0f;
-      nvgBeginFrame(ctx, ww + 2, hh + 2, pxRatio);
-
-      NVGcolor gradTop = theme->mButtonGradientTopUnfocused.toNvgColor();
-      NVGcolor gradBot = theme->mButtonGradientBotUnfocused.toNvgColor();
-
-      if (pushed)
-      {
-        gradTop = theme->mButtonGradientTopPushed.toNvgColor();
-        gradBot = theme->mButtonGradientBotPushed.toNvgColor();
-      }
-      else if (focused && enabled)
-      {
-        gradTop = theme->mButtonGradientTopFocused.toNvgColor();
-        gradBot = theme->mButtonGradientBotFocused.toNvgColor();
-      }
-
-      nvgBeginPath(ctx);
-
-      nvgRoundedRect(ctx, 1, 1.0f, ww - 2, hh - 2, theme->mButtonCornerRadius - 1);
-
-      if (backgroundColor.a() != 0)
-      {
-        Color rgb = backgroundColor.rgb(); 
-        rgb.setAlpha(1.f);
-        nvgFillColor(ctx, rgb.toNvgColor());
-        nvgFill(ctx);
-        if (pushed)
-        {
-          gradTop.a = gradBot.a = 0.8f;
-        }
-        else
-        {
-          double v = 1 - backgroundColor.a();
-          gradTop.a = gradBot.a = enabled ? v : v * .5f + .5f;
-        }
-      }
-
-      NVGpaint bg = nvgLinearGradient(ctx, 0, 0, 0, hh, gradTop, gradBot);
-
-      nvgFillPaint(ctx, bg);
-      nvgFill(ctx);
-
-      nvgBeginPath(ctx);
-      nvgStrokeWidth(ctx, 1.0f);
-      nvgRoundedRect(ctx, 0.5f, (pushed ? 0.5f : 1.5f), ww - 1, hh - 1 - (pushed ? 0.0f : 1.0f), theme->mButtonCornerRadius);
-      nvgStrokeColor(ctx, theme->mBorderLight.toNvgColor());
-      nvgStroke(ctx);
-
-      nvgBeginPath(ctx);
-      nvgRoundedRect(ctx, 0.5f, 0.5f, ww - 1, hh - 2, theme->mButtonCornerRadius);
-      nvgStrokeColor(ctx, theme->mBorderDark.toNvgColor());
-      nvgStroke(ctx);
-
-      nvgEndFrame(ctx);
-      self->tex.rrect = { 0, 0, ww + 2, hh + 2 };
+      NVGcontext *ctx = nullptr;
+      int realw, realh;
+      button->renderBodyTexture(ctx, realw, realh);
+      self->tex.rrect = { 0, 0, realw, realh };
       self->ctx = ctx;
     });
 
@@ -326,7 +268,7 @@ void Button::drawBody(SDL_Renderer* renderer)
   else
   {
     AsyncTexturePtr newtx = std::make_shared<AsyncTexture>(id);
-    newtx->load(this, mPushed, mMouseFocus, mEnabled);
+    newtx->load(this);
     _txs.push_back(newtx);
   }
 }
@@ -403,12 +345,83 @@ void Button::draw(SDL_Renderer* renderer)
     }
 
     if (nvgIsFontIcon(mIcon)) 
-      SDL_RenderCopy(renderer, _iconTex, iconPos + Vector2i(offset, offset - _iconTex.h() * 0.5f + 1));
+      SDL_RenderCopy(renderer, _iconTex, iconPos + getTextOffset() + Vector2i(0, - _iconTex.h() * 0.5f + 1));
     else 
-      SDL_RenderCopy(renderer, _iconTex, iconPos + Vector2i(offset, - ih / 2 + offset));
+      SDL_RenderCopy(renderer, _iconTex, iconPos + getTextOffset() + Vector2i(0, - ih / 2));
   }
 
-  SDL_RenderCopy(renderer, _captionTex, textPos + Vector2i(offset, 1 + offset));
+  SDL_RenderCopy(renderer, _captionTex, textPos + getTextOffset());
+}
+
+Vector2i Button::getTextOffset() const
+{
+  int offset = mPushed ? 2 : 0;
+  return Vector2i(offset, 1 + offset);
+}
+
+void Button::renderBodyTexture(NVGcontext* &ctx, int &realw, int &realh)
+{
+  int ww = width();
+  int hh = height();
+  ctx = nvgCreateRT(NVG_DEBUG, ww + 2, hh + 2, 0);
+
+  float pxRatio = 1.0f;
+  realw = ww + 2;
+  realh = hh + 2;
+  nvgBeginFrame(ctx, realw, realh, pxRatio);
+
+  NVGcolor gradTop = mTheme->mButtonGradientTopUnfocused.toNvgColor();
+  NVGcolor gradBot = mTheme->mButtonGradientBotUnfocused.toNvgColor();
+
+  if (mPushed)
+  {
+    gradTop = mTheme->mButtonGradientTopPushed.toNvgColor();
+    gradBot = mTheme->mButtonGradientBotPushed.toNvgColor();
+  }
+  else if (mMouseFocus && mEnabled)
+  {
+    gradTop = mTheme->mButtonGradientTopFocused.toNvgColor();
+    gradBot = mTheme->mButtonGradientBotFocused.toNvgColor();
+  }
+
+  nvgBeginPath(ctx);
+
+  nvgRoundedRect(ctx, 1, 1.0f, ww - 2, hh - 2, mTheme->mButtonCornerRadius - 1);
+
+  if (mBackgroundColor.a() != 0)
+  {
+    Color rgb = mBackgroundColor.rgb();
+    rgb.setAlpha(1.f);
+    nvgFillColor(ctx, rgb.toNvgColor());
+    nvgFill(ctx);
+    if (mPushed)
+    {
+      gradTop.a = gradBot.a = 0.8f;
+    }
+    else
+    {
+      double v = 1 - mBackgroundColor.a();
+      gradTop.a = gradBot.a = mEnabled ? v : v * .5f + .5f;
+    }
+  }
+
+  NVGpaint bg = nvgLinearGradient(ctx, 0, 0, 0, hh, gradTop, gradBot);
+
+  nvgFillPaint(ctx, bg);
+  nvgFill(ctx);
+
+  nvgBeginPath(ctx);
+  nvgStrokeWidth(ctx, 1.0f);
+  nvgRoundedRect(ctx, 0.5f, (mPushed ? 0.5f : 1.5f), ww - 1, hh - 1 - (mPushed ? 0.0f : 1.0f), mTheme->mButtonCornerRadius);
+  nvgStrokeColor(ctx, mTheme->mBorderLight.toNvgColor());
+  nvgStroke(ctx);
+
+  nvgBeginPath(ctx);
+  nvgRoundedRect(ctx, 0.5f, 0.5f, ww - 1, hh - 2, mTheme->mButtonCornerRadius);
+  nvgStrokeColor(ctx, mTheme->mBorderDark.toNvgColor());
+  nvgStroke(ctx);
+
+  nvgEndFrame(ctx);
 }
 
 NAMESPACE_END(sdlgui)

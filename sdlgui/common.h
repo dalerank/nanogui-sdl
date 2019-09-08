@@ -26,6 +26,7 @@ enum class Cursor {
 };
 
 struct NVGcolor;
+struct NVGcontext;
 
 #ifdef _MSC_VER
 #define SDLGUI_SNPRINTF _snprintf

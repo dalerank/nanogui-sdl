@@ -83,15 +83,19 @@ public:
     virtual bool mouseButtonEvent(const Vector2i &p, int button, bool down, int modifiers) override;
     virtual void draw(SDL_Renderer* renderer) override;
     virtual void drawBody(SDL_Renderer* renderer);
-    void drawBodyTemp(SDL_Renderer* renderer);
+    virtual void drawBodyTemp(SDL_Renderer* renderer);
     virtual Color bodyColor();
+    virtual Vector2i getTextOffset() const;
 
     Button& withCallback(const std::function<void()> &callback) { setCallback( callback ); return *this; }
     Button& withFlags(int flags) { setFlags( flags); return *this; }
     Button& withChangeCallback(const std::function<void(bool)>& callback) { setChangeCallback( callback ); return *this; }
     Button& withBackgroundColor(const Color& color) { setBackgroundColor( color ); return *this; }
     Button& withIcon(int icon) { setIcon( icon ); return *this; }
+
 protected:
+    virtual void renderBodyTexture(NVGcontext* &ctx, int &realw, int &realh);
+
     std::string mCaption;
     intptr_t mIcon;
     IconPosition mIconPosition;
