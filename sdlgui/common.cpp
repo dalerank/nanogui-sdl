@@ -13,13 +13,9 @@
 #include <windows.h>
 #endif
 
-#ifdef SDLGUI_LINUX
-    #include <SDL2/SDL.h>
-#else
-    #include <SDL.h>
-    #include <SDL_image.h>
-    #include "nanovg.h"
-#endif
+#include <SDL.h>
+#include <SDL_image.h>
+#include "nanovg.h"
 
 #include <map>
 #include <array>

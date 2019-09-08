@@ -39,14 +39,8 @@
 #endif
 #include <iostream>
 
-#ifdef SDLGUI_LINUX
-    #include <SDL2/SDL.h>
-    #include <SDL2/SDL_opengl.h>
-#else
-    #include <SDL.h>
-    #include <SDL_image.h>
-    #include <SDL_opengl.h>
-#endif
+#include <SDL.h>
+#include <SDL_image.h>
 
 using std::cout;
 using std::cerr;
@@ -476,8 +470,6 @@ int main(int /* argc */, char ** /* argv */)
                 screen->onEvent( e );
             }
             
-            glViewport(0, 0, winWidth, winHeight);
-
             SDL_SetRenderDrawColor(renderer, 0xd3, 0xd3, 0xd3, 0xff );
             SDL_RenderClear( renderer );
 

@@ -29,29 +29,35 @@ matrix:
         - cmake --version 
         - cmake -DSDL2_LIBRARY="$CURSRC/SDL2-2.0.10/lib/x86/sdl2.lib" -DSDL2_INCLUDE_DIR="$CURSRC/sdl2-2.0.10/include" -DSDL2TTF_LIBRARY="$CURSRC/SDL2_ttf-2.0.15/lib/x86/sdl2_ttf.lib" -DSDL2TTF_INCLUDE_DIR="$CURSRC/SDL2_ttf-2.0.15/include" -DSDL2_IMAGE_LIBRARY="$CURSRC/SDL2_image-2.0.5/lib/x86/sdl2_image.lib" -DSDL2_IMAGE_INCLUDE_DIR="$CURSRC/SDL2_image-2.0.5/include" ..
         - cmake --build .
-#    - os: linux
-#      compiler: gcc-4.9x 
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#            - deadsnakes
-#            - kubuntu-backports
-#          packages:
-#            - g++-4.9
-#            - libxxf86vm-dev
-#            - libxrandr-dev
-#            - libxinerama-dev
-#            - libxcursor-dev
-#            - libxi-dev
-#            - libx11-dev
-#            - cmake
-#      script:
-#        - mkdir build
-#        - cd build
-#        - cmake --version 
-#        - cmake ..
-#        - cmake --build .
+    - os: linux
+      compiler: gcc-4.9x 
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - deadsnakes
+            - kubuntu-backports
+          packages:
+            - g++-4.9
+            - libsdl2-2.0-0
+            - libsdl2-dev
+            - libsdl2-image-2.0-0
+            - libsdl2-image-dev
+            - libsdl2-ttf-2.0-0
+            - libsdl2-ttf-dev
+            - libxxf86vm-dev
+            - libxrandr-dev
+            - libxinerama-dev
+            - libxcursor-dev
+            - libxi-dev
+            - libx11-dev
+            - cmake
+      script:
+        - mkdir build
+        - cd build
+        - cmake --version 
+        - cmake ..
+        - cmake --build .
 #    - os: osx
 #      compiler: clang
 #      script:
