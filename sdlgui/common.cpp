@@ -37,8 +37,6 @@ NVGcolor Color::toNvgColor() const {
 
 extern std::map<SDL_Window *, Screen *> __sdlgui_screens;
 
-SDL_FPoint to_fpnt(const SDL_Point& p) { return SDL_FPoint{ (float)p.x, (float)p.y }; }
-
 PntRect srect2pntrect(const SDL_Rect& srect)
 {
   return{ srect.x, srect.y, srect.x + srect.w, srect.y + srect.h };

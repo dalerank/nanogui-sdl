@@ -13,6 +13,7 @@
 #include <sdlgui/screen.h>
 #include <sdlgui/layout.h>
 #include <SDL.h>
+#include <thread>
 
 #include "nanovg.h"
 #define NANOVG_RT_IMPLEMENTATION
@@ -238,7 +239,7 @@ void Window::drawBody(SDL_Renderer* renderer)
 {
   int id = (mMouseFocus ? 0x1 : 0);
 
-  auto atx = std::find_if(_txs.begin(), _txs.end(), [id](auto p) { return p->id == id; });
+  auto atx = std::find_if(_txs.begin(), _txs.end(), [id](AsyncTexturePtr p) { return p->id == id; });
 
   if (atx != _txs.end())
   {

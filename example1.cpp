@@ -60,38 +60,38 @@ public:
           auto& nwindow = window("Button demo", Vector2i{15, 15})
                             .withLayout<GroupLayout>();
 
-          nwindow.label("Push buttons", "sans-bold").and()
+          nwindow.label("Push buttons", "sans-bold")._and()
                  .button("Plain button", [] { cout << "pushed!" << endl; })
                     .withTooltip("This is plain button tips");
 
           nwindow.button("Styled", ENTYPO_ICON_ROCKET, [] { cout << "pushed!" << endl; })
                    .withBackgroundColor( Color(0, 0, 255, 25) );
 
-          nwindow.label("Toggle buttons", "sans-bold").and()
+          nwindow.label("Toggle buttons", "sans-bold")._and()
                  .button("Toggle me", [](bool state) { cout << "Toggle button state: " << state << endl; })
                     .withFlags(Button::ToggleButton);
 
-          nwindow.label("Radio buttons", "sans-bold").and()
+          nwindow.label("Radio buttons", "sans-bold")._and()
                  .button("Radio button 1")
                     .withFlags(Button::RadioButton);
 
           nwindow.button("Radio button 2")
-                    .withFlags(Button::RadioButton).and()
+                    .withFlags(Button::RadioButton)._and()
                  .label("A tool palette", "sans-bold");
 
           auto& tools = nwindow.widget().boxlayout(Orientation::Horizontal, Alignment::Middle, 0, 6);
 
-          tools.toolbutton(ENTYPO_ICON_CLOUD).and()
-               .toolbutton(ENTYPO_ICON_FF).and()
-               .toolbutton(ENTYPO_ICON_COMPASS).and()
+          tools.toolbutton(ENTYPO_ICON_CLOUD)._and()
+               .toolbutton(ENTYPO_ICON_FF)._and()
+               .toolbutton(ENTYPO_ICON_COMPASS)._and()
                .toolbutton(ENTYPO_ICON_INSTALL);  
 
-          nwindow.label("Popup buttons", "sans-bold").and()
+          nwindow.label("Popup buttons", "sans-bold")._and()
                  .popupbutton("Popup", ENTYPO_ICON_EXPORT)
                     .popup()
                       .withLayout<GroupLayout>()
-                         .label("Arbitrary widgets can be placed here").and()
-                         .checkbox("A check box").and()
+                         .label("Arbitrary widgets can be placed here")._and()
+                         .checkbox("A check box")._and()
                       .popupbutton("Recursive popup", ENTYPO_ICON_FLASH).popup()
                          .withLayout<GroupLayout>()
                            .checkbox("Another check box");
@@ -102,15 +102,15 @@ public:
         {
           auto& pwindow = window("Basic widgets", Vector2i{ 200, 15 }).withLayout<GroupLayout>();
                           
-          pwindow.label("Message dialog", "sans-bold").and()
+          pwindow.label("Message dialog", "sans-bold")._and()
                  .widget()
                     .boxlayout(Orientation::Horizontal,Alignment::Middle, 0, 6)
                       .button("Info", [&] {
                             msgdialog(MessageDialog::Type::Information, "Title", "This is an information message",
-                                      [](int result) { cout << "Dialog result: " << result << endl; }); }).and()
+                                      [](int result) { cout << "Dialog result: " << result << endl; }); })._and()
                       .button("Warn", [&] {
                             msgdialog(MessageDialog::Type::Warning, "Title", "This is a warning message",
-                                      [](int result) { cout << "Dialog result: " << result << endl; }); }).and()
+                                      [](int result) { cout << "Dialog result: " << result << endl; }); })._and()
                       .button("Ask", [&] {
                             msgdialog(MessageDialog::Type::Warning, "Title", "This is a question message", 
                                       "Yes", "No", true, [](int result) { cout << "Dialog result: " << result << endl; }); });
@@ -171,34 +171,34 @@ public:
               }
           );
 
-          pwindow.label("File dialog", "sans-bold").and()
+          pwindow.label("File dialog", "sans-bold")._and()
                  .widget()
                        .boxlayout(Orientation::Horizontal, Alignment::Middle, 0, 6 )
                          .button("Open", [&] {
                                 cout << "File dialog result: " << file_dialog(
                                 { {"png", "Portable Network Graphics"}, {"txt", "Text file"} }, false) << endl;
-                              }).and()
+                              })._and()
                          .button("Save", [&] {
                                 cout << "File dialog result: " << file_dialog(
                                 { {"png", "Portable Network Graphics"}, {"txt", "Text file"} }, true) << endl;
                               });
 
-          pwindow.label("Combo box", "sans-bold").and()
-                 .dropdownbox(std::vector<std::string>{ "Dropdown item 1", "Dropdown item 2", "Dropdown item 3" }).and()
-                 .combobox(std::vector<std::string>{ "Combo box item 1", "Combo box item 2", "Combo box item 3"}).and()
-                 .label("Check box", "sans-bold").and()
+          pwindow.label("Combo box", "sans-bold")._and()
+                 .dropdownbox(std::vector<std::string>{ "Dropdown item 1", "Dropdown item 2", "Dropdown item 3" })._and()
+                 .combobox(std::vector<std::string>{ "Combo box item 1", "Combo box item 2", "Combo box item 3"})._and()
+                 .label("Check box", "sans-bold")._and()
                  .checkbox("Flag 1", [](bool state) { cout << "Check box 1 state: " << state << endl; })
-                     .withChecked(true).and()
-                 .checkbox("Flag 2", [](bool state) { cout << "Check box 2 state: " << state << endl; }).and()
-                 .label("Progress bar", "sans-bold").and()
-                 .progressbar().withId("progressbar").and()
-                 .label("Slider and text box", "sans-bold").and()
+                     .withChecked(true)._and()
+                 .checkbox("Flag 2", [](bool state) { cout << "Check box 2 state: " << state << endl; })._and()
+                 .label("Progress bar", "sans-bold")._and()
+                 .progressbar().withId("progressbar")._and()
+                 .label("Slider and text box", "sans-bold")._and()
                  .widget().withLayout<BoxLayout>(Orientation::Horizontal, Alignment::Middle, 0, 20)
                     .slider(0.5f, [](Slider* obj, float value) {
                       if (auto* textBox = obj->gfind<TextBox>("slider-textbox"))
                         textBox->setValue(std::to_string((int)(value * 100)));
                     }, [](float value) { cout << "Final slider value: " << (int)(value * 100) << endl; })
-                        .withFixedWidth(80).and()
+                        .withFixedWidth(80)._and()
                  .textbox("50", "%").withAlignment(TextBox::Alignment::Right)
                     .withId("slider-textbox")
                     .withFixedSize(Vector2i(60, 25))

@@ -10,6 +10,7 @@
 
 #include <sdlgui/progressbar.h>
 #include <sdlgui/theme.h>
+#include <thread>
 
 #include "nanovg.h"
 #define NANOVG_RT_IMPLEMENTATION

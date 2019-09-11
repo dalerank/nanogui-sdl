@@ -150,9 +150,9 @@ void TabHeader::TabButton::drawActiveBorderAt(SDL_Renderer *renderer, const Vect
 
     SDL_Color c = color.toSdlColor();
     SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a);
-    SDL_RenderDrawLineF(renderer, xPos + offset, yPos + height + offset, xPos + offset, yPos + offset);
-    SDL_RenderDrawLineF(renderer, xPos + offset, yPos + offset, xPos + width - offset, yPos + offset);
-    SDL_RenderDrawLineF(renderer, xPos + width - offset, yPos + offset, xPos + width - offset, yPos + height + offset);
+    SDL_RenderDrawLine(renderer, xPos + offset, yPos + height + offset, xPos + offset, yPos + offset);
+    SDL_RenderDrawLine(renderer, xPos + offset, yPos + offset, xPos + width - offset, yPos + offset);
+    SDL_RenderDrawLine(renderer, xPos + width - offset, yPos + offset, xPos + width - offset, yPos + height + offset);
 }
 
 void TabHeader::TabButton::drawInactiveBorderAt(SDL_Renderer *renderer, const Vector2i &position,

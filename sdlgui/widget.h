@@ -285,7 +285,7 @@ public:
     virtual PntRect getAbsoluteCliprect() const;
     virtual int getAbsoluteTop() const;
 
-    Widget& and() { return *parent(); }
+    Widget& _and() { return *parent(); }
     Widget& withId(const std::string& id) { setId(id); return *this; }
     
     Widget& withPosition( const Vector2i& pos ) { setPosition( pos); return *this; }

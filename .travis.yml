@@ -30,7 +30,7 @@ matrix:
         - cmake -DSDL2_LIBRARY="$CURSRC/SDL2-2.0.10/lib/x86/sdl2.lib" -DSDL2_INCLUDE_DIR="$CURSRC/sdl2-2.0.10/include" -DSDL2TTF_LIBRARY="$CURSRC/SDL2_ttf-2.0.15/lib/x86/sdl2_ttf.lib" -DSDL2TTF_INCLUDE_DIR="$CURSRC/SDL2_ttf-2.0.15/include" -DSDL2_IMAGE_LIBRARY="$CURSRC/SDL2_image-2.0.5/lib/x86/sdl2_image.lib" -DSDL2_IMAGE_INCLUDE_DIR="$CURSRC/SDL2_image-2.0.5/include" ..
         - cmake --build .
     - os: linux
-      compiler: gcc-4.9x 
+      compiler: gcc-4.9
       addons:
         apt:
           sources:

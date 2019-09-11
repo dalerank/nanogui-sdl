@@ -164,8 +164,8 @@ public:
         widget->setCallback(setter);
         widget->setEditable(editable);
         widget->setFontSize(mWidgetFontSize);
-        Point2 fs = widget->fixedSize();
-        widget->setFixedSize(Point2(fs.x != 0 ? fs.x : mFixedSize.x,
+        Vector2i fs = widget->fixedSize();
+        widget->setFixedSize(Vector2i(fs.x != 0 ? fs.x : mFixedSize.x,
                                       fs.y != 0 ? fs.y : mFixedSize.y));
         mRefreshCallbacks.push_back(refresh);
         if (mLayout->rowCount() > 0)

@@ -12,6 +12,7 @@
 #pragma once
 
 #include <sdlgui/widget.h>
+#include <memory>
 
 NAMESPACE_BEGIN(sdlgui)
 

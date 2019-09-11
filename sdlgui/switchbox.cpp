@@ -10,6 +10,7 @@
 
 #include <sdlgui/switchbox.h>
 #include <sdlgui/theme.h>
+#include <thread>
 
 #include "nanovg.h"
 #define NANOVG_RT_IMPLEMENTATION
@@ -182,7 +183,7 @@ Vector2i SwitchBox::preferredSize(SDL_Renderer *renderer) const
 void SwitchBox::drawBody(SDL_Renderer *renderer)
 {
   int id = (0x100) + (mEnabled ? 1 : 0);
-  auto atx = std::find_if(_txs.begin(), _txs.end(), [id](auto p) { return p->id == id; });
+  auto atx = std::find_if(_txs.begin(), _txs.end(), [id](AsyncTexturePtr p) { return p->id == id; });
 
   if (atx != _txs.end())
   {
@@ -201,7 +202,7 @@ void SwitchBox::drawBody(SDL_Renderer *renderer)
 void SwitchBox::drawKnob(SDL_Renderer *renderer)
 {
   int id = (0x200) + (mEnabled ? 1 : 0);
-  auto atx = std::find_if(_txs.begin(), _txs.end(), [id](auto p) { return p->id == id; });
+  auto atx = std::find_if(_txs.begin(), _txs.end(), [id](AsyncTexturePtr p) { return p->id == id; });
  
   Vector2i ap = absolutePosition();
   Vector2f center = ap.As<float>() + mSize.As<float>() * 0.5f;

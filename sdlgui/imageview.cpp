@@ -380,7 +380,7 @@ void ImageView::drawPixelGrid(SDL_Renderer* renderer, const Vector2f& upperLeftC
     float currentX = std::floor(upperLeftCorner.x);
     while (currentX <= lowerRightCorner.x) 
     {
-      SDL_RenderDrawLineF(renderer, std::floor(currentX), std::floor(upperLeftCorner.y),
+      SDL_RenderDrawLine(renderer, std::floor(currentX), std::floor(upperLeftCorner.y),
                           std::floor(currentX), std::floor(lowerRightCorner.y));
       currentX += stride;
     }
@@ -388,7 +388,7 @@ void ImageView::drawPixelGrid(SDL_Renderer* renderer, const Vector2f& upperLeftC
     float currentY = std::floor(upperLeftCorner.y);
     while (currentY <= lowerRightCorner.y) 
     {
-      SDL_RenderDrawLineF(renderer, std::floor(upperLeftCorner.x), std::floor(currentY),
+      SDL_RenderDrawLine(renderer, std::floor(upperLeftCorner.x), std::floor(currentY),
                                     std::floor(lowerRightCorner.x), std::floor(currentY));
       currentY += stride;
     }

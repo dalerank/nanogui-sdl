@@ -12,6 +12,7 @@
 #include <sdlgui/theme.h>
 #include <sdlgui/entypo.h>
 #include <array>
+#include <thread>
 
 #include "nanovg.h"
 #define NANOVG_RT_IMPLEMENTATION

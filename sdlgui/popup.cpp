@@ -11,6 +11,7 @@
 
 #include <sdlgui/popup.h>
 #include <sdlgui/theme.h>
+#include <thread>
 
 #include "nanovg.h"
 #define NANOVG_RT_IMPLEMENTATION
@@ -170,7 +171,7 @@ void Popup::drawBodyTemp(SDL_Renderer* renderer)
   SDL_SetRenderDrawColor(renderer, bg.r, bg.g, bg.b, bg.a);
   for (int i = 0; i < 15; i++)
   {
-    SDL_RenderDrawLineF(renderer, _pos.x - 15 + i, _pos.y + mAnchorHeight - i,
+    SDL_RenderDrawLine(renderer, _pos.x - 15 + i, _pos.y + mAnchorHeight - i,
       _pos.x - 15 + i, _pos.y + mAnchorHeight + i);
   }
 }
@@ -179,7 +180,7 @@ void Popup::drawBody(SDL_Renderer* renderer)
 {
   int id = 1;
 
-  auto atx = std::find_if(_txs.begin(), _txs.end(), [id](auto p) { return p->id == id; });
+  auto atx = std::find_if(_txs.begin(), _txs.end(), [id](AsyncTexturePtr p) { return p->id == id; });
 
   if (atx != _txs.end())
   {  

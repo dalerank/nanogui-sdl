@@ -13,6 +13,7 @@
 
 #include <SDL.h>
 #include <array>
+#include <thread>
 
 #include "nanovg.h"
 #define NANOVG_RT_IMPLEMENTATION
@@ -234,14 +235,14 @@ void Button::drawBodyTemp(SDL_Renderer* renderer)
   SDL_Color bl = (mPushed ? mTheme->mBorderDark : mTheme->mBorderLight).toSdlColor();
   SDL_SetRenderDrawColor(renderer, bl.r, bl.g, bl.b, bl.a);
   SDL_Rect blr{ ap.x, ap.y + (mPushed ? 1 : 2), width() - 1, height() - 1 - (mPushed ? 0 : 1) };
-  SDL_RenderDrawLineF(renderer, blr.x, blr.y, blr.x + blr.w, blr.y);
-  SDL_RenderDrawLineF(renderer, blr.x, blr.y, blr.x, blr.y + blr.h - 1);
+  SDL_RenderDrawLine(renderer, blr.x, blr.y, blr.x + blr.w, blr.y);
+  SDL_RenderDrawLine(renderer, blr.x, blr.y, blr.x, blr.y + blr.h - 1);
 
   SDL_Color bd = (mPushed ? mTheme->mBorderLight : mTheme->mBorderDark).toSdlColor();
   SDL_SetRenderDrawColor(renderer, bd.r, bd.g, bd.b, bd.a);
   SDL_Rect bdr{ ap.x, ap.y + 1, width() - 1, height() - 2 };
-  SDL_RenderDrawLineF(renderer, bdr.x, bdr.y + bdr.h, bdr.x + bdr.w, bdr.y + bdr.h);
-  SDL_RenderDrawLineF(renderer, bdr.x + bdr.w, bdr.y, bdr.x + bdr.w, bdr.y + bdr.h);
+  SDL_RenderDrawLine(renderer, bdr.x, bdr.y + bdr.h, bdr.x + bdr.w, bdr.y + bdr.h);
+  SDL_RenderDrawLine(renderer, bdr.x + bdr.w, bdr.y, bdr.x + bdr.w, bdr.y + bdr.h);
 
   bd = mTheme->mBorderDark.toSdlColor();
   SDL_SetRenderDrawColor(renderer, bd.r, bd.g, bd.b, bd.a);
@@ -253,7 +254,7 @@ void Button::drawBody(SDL_Renderer* renderer)
 {
   int id = (mPushed ? 0x1 : 0) + (mMouseFocus ? 0x2 : 0) + (mEnabled ? 0x4 : 0);
 
-  auto atx = std::find_if(_txs.begin(), _txs.end(), [id](auto p) { return p->id == id; });
+  auto atx = std::find_if(_txs.begin(), _txs.end(), [id](AsyncTexturePtr p) { return p->id == id; });
 
   if (atx != _txs.end())
   {

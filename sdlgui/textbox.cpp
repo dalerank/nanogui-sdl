@@ -18,6 +18,7 @@
 #include <SDL.h>
 #include <regex>
 #include <iostream>
+#include <thread>
 
 #include "nanovg.h"
 #define NANOVG_RT_IMPLEMENTATION
@@ -197,7 +198,7 @@ void TextBox::drawBody(SDL_Renderer* renderer)
     + (mValidFormat ? 0x4 : 0)
     + (outside ? 0x8 : 0);
 
-  auto atx = std::find_if(_txs.begin(), _txs.end(), [id](auto p) { return p->id == id; });
+  auto atx = std::find_if(_txs.begin(), _txs.end(), [id](AsyncTexturePtr p) { return p->id == id; });
  
   if (atx != _txs.end())
   {
