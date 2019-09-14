@@ -163,4 +163,8 @@ set_target_properties(
 target_link_libraries(example1 ${NNGUI_EXTRA_LIBS} ${SDL2_LIBRARY} ${SDL2IMAGE_LIBRARY} ${SDL2TTF_LIBRARY})
 
 # Copy icons for example application
-file(COPY resources/icons DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/debug)
+if (WIN32) 
+  file(COPY resources/icons DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/debug)
+else()
+  file(COPY resources/icons DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+endif()
