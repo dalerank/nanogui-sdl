@@ -122,6 +122,24 @@ $ cmake -DSDL2_LIBRARY="$CURSRC/SDL2-2.0.10/lib/x86/sdl2.lib" -DSDL2_INCLUDE_DIR
 $ cmake --build .
 ```
 
+### start On Linux (Ubuntu)
+```
+#prerequirements:
+
+$ sudo apt install build-essential cmake libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev
+
+#setup and run example:
+
+$ git clone https://github.com/dalerank/nanogui-sdl
+$ cd nanogui-sdl
+$ mkdir -p build
+$ cd build/
+$ cmake ..
+$ cmake --build .
+$ ./example1
+
+```
+
 ### License
 
 nanogui-sdl is provided under a BSD-style license that can be found in the
