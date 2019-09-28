@@ -270,6 +270,8 @@ void Button::drawBody(SDL_Renderer* renderer)
     AsyncTexturePtr newtx = std::make_shared<AsyncTexture>(id);
     newtx->load(this);
     _txs.push_back(newtx);
+
+    drawBodyTemp(renderer);
   }
 }
 
