@@ -260,8 +260,9 @@ void Window::drawBody(SDL_Renderer* renderer)
     AsyncTexturePtr newtx = std::make_shared<AsyncTexture>(id);
     newtx->load(this, 0, 0, mMouseFocus);
     _txs.push_back(newtx);
-  }
 
+    drawBodyTemp(renderer);
+  }
 }
 
 void Window::draw(SDL_Renderer* renderer)
@@ -302,7 +303,7 @@ void Window::center()
 bool Window::mouseDragEvent(const Vector2i &, const Vector2i &rel,
                             int button, int /* modifiers */) 
 {
-    if (mDrag && (button & (1 << SDL_BUTTON_LEFT)) != 0) 
+    if (mDrag && (button & (1 << SDL_BUTTON_LEFT)) != 0)
     {
         _pos += rel;
         _pos = _pos.cmax({ 0, 0 });
