@@ -77,7 +77,7 @@ void ImagePanel::draw(SDL_Renderer* renderer)
 
     for (size_t i=0; i<mImages.size(); ++i) 
     {
-      Vector2i p = _pos + Vector2i(mMargin, mMargin) + Vector2i((int) i % grid.x, (int) i / grid.x) * (mThumbSize + mSpacing);
+      Vector2i p = Vector2i(mMargin, mMargin) + Vector2i((int) i % grid.x, (int) i / grid.x) * (mThumbSize + mSpacing);
         p += Vector2i(ax, ay);
         int imgw = mImages[i].w;
         int imgh = mImages[i].h;
