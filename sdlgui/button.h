@@ -48,7 +48,7 @@ public:
       : Button(parent, caption) { setChangeCallback(callback); }
 
     const std::string &caption() const { return mCaption; }
-    void setCaption(const std::string &caption) { mCaption = caption; }
+    void setCaption(const std::string &caption) { mCaption = caption; _captionTex.dirty = true; }
 
     const Color &backgroundColor() const { return mBackgroundColor; }
     void setBackgroundColor(const Color &backgroundColor) { mBackgroundColor = backgroundColor; }
