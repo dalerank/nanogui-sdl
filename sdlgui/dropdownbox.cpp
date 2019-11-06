@@ -296,15 +296,21 @@ void DropdownBox::performLayout(SDL_Renderer *renderer)
   }
 }
 
-void DropdownBox::setSelectedIndex(int idx) {
+void DropdownBox::setSelectedIndex(int idx)
+{
     if (mItemsShort.empty())
         return;
+
+    const std::vector<Widget *> &children = popup().children();
+    ((Button *) children[mSelectedIndex + 1])->setPushed(false);
+    ((Button *) children[idx + 1])->setPushed(true);
     mSelectedIndex = idx;
     setCaption(mItemsShort[idx]);
     ((DropdownPopup*)mPopup)->updateCaption(mItemsShort[idx]);
 }
 
-void DropdownBox::setItems(const std::vector<std::string> &items, const std::vector<std::string> &itemsShort) {
+void DropdownBox::setItems(const std::vector<std::string> &items, const std::vector<std::string> &itemsShort)
+{
     assert(items.size() == itemsShort.size());
     mItems = items;
     mItemsShort = itemsShort;
