@@ -39,6 +39,14 @@ void Screen::onEvent(SDL_Event& event)
 
     switch( event.type )
     {
+    case SDL_MOUSEWHEEL:
+    {
+        if (!mProcessEvents)
+            return;
+        scrollCallbackEvent(event.wheel.x, event.wheel.y);
+    }
+    break;
+
     case SDL_MOUSEMOTION:
     {
       if (!mProcessEvents)
