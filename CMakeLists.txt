@@ -154,17 +154,19 @@ list(APPEND NNGUI_BASIC_SOURCE
      sdlgui/nanovg.c
 )
      
-     # Build example application if desired
-add_executable(example1 ${NNGUI_EXTRA_SOURCE} ${NNGUI_BASIC_SOURCE} example1.cpp )
-set_target_properties(
-    example1 PROPERTIES
-    VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/build/debug")
+option(NANOGUI_BUILD_EXAMPLE "Build example application" ON)
+if (NANOGUI_BUILD_EXAMPLE)
+  # Build example application if desired
+  add_executable(example1 ${NNGUI_EXTRA_SOURCE} ${NNGUI_BASIC_SOURCE} example1.cpp )
+  set_target_properties(
+      example1 PROPERTIES
+      VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/build/debug")
+  target_link_libraries(example1 ${NNGUI_EXTRA_LIBS} ${SDL2_LIBRARY} ${SDL2IMAGE_LIBRARY} ${SDL2TTF_LIBRARY})
 
-target_link_libraries(example1 ${NNGUI_EXTRA_LIBS} ${SDL2_LIBRARY} ${SDL2IMAGE_LIBRARY} ${SDL2TTF_LIBRARY})
-
-# Copy icons for example application
-if (WIN32) 
-  file(COPY resources/icons DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/debug)
-else()
-  file(COPY resources/icons DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+  # Copy icons for example application
+  if (WIN32) 
+    file(COPY resources/icons DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/debug)
+  else()
+    file(COPY resources/icons DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+  endif()
 endif()
