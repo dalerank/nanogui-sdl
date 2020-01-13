@@ -12,7 +12,7 @@
 #include <assert.h>
 #include <istream>
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 /* Cursor shapes */
 enum class Cursor {
