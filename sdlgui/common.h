@@ -11,8 +11,11 @@
 #include <math.h>
 #include <assert.h>
 #include <istream>
-
+#if defined(_WIN32)
 #include <SDL.h>
+#else
+#include <SDL2/SDL.h>
+#endif
 
 /* Cursor shapes */
 enum class Cursor {
