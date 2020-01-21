@@ -31,27 +31,19 @@ Screen::Screen( SDL_Window* window, const Vector2i &size, const std::string &cap
     initialize( window );
 }
 
-void Screen::onEvent(SDL_Event& event)
+bool Screen::onEvent(SDL_Event& event)
 {
     auto it = __sdlgui_screens.find(_window);
     if (it == __sdlgui_screens.end())
-       return;
+       return false;
 
     switch( event.type )
     {
-    case SDL_MOUSEWHEEL:
-    {
-        if (!mProcessEvents)
-            return;
-        scrollCallbackEvent(event.wheel.x, event.wheel.y);
-    }
-    break;
-
     case SDL_MOUSEMOTION:
     {
       if (!mProcessEvents)
-         return;
-      cursorPosCallbackEvent(event.motion.x, event.motion.y);
+         return false;
+      return cursorPosCallbackEvent(event.motion.x, event.motion.y);
     }
     break;
 
@@ -59,10 +51,10 @@ void Screen::onEvent(SDL_Event& event)
     case SDL_MOUSEBUTTONUP:
     {
       if (!mProcessEvents)
-        return;
+        return false;
 
       SDL_Keymod mods = SDL_GetModState();
-      mouseButtonCallbackEvent(event.button.button, event.button.type, mods);
+      return mouseButtonCallbackEvent(event.button.button, event.button.type, mods);
     }
     break;
 
@@ -70,21 +62,22 @@ void Screen::onEvent(SDL_Event& event)
     case SDL_KEYUP:
     {
       if (!mProcessEvents)
-        return;
+        return false;
 
       SDL_Keymod mods = SDL_GetModState();
-      keyCallbackEvent(event.key.keysym.sym, event.key.keysym.scancode, event.key.state, mods);
+      return keyCallbackEvent(event.key.keysym.sym, event.key.keysym.scancode, event.key.state, mods);
     }
     break;
 
     case SDL_TEXTINPUT:
     {
       if (!mProcessEvents)
-        return;
-      charCallbackEvent(event.text.text[0]);
+        return false;
+      return charCallbackEvent(event.text.text[0]);
     }
     break;
     }
+    return false;
 }
 
 void Screen::initialize(SDL_Window* window)
