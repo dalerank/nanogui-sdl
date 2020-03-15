@@ -13,7 +13,11 @@
 #include <map>
 #include <string>
 
-#include <SDL_ttf.h>
+#if defined(_WIN32)
+#include <SDL_ttf.h.h>
+#else
+#include <SDL2/SDL_ttf.h>
+#endif
 
 NAMESPACE_BEGIN(sdlgui)
 

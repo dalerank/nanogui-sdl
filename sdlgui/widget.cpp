@@ -13,7 +13,11 @@
 #include <sdlgui/theme.h>
 #include <sdlgui/window.h>
 #include <sdlgui/screen.h>
+#if defined(_WIN32)
 #include <SDL.h>
+#else
+#include <SDL2/SDL.h>
+#endif
 
 NAMESPACE_BEGIN(sdlgui)
 

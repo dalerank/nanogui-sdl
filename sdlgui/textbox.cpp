@@ -15,7 +15,11 @@
 #include <sdlgui/textbox.h>
 #include <sdlgui/theme.h>
 #include <sdlgui/entypo.h>
-#include <SDL.h>
+#if defined(_WIN32)
+#include <SDL.h.h>
+#else
+#include <SDL2/SDL.h>
+#endif
 #include <regex>
 #include <iostream>
 #include <thread>
