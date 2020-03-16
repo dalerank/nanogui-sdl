@@ -39,8 +39,16 @@
 #endif
 #include <iostream>
 
+#if defined(_WIN32)
 #include <SDL.h>
+#else
+#include <SDL2/SDL.h>
+#endif
+#if defined(_WIN32)
 #include <SDL_image.h>
+#else
+#include <SDL2/SDL_image.h>
+#endif
 
 using std::cout;
 using std::cerr;

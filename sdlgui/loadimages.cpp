@@ -1,13 +1,21 @@
 #include <sdlgui/common.h>
 
+#if defined(_WIN32)
 #include <SDL.h>
+#else
+#include <SDL2/SDL.h>
+#endif
 #if defined(_WIN32)
 #include <windows.h>
 #else
 #include <dirent.h>
 #endif
 
+#if defined(_WIN32)
 #include <SDL_image.h>
+#else
+#include <SDL2/SDL_image.h>
+#endif
 
 NAMESPACE_BEGIN(sdlgui)
 

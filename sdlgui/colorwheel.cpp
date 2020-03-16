@@ -12,7 +12,11 @@
 
 #include <sdlgui/colorwheel.h>
 #include <sdlgui/theme.h>
+#if defined(_WIN32)
 #include <SDL.h>
+#else
+#include <SDL2/SDL.h>
+#endif
 
 NAMESPACE_BEGIN(sdlgui)
 
