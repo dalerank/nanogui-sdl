@@ -16,7 +16,7 @@
 #include <sdlgui/theme.h>
 #include <sdlgui/entypo.h>
 #if defined(_WIN32)
-#include <SDL.h.h>
+#include <SDL.h>
 #else
 #include <SDL2/SDL.h>
 #endif
