@@ -57,7 +57,7 @@ public:
     /// Return the ratio between pixel and device coordinates (e.g. >= 2 on Mac Retina displays)
     float pixelRatio() const { return mPixelRatio; }
 
-    virtual void onEvent(SDL_Event& event);
+    virtual bool onEvent(SDL_Event& event);
 
     /// Draw the window contents -- put your OpenGL draw calls here
     virtual void drawContents() { /* To be overridden */ }
