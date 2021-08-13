@@ -39,6 +39,11 @@ public:
     /// Set whether or not this is a modal dialog
     void setModal(bool modal) { mModal = modal; }
 
+    /// Is this draggable?
+    bool draggable() const { return mDraggable; }
+    /// Set whether or not this is draggable
+    void setDraggable(bool draggable) { mDraggable = draggable; }
+
     /// Return the panel used to house window buttons
     Widget *buttonPanel();
 
@@ -79,6 +84,7 @@ protected:
 
     bool mModal;
     bool mDrag;
+    bool mDraggable = true;
 
     struct AsyncTexture;
     typedef std::shared_ptr<AsyncTexture> AsyncTexturePtr;

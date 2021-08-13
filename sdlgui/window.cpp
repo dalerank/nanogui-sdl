@@ -307,6 +307,10 @@ void Window::center()
 bool Window::mouseDragEvent(const Vector2i &, const Vector2i &rel,
                             int button, int /* modifiers */) 
 {
+    if (!mDraggable)
+    {
+        return false;
+    }
     if (mDrag && (button & (1 << SDL_BUTTON_LEFT)) != 0)
     {
         _pos += rel;
