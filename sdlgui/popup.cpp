@@ -112,8 +112,8 @@ void Popup::rendereBodyTexture(NVGcontext*& ctx, int& realw, int& realh, int dx)
   int sign = -1;
 
   nvgMoveTo(ctx, base.x + 15 * sign, base.y);
-  nvgLineTo(ctx, base.x - 1 * sign, base.y - 15);
-  nvgLineTo(ctx, base.x - 1 * sign, base.y + 15);
+  nvgLineTo(ctx, base.x, base.y - 15);
+  nvgLineTo(ctx, base.x, base.y + 15);
 
   nvgFillColor(ctx, mTheme->mWindowPopup.toNvgColor());
   nvgFill(ctx);
