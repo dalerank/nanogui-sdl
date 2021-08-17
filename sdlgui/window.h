@@ -44,6 +44,11 @@ public:
     /// Set whether or not this is draggable
     void setDraggable(bool draggable) { mDraggable = draggable; }
 
+    /// Drop shadow enabled?
+    bool dropShadowEnabled() const { return mDropShadowEnabled; }
+    /// Set whether or not drop shadow is enabled
+    void setDropShadowEnabled(bool dropShadowEnabled) { mDropShadowEnabled = dropShadowEnabled; }
+
     /// Return the panel used to house window buttons
     Widget *buttonPanel();
 
@@ -85,6 +90,7 @@ protected:
     bool mModal;
     bool mDrag;
     bool mDraggable = true;
+    bool mDropShadowEnabled = true;
 
     struct AsyncTexture;
     typedef std::shared_ptr<AsyncTexture> AsyncTexturePtr;
