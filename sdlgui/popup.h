@@ -13,6 +13,7 @@
 #pragma once
 
 #include <sdlgui/window.h>
+#include <sdlgui/screen.h>
 #include <vector>
 
 NAMESPACE_BEGIN(sdlgui)

@@ -138,7 +138,15 @@ void Popup::refreshRelativePlacement()
 {
     mParentWindow->refreshRelativePlacement();
     mVisible &= mParentWindow->visibleRecursive();
+
+    Widget *widget = this;
+    while (widget->parent() != nullptr)
+        widget = widget->parent();
+    Screen *screen = (Screen *)widget;
+    Vector2i screenSize = screen->size();
+
     _pos = mParentWindow->position() + mAnchorPos - Vector2i(0, mAnchorHeight);
+    _pos = Vector2i(_pos.x, std::min(_pos.y, screen->size().y - mSize.y));
 }
 
 void Popup::drawBodyTemp(SDL_Renderer* renderer)
