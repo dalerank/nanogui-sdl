@@ -70,20 +70,22 @@ struct Window::AsyncTexture
 
 
       /* Draw a drop shadow */
-      NVGpaint shadowPaint = nvgBoxGradient(
-        ctx, mPos.x, mPos.y, ww, hh, cr * 2, ds * 2,
-        mTheme->mDropShadow.toNvgColor(), 
-        mTheme->mTransparent.toNvgColor());
+      if (wnd->dropShadowEnabled()) {
+        NVGpaint shadowPaint = nvgBoxGradient(
+          ctx, mPos.x, mPos.y, ww, hh, cr * 2, ds * 2,
+          mTheme->mDropShadow.toNvgColor(), 
+          mTheme->mTransparent.toNvgColor());
 
-      nvgSave(ctx);
-      nvgResetScissor(ctx);
-      nvgBeginPath(ctx);
-      nvgRect(ctx, mPos.x - ds, mPos.y - ds, ww + 2 * ds, hh + 2 * ds);
-      nvgRoundedRect(ctx, mPos.x, mPos.y, ww, hh, cr);
-      nvgPathWinding(ctx, NVG_HOLE);
-      nvgFillPaint(ctx, shadowPaint);
-      nvgFill(ctx);
-      nvgRestore(ctx);
+        nvgSave(ctx);
+        nvgResetScissor(ctx);
+        nvgBeginPath(ctx);
+        nvgRect(ctx, mPos.x - ds, mPos.y - ds, ww + 2 * ds, hh + 2 * ds);
+        nvgRoundedRect(ctx, mPos.x, mPos.y, ww, hh, cr);
+        nvgPathWinding(ctx, NVG_HOLE);
+        nvgFillPaint(ctx, shadowPaint);
+        nvgFill(ctx);
+        nvgRestore(ctx);
+      }
 
       /* Draw header */
       NVGpaint headerPaint = nvgLinearGradient(
