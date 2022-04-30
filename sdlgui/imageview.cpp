@@ -300,7 +300,12 @@ void ImageView::draw(SDL_Renderer* renderer)
         positionAfterOffset.y = absolutePosition().y;
       }
       SDL_Rect imgrect{ix, iy, iw, ih};
-      SDL_Rect rect{ positionAfterOffset.x, positionAfterOffset.y, imgrect.w, imgrect.h};
+      SDL_Rect rect{ 
+          (int)std::round(positionAfterOffset.x), 
+          (int)std::round(positionAfterOffset.y), 
+          imgrect.w, 
+          imgrect.h
+     };
 
       SDL_RenderCopy(renderer, mTexture, &imgrect, &rect);
     }
@@ -368,7 +373,12 @@ void ImageView::drawHelpers(SDL_Renderer* renderer) const
   Vector2f sizeOffsetDifference = sizeF() - mOffset;
   Vector2f scissorSize = sizeOffsetDifference.cmin(sizeF());
 
-  SDL_Rect r{ scissorPosition.x, scissorPosition.y, scissorSize.x, scissorSize.y };
+  SDL_Rect r{
+      (int)std::round(scissorPosition.x),
+      (int)std::round(scissorPosition.y),
+      (int)std::round(scissorSize.x),
+      (int)std::round(scissorSize.y)
+  };
   if (gridVisible())
     drawPixelGrid(renderer, upperLeftCorner, lowerRightCorner, mScale);
   if (pixelInfoVisible())

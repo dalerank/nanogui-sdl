@@ -9,6 +9,7 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
+#include <cmath>
 #include <sdlgui/imagepanel.h>
 
 NAMESPACE_BEGIN(sdlgui)
@@ -111,7 +112,12 @@ void ImagePanel::draw(SDL_Renderer* renderer)
           SDL_RenderFillRect(renderer, &shadowPaintRect);
         }
 
-        SDL_Rect imgPaintRect{ p.x + ix, p.y + iy, iw, ih };
+        SDL_Rect imgPaintRect{
+            (int)std::round(p.x + ix),
+            (int)std::round(p.y + iy),
+            (int)std::round(iw),
+            (int)std::round(ih)
+        };
         SDL_Rect imgSrcRect{ 0, 0, imgw, imgh };
         PntRect imgrect = clip_rects(srect2pntrect(imgPaintRect), clip);
         imgPaintRect.w = imgrect.x2 - imgrect.x1;

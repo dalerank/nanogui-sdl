@@ -11,6 +11,7 @@
 
 #include <sdlgui/vscrollpanel.h>
 #include <sdlgui/theme.h>
+#include <cmath>
 
 NAMESPACE_BEGIN(sdlgui)
 
@@ -110,8 +111,12 @@ void VScrollPanel::draw(SDL_Renderer *renderer)
     SDL_RenderFillRect(renderer, &srect);
       
     SDL_Color ss = mTheme->mBorderLight.toSdlColor();
-    SDL_Rect drect{ ap.x + mSize.x - 12 + 1, ap.y + 4 + (mSize.y - 8 - scrollh) * mScroll + 1, 6, scrollh - 1 };
-
+    SDL_Rect drect{
+        (int)std::round(ap.x + mSize.x - 12 + 1),
+        (int)std::round(ap.y + 4 + (mSize.y - 8 - scrollh) * mScroll + 1),
+        6,
+       (int)std::round(scrollh - 1)
+    };
     SDL_SetRenderDrawColor(renderer, ss.r, ss.g, ss.b, ss.a);
     SDL_RenderFillRect(renderer, &drect);
 }

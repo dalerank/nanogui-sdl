@@ -20,6 +20,7 @@
 #endif
 #include <numeric>
 #include <array>
+#include <cmath>
 
 NAMESPACE_BEGIN(sdlgui)
 
@@ -169,7 +170,12 @@ void TabHeader::TabButton::drawInactiveBorderAt(SDL_Renderer *renderer, const Ve
 
     SDL_Color c = color.toSdlColor();
     SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a);
-    SDL_Rect r{ xPos + offset, yPos + offset, width - offset, height - offset };
+    SDL_Rect r{
+        (int)std::round(xPos + offset),
+        (int)std::round(yPos + offset),
+        (int)std::round(width - offset),
+        (int)std::round(height - offset)
+    };
     SDL_RenderDrawRect(renderer, &r);
 }
 
