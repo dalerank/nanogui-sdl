@@ -14,6 +14,7 @@
 #pragma once
 
 #include <sdlgui/widget.h>
+#include <cmath>
 #include <vector>
 #include <string>
 #include <functional>
