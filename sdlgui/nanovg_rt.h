@@ -219,7 +219,9 @@ int inline fasterfloor(const float x) {
   return y;
 }
 
-inline float lerp(float x, float y, float t) { return x + t * (y - x); }
+#if __cplusplus < 202002L
+  inline float lerp(float x, float y, float t) { return x + t * (y - x); }
+#endif
 
 // bool myisnan(float a) {
 //  volatile float d = a;

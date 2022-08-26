@@ -72,10 +72,10 @@ namespace nanort {
 // the container will allocate a small array which will "use up" the stack
 // buffer.
 template <typename T, size_t stack_capacity>
-class StackAllocator : public std::allocator<T> {
+class StackAllocator {
 public:
-  typedef typename std::allocator<T>::pointer pointer;
-  typedef typename std::allocator<T>::size_type size_type;
+  using value_type = T;
+  using Allocator = std::allocator<T>;
 
   // Backing store for the allocator. The container owner is responsible for
   // maintaining this for as long as any containers using this allocator are
@@ -133,27 +133,28 @@ public:
   // Actually do the allocation. Use the stack buffer if nobody has used it yet
   // and the size requested fits. Otherwise, fall through to the standard
   // allocator.
-  pointer allocate(size_type n, void *hint = 0) {
+  T* allocate(std::size_t n, void *hint = 0) {
     if (source_ != NULL && !source_->used_stack_buffer_ &&
         n <= stack_capacity) {
       source_->used_stack_buffer_ = true;
       return source_->stack_buffer();
     } else {
-      return std::allocator<T>::allocate(n, hint);
+      return std::allocator_traits<Allocator>::allocate(allocator_, n, hint);
     }
   }
 
   // Free: when trying to free the stack buffer, just mark it as free. For
   // non-stack-buffer pointers, just fall though to the standard allocator.
-  void deallocate(pointer p, size_type n) {
+  void deallocate(T* p, std::size_t n) {
     if (source_ != NULL && p == source_->stack_buffer())
       source_->used_stack_buffer_ = false;
     else
-      std::allocator<T>::deallocate(p, n);
+      std::allocator_traits<Allocator>::deallocate(allocator_, p, n);
   }
 
 private:
   Source *source_;
+  Allocator allocator_;
 };
 
 // A wrapper around STL containers that maintains a stack-sized buffer that the
@@ -167,8 +168,7 @@ private:
 template <typename TContainerType, int stack_capacity> class StackContainer {
 public:
   typedef TContainerType ContainerType;
-  typedef typename ContainerType::value_type ContainedType;
-  typedef StackAllocator<ContainedType, stack_capacity> Allocator;
+  using Allocator = typename ContainerType::allocator_type;
 
   // Allocator must be constructed before the container!
   StackContainer() : allocator_(&stack_data_), container_(allocator_) {
