@@ -967,12 +967,15 @@ bool FindCutFromBinBuffer(float *cutPos,    // [out] xyz
   return true;
 }
 
-class SAHPred : public std::unary_function<unsigned int, bool> {
+class SAHPred {
 public:
+  using argument_type = unsigned int;
+  using result_type = bool;
+
   SAHPred(int axis, float pos, const float *vertices, const unsigned int *faces)
       : axis_(axis), pos_(pos), vertices_(vertices), faces_(faces) {}
 
-  bool operator()(unsigned int i) const {
+  result_type operator()(argument_type i) const {
     int axis = axis_;
     float pos = pos_;
 
