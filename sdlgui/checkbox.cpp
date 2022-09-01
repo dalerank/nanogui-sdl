@@ -139,27 +139,17 @@ void CheckBox::drawBody(SDL_Renderer* renderer)
 {
   int id = (mPushed ? 0x1 : 0) + (mMouseFocus ? 0x2 : 0) + (mEnabled ? 0x4 : 0);
 
-  AsyncTexturePtr atx;
-  for (auto& txid : _txs)
-  {
-    if (txid->id == id)
-    {
-      atx = txid;
-      break;
-    }
-  }
+  auto atx = std::find_if(_txs.begin(), _txs.end(), [id](AsyncTexturePtr const& p) { return p->id == id; });
 
-  if (atx)
-  {
-    Vector2i ap = absolutePosition();
-    atx->perform(renderer);
-    SDL_RenderCopy(renderer, atx->tex, ap);
-  }
+  if (atx != _txs.end())
+    drawTexture(*atx, renderer);
   else
   {
     AsyncTexturePtr newtx = std::make_shared<AsyncTexture>(id);
     newtx->load(this, mPushed, mMouseFocus, mEnabled);
     _txs.push_back(newtx);
+
+    drawTexture(current_texture_, renderer);
   }
 }
 
@@ -182,6 +172,26 @@ void CheckBox::draw(SDL_Renderer *renderer)
   
   if (mChecked) 
     SDL_RenderCopy(renderer, _pointTex, ap + Vector2i((mSize.y - _pointTex.w()) * 0.5f + 1,  (mSize.y - _pointTex.h()) * 0.5f));
+}
+
+void CheckBox::drawTexture(AsyncTexturePtr& texture, SDL_Renderer* renderer)
+{
+  if (texture)
+  {
+    texture->perform(renderer);
+
+    if (texture->tex.tex)
+    {
+      SDL_RenderCopy(renderer, texture->tex, absolutePosition());
+
+      if (!current_texture_ || texture->id != current_texture_->id)
+        current_texture_ = texture;
+    }
+    else if (current_texture_)
+    {
+      SDL_RenderCopy(renderer, current_texture_->tex, absolutePosition());
+    }
+  }
 }
 
 NAMESPACE_END(sdlgui)
