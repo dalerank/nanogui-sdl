@@ -258,24 +258,17 @@ void Button::drawBody(SDL_Renderer* renderer)
 {
   int id = (mPushed ? 0x1 : 0) + (mMouseFocus ? 0x2 : 0) + (mEnabled ? 0x4 : 0);
 
-  auto atx = std::find_if(_txs.begin(), _txs.end(), [id](AsyncTexturePtr p) { return p->id == id; });
+  auto atx = std::find_if(_txs.begin(), _txs.end(), [id](AsyncTexturePtr const& p) { return p->id == id; });
 
   if (atx != _txs.end())
-  {
-    Vector2i ap = absolutePosition();
-    (*atx)->perform(renderer);
-    if ((*atx)->tex.tex)
-      SDL_RenderCopy(renderer, (*atx)->tex, ap);
-    else
-      drawBodyTemp(renderer);
-  }
+    drawTexture(*atx, renderer);
   else
   {
-    AsyncTexturePtr newtx = std::make_shared<AsyncTexture>(id);
-    newtx->load(this);
-    _txs.push_back(newtx);
+    AsyncTexturePtr new_texture = std::make_shared<AsyncTexture>(id);
+    new_texture->load(this);
+    _txs.push_back(new_texture);
 
-    drawBodyTemp(renderer);
+    drawTexture(current_texture_, renderer);
   }
 }
 
@@ -428,6 +421,30 @@ void Button::renderBodyTexture(NVGcontext* &ctx, int &realw, int &realh)
   nvgStroke(ctx);
 
   nvgEndFrame(ctx);
+}
+
+void Button::drawTexture(AsyncTexturePtr& texture, SDL_Renderer* renderer)
+{
+  if (texture)
+  {
+    texture->perform(renderer);
+
+    if (texture->tex.tex)
+    {
+      SDL_RenderCopy(renderer, texture->tex, absolutePosition());
+
+      if (!current_texture_ || texture->id != current_texture_->id)
+        current_texture_ = texture;
+    }
+    else if (current_texture_)
+    {
+      SDL_RenderCopy(renderer, current_texture_->tex, absolutePosition());
+    }
+    else
+      drawBodyTemp(renderer);
+  }
+  else
+    drawBodyTemp(renderer);
 }
 
 NAMESPACE_END(sdlgui)

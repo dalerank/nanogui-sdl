@@ -245,29 +245,17 @@ void Window::drawBody(SDL_Renderer* renderer)
 {
   int id = (mMouseFocus ? 0x1 : 0);
 
-  auto atx = std::find_if(_txs.begin(), _txs.end(), [id](AsyncTexturePtr p) { return p->id == id; });
+  auto atx = std::find_if(_txs.begin(), _txs.end(), [id](AsyncTexturePtr const& p) { return p->id == id; });
 
   if (atx != _txs.end())
-  {
-    Vector2i ap = absolutePosition();
-    (*atx)->perform(renderer);
-    if ((*atx)->ready())
-    {
-      int ds = mTheme->mWindowDropShadowSize;
-      SDL_RenderCopy(renderer, (*atx)->tex, ap - Vector2i(ds, ds));
-    }
-    else
-    {
-      drawBodyTemp(renderer);
-    }
-  }
+    drawTexture(*atx, renderer);
   else
   {
     AsyncTexturePtr newtx = std::make_shared<AsyncTexture>(id);
     newtx->load(this, 0, 0, mMouseFocus);
     _txs.push_back(newtx);
 
-    drawBodyTemp(renderer);
+    drawTexture(current_texture_, renderer);
   }
 }
 
@@ -343,6 +331,30 @@ bool Window::scrollEvent(const Vector2i &p, const Vector2f &rel)
 void Window::refreshRelativePlacement() 
 {
     /* Overridden in \ref Popup */
+}
+
+void Window::drawTexture(AsyncTexturePtr& texture, SDL_Renderer* renderer)
+{
+  if (texture)
+  {
+    texture->perform(renderer);
+
+    if (texture->tex.tex)
+    {
+      SDL_RenderCopy(renderer, texture->tex, absolutePosition());
+
+      if (!current_texture_ || texture->id != current_texture_->id)
+        current_texture_ = texture;
+    }
+    else if (current_texture_)
+    {
+      SDL_RenderCopy(renderer, current_texture_->tex, absolutePosition());
+    }
+    else
+      drawBodyTemp(renderer);
+  }
+  else
+    drawBodyTemp(renderer);
 }
 
 NAMESPACE_END(sdlgui)
