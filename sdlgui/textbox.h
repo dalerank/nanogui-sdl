@@ -127,6 +127,11 @@ protected:
     struct AsyncTexture;
     typedef std::shared_ptr<AsyncTexture> AsyncTexturePtr;
     std::vector<AsyncTexturePtr> _txs;
+
+    AsyncTexturePtr current_texture_ = nullptr;
+
+private:
+    void drawTexture(AsyncTexturePtr& texture, SDL_Renderer* renderer);
 };
 
 /**

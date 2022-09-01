@@ -203,19 +203,17 @@ void TextBox::drawBody(SDL_Renderer* renderer)
     + (mValidFormat ? 0x4 : 0)
     + (outside ? 0x8 : 0);
 
-  auto atx = std::find_if(_txs.begin(), _txs.end(), [id](AsyncTexturePtr p) { return p->id == id; });
- 
+  auto atx = std::find_if(_txs.begin(), _txs.end(), [id](AsyncTexturePtr const& p) { return p->id == id; });
+
   if (atx != _txs.end())
-  {
-    Vector2i ap = absolutePosition();
-    (*atx)->perform(renderer);
-    SDL_RenderCopy(renderer, (*atx)->tex, ap - Vector2i(1,1));
-  }
+    drawTexture(*atx, renderer);
   else
   {
     AsyncTexturePtr newtx = std::make_shared<AsyncTexture>(id);
     newtx->load(this, mEditable, focused(), mValidFormat, outside);
     _txs.push_back(newtx);
+
+    drawTexture(current_texture_, renderer);
   }
 }
 
@@ -830,6 +828,27 @@ TextBox::SpinArea TextBox::spinArea(const Vector2i & pos)
         }
     }
     return SpinArea::None;
+}
+
+
+void TextBox::drawTexture(AsyncTexturePtr& texture, SDL_Renderer* renderer)
+{
+  if (texture)
+  {
+    texture->perform(renderer);
+
+    if (texture->tex.tex)
+    {
+      SDL_RenderCopy(renderer, texture->tex, absolutePosition());
+
+      if (!current_texture_ || texture->id != current_texture_->id)
+        current_texture_ = texture;
+    }
+    else if (current_texture_)
+    {
+      SDL_RenderCopy(renderer, current_texture_->tex, absolutePosition());
+    }
+  }
 }
 
 NAMESPACE_END(sdlgui)

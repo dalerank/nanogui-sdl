@@ -24,18 +24,18 @@ NAMESPACE_BEGIN(sdlgui)
 class  ProgressBar : public Widget 
 {
 public:
-    ProgressBar(Widget *parent);
+    explicit ProgressBar(Widget* parent);
 
-    float value() { return mValue; }
+    float value() const { return mValue; }
     void setValue(float value);
 
-    Vector2i preferredSize(SDL_Renderer *ctx) const override;
+    Vector2i preferredSize(SDL_Renderer* ctx) const override;
     void draw(SDL_Renderer* renderer) override;
     void drawBody(SDL_Renderer* renderer);
     void drawBar(SDL_Renderer* renderer);
 
 protected:
-  float mValue;
+    float mValue;
 
     struct AsyncTexture;
     typedef std::shared_ptr<AsyncTexture> AsyncTexturePtr;
