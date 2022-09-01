@@ -55,7 +55,7 @@ struct ProgressBar::AsyncTexture
     tgr.detach();
   }
 
-  void load_bar(ProgressBar* ptr, float newvalue)
+  void load_bar(ProgressBar* ptr)
   {
     ProgressBar* pbar = ptr;
     AsyncTexture* self = this;
@@ -64,7 +64,6 @@ struct ProgressBar::AsyncTexture
       return;
 
     busy = true;
-    value = newvalue;
 
     std::thread tgr([=]() {
       Theme* mTheme = pbar->theme();
@@ -166,7 +165,7 @@ void ProgressBar::drawBar(SDL_Renderer* renderer)
     _bar = std::make_shared<AsyncTexture>();
 
   if (mValue != _bar->value)
-    _bar->load_bar(this, _bar->value);
+    _bar->load_bar(this);
 
   if (_bar)
   {
@@ -181,10 +180,7 @@ void ProgressBar::draw(SDL_Renderer* renderer)
   Widget::draw(renderer);
 
   drawBody(renderer);
-
-  float value = std::min(std::max(0.0f, mValue), 1.0f);
-  if (value > 0)
-    drawBar(renderer);
+  drawBar(renderer);
 }
 
 NAMESPACE_END(sdlgui)
