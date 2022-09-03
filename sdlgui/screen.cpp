@@ -25,8 +25,6 @@
 
 NAMESPACE_BEGIN(sdlgui)
 
-std::map<SDL_Window *, Screen *> __sdlgui_screens;
-
 Screen::Screen( SDL_Window* window, const Vector2i &size, const std::string &caption,
                bool resizable, bool fullscreen)
     : Widget(nullptr), _window(nullptr), mSDL_Renderer(nullptr), mCaption(caption)
@@ -37,10 +35,6 @@ Screen::Screen( SDL_Window* window, const Vector2i &size, const std::string &cap
 
 bool Screen::onEvent(SDL_Event& event)
 {
-    auto it = __sdlgui_screens.find(_window);
-    if (it == __sdlgui_screens.end())
-       return false;
-
     switch( event.type )
     {
     case SDL_MOUSEWHEEL:
@@ -110,12 +104,10 @@ void Screen::initialize(SDL_Window* window)
     mLastInteraction = SDL_GetTicks();
     mProcessEvents = true;
     mBackground = Color(0.3f, 0.3f, 0.32f, 1.0f);
-    __sdlgui_screens[_window] = this;
 }
 
 Screen::~Screen()
 {
-    __sdlgui_screens.erase(_window);
 }
 
 void Screen::setVisible(bool visible)
