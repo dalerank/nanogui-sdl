@@ -90,6 +90,7 @@ SDL_Color Color::toSdlColor() const
 {
   SDL_Color color{
       (uint8_t)std::round(r() * 255),
+      (uint8_t)std::round(g() * 255),
       (uint8_t)std::round(b() * 255),
       (uint8_t)std::round(a() * 255)
   };
